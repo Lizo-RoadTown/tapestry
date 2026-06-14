@@ -2,7 +2,16 @@
 
 The canonical home of the enterprise-scale architecture for the project-intelligence platform.
 
-**Status:** Initial spawn 2026-06-12. The prior stub at `the-loom/docs/architecture/UMBRELLA.md` points forward to this document; that stub stays in place during the parallel-build phase as a cross-link.
+**Status:** Initial spawn 2026-06-12. Reframed 2026-06-13 per operator: Tapestry is the canonical product system; the-loom + Make_Skills are legacy prototype/source repos that will be migrated into Tapestry and retired after parity. The prior stub at `the-loom/docs/architecture/UMBRELLA.md` points forward to this document; that stub stays in place during the migration phase as a cross-link to the canonical architecture.
+
+## Framing rules (binding)
+
+1. **Tapestry is the canonical product system.** the-loom + Make_Skills are legacy source repos.
+2. **Every capability listed below is a Tapestry product capability.** Some are currently prototyped in the legacy repos. During migration, the prototype version remains live as a source/compatibility provider — temporarily.
+3. **Once a capability reaches parity in Tapestry, the legacy version is frozen.** Once all useful capabilities are migrated, the legacy repo is archived or made read-only.
+4. **No final runtime dependency on the-loom or Make_Skills as separate systems.** Customers experience ONE product: Tapestry.
+5. **Migration remains incremental.** No big-bang. But the destination is not optional — every prototype change should have a declared import path into Tapestry.
+6. **New product-facing architecture decisions land in Tapestry first.** Prototype repos may continue only for isolated experiments or pre-migration stabilization.
 
 ## What this document covers
 
@@ -120,19 +129,26 @@ services/telemetry-ingestion → services/project-observatory (Grafana)
 
 | Agent | Domain | Spawned? |
 |---|---|---|
-| **operator (Liz)** | Decisions on naming, scope, sequencing, agent spawning, what merges, what archives | Always |
-| **loom-agent** | Currently: `the-loom/` (legacy platform prototype). Eventual: Tapestry `services/` consolidation + `engine/local-observer/` import + `apps/web-dashboard/` import | Spawned, active in `the-loom` |
-| **MS-agent** | Currently: `Make_Skills/` (legacy engine prototype). Eventual: Tapestry `engine/` consolidation + `services/skill-making/` + `templates/*` from default-seed/ | Spawned, active in `Make_Skills` |
-| **Tapestry-agent** | Eventually: cross-service consolidation, schema unification, API contract enforcement, the migration choreography | **Not yet spawned** — open decision |
+| **operator (Liz)** | Canonical decisions on naming, scope, sequencing, agent spawning, what merges, what archives | Always |
+| **Tapestry-agent** | **Owns the canonical product system.** Migration choreography, import maps, API/schema contracts, naming consistency, ADR discipline, deciding what imports / what retires / what stays prototype-only. Actively prevents the-loom and Make_Skills from continuing as permanent product boundaries. | **Spawn now** per operator directive 2026-06-13 |
+| **loom-agent** | Legacy-source steward for `the-loom/`. Stabilizes capabilities pre-migration; hands them off to Tapestry-agent on parity. Not a permanent role. | Spawned, active in `the-loom` (transitional) |
+| **MS-agent** | Legacy-source steward for `Make_Skills/`. Stabilizes engine + skill-making + adapters + templates pre-migration; hands them off to Tapestry-agent on parity. Not a permanent role. | Spawned, active in `Make_Skills` (transitional) |
 | **security-review-agent** | Reviewing candidate of kind=`inline_tool`/`external_tool` touching FS/network/shell. Veto power. Possibly extending to architecture-pattern + service kinds | **Not yet spawned** |
 
-The matrix is intentionally small. We aren't planning for many agents — we're planning for clean separation of concerns. New agent roles go through periodic-architectural-checkin discipline.
+The matrix is intentionally small. Tapestry-agent is the only permanent product role; the legacy-source stewards retire when their source repos are archived.
 
 ## How Tapestry relates to legacy repos
 
 See [`../migration/legacy-repo-inventory.md`](../migration/legacy-repo-inventory.md).
 
-Summary: prototype repos remain primary development homes. Tapestry slots get populated incrementally as each piece matures. No big-bang migration; no premature consolidation. Tapestry catches up to the prototypes; the prototypes don't pause for Tapestry.
+**Summary:** Tapestry is the canonical product system. the-loom and Make_Skills are legacy source repos.
+
+- **the-loom** is the source prototype for: agent-context MCP, project-registry, project-observatory, telemetry-ingestion, architecture/candidate-registry, policy, audit patterns, dashboard, Claude Code discipline plugin, scaffolder/CLI source material, auth bridge, Grafana integration, deploy configuration. Each migrates into a named Tapestry destination; the legacy version freezes on parity.
+- **Make_Skills** is the source prototype for: agency-to-structure engine, skill-compiler, bridge receiver, skill-making services, project-type adapters, default template seeds, runtime/tool telemetry. Each migrates into a named Tapestry destination; the legacy version freezes on parity.
+
+Migration is incremental — no big-bang, no pause-and-port. But the destination is not optional. Each prototype change should carry a declared import path into Tapestry. Once all useful capabilities are migrated, the legacy repo is archived or made read-only. **No final runtime dependency on the-loom or Make_Skills as separate systems.**
+
+Prior framings that implied permanent boundaries ("loom-side ownership", "Tapestry subscribes to loom", "Tapestry catches up to prototypes") are superseded by this rule.
 
 ## Related
 

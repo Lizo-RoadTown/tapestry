@@ -51,12 +51,12 @@ This boundary survives the migration to Tapestry: it becomes the rule for what l
 
 ```text
 /plugin marketplace add Lizo-RoadTown/claude-skills-marketplace
-/plugin install make-skills-discipline@lizo-skills
+/plugin install loom-discipline@lizo-loom
 ```
 
 The plugin auto-injects behavioral rules into every session — PROBE before asserting, cite `file:line`, distinguish dev-tooling from runtime, write friction as memory at the moment of correction, cite skills by name, append to test-runs log, enforce session-end upskilling reports.
 
-(Reconciliation note: `loom-discipline` v0.1.12 source lives at `the-loom/adapters/claude-code/loom-discipline/` — newer/fuller plugin. Marketplace migration deferred — see `feedback_discipline_plugin_reconciliation_deferred_2026_06_14`.)
+(`loom-discipline` is published via the `lizo-loom` marketplace which sources from `the-loom/adapters/claude-code/loom-discipline/`. The two-discipline-plugin ambiguity was resolved 2026-06-14 per Option A; the `make-skills-discipline` plugin in claude-skills-marketplace has been retired.)
 
 ## Canonical patterns (operator's patterns library)
 

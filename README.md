@@ -4,6 +4,41 @@
 
 **The enterprise system-of-record monorepo for the project-intelligence platform.** Tapestry is where the prototype boundaries — discovered through the existing multi-repo experimentation — consolidate into a clean architecture once each piece has matured in its current home.
 
+## The loop in one picture
+
+Tapestry's thesis is *agency becomes structure*. A coding agent works on a project; the platform observes what the agent does repeatedly; promotes the durable patterns into reusable structure; feeds the structure back to future agent runs.
+
+```text
+   ┌────── INPUT: observe ──────┐         ┌───── OUTPUT: compile ─────┐
+   │                            │         │                           │
+   │   consuming projects       │         │   engine/skill-compiler   │
+   │       │                    │         │       ▲                   │
+   │       ▼ telemetry          │         │       │ promoted          │
+   │   project-observatory      │         │   bridge dispatch         │
+   │       │                    │         │       ▲                   │
+   │       ▼ patterns           │         │       │                   │
+   │   local-observer           │         │   policy decision         │
+   │       │                    │         │       ▲                   │
+   │       ▼ Path A candidates  │         │       │ promote           │
+   │   candidate-registry  ◄────┼─────────┼───────┘                   │
+   │       ▲                    │         │       │                   │
+   │       │ Path B candidates  │         │       │                   │
+   │   self-observer            │         │   operator (dashboard)    │
+   │       │                    │         │                           │
+   │       ▼ (every 6h cron)    │         │                           │
+   │   GitHub: scan platform    │         │                           │
+   │   skills/ agents/ tools/   │         │                           │
+   │                            │         │                           │
+   └────────────────────────────┘         └───────────────────────────┘
+
+   Status 2026-06-13:
+   ✓ INPUT  side green for Path B  (self-observer cron live, 40 candidates landed)
+   ✓ OUTPUT side green for kind=skill end-to-end (bridge fires, engine compiles, ack returns)
+   ⏳ Other 8 kinds ack-defer until per-kind handlers ship
+```
+
+Full architecture diagram with deploy topology + auth + service boundaries lives at [`docs/proposals/2026-06-13-v1-scope-and-roadmap.md`](docs/proposals/2026-06-13-v1-scope-and-roadmap.md).
+
 ## What Tapestry is
 
 A single source-control house with **bounded services, clear APIs, clear schemas, clear deploy units, clear ownership**. Internal structure:

@@ -47,14 +47,33 @@ See [`docs/migration/legacy-repo-inventory.md`](docs/migration/legacy-repo-inven
 
 This boundary survives the migration to Tapestry: it becomes the rule for what lives in `engine/` vs `services/`.
 
-## Discipline plugin
+## Discipline plugin (required)
 
-This project depends on the `loom-discipline` Claude Code plugin. Install once per machine:
+```text
+/plugin marketplace add Lizo-RoadTown/claude-skills-marketplace
+/plugin install make-skills-discipline@lizo-skills
+```
 
-    /plugin marketplace add Lizo-RoadTown/claude-skills-marketplace
-    /plugin install loom-discipline@lizo-skills
+The plugin auto-injects behavioral rules into every session — PROBE before asserting, cite `file:line`, distinguish dev-tooling from runtime, write friction as memory at the moment of correction, cite skills by name, append to test-runs log, enforce session-end upskilling reports.
 
-The plugin auto-injects behavioral rules into every session in this repo — PROBE before asserting, cite `file:line`, distinguish dev-tooling from runtime, write friction as memory at the moment of correction, cite skills by name, append to test-runs log, enforce session-end upskilling reports.
+(Reconciliation note: `loom-discipline` v0.1.12 source lives at `the-loom/adapters/claude-code/loom-discipline/` — newer/fuller plugin. Marketplace migration deferred — see `feedback_discipline_plugin_reconciliation_deferred_2026_06_14`.)
+
+## Canonical patterns (operator's patterns library)
+
+The canonical home for reusable agents + skills + tools is the `liz-patterns` plugin:
+
+```text
+/plugin install liz-patterns@lizo-skills
+```
+
+This makes the following available **by name in every project**, with one canonical implementation:
+
+- **Agents** (invoke via `Agent({subagent_type: "liz-patterns:<name>", ...})`):
+  `infrastructure-mapping`, `next-actions-planning`, `lessons-learned`, `orchestration-cataloging`, `eval-deep-research`, `web-app-scaffold`, `agentic-upskilling`
+- **Skills** (invoke via Skill tool with `liz-patterns:<name>`):
+  `agentic-skill-design`, `deep-research-pattern`, `design-evaluation`, `documentation`, `document-parsing`, `layered-explanation`, `open-source-documentation`, `proposal-authoring`
+
+Per [MANIFESTO Pillar 1](MANIFESTO.md): every reusable pattern has ONE name, ONE home, available everywhere via reference, not copy. When Tapestry's `engine/` is built out, compiled-skill output will land in this plugin (auto-write loop closure is future scope per MANIFESTO Part 4.7).
 
 ## Two-mode commitment (will apply once code arrives)
 

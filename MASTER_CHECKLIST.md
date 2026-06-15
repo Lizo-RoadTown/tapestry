@@ -26,37 +26,37 @@ When the primary updates this document, it commits the change to tapestry repo s
 
 **Spawned drift-watcher:** background agent `a055617579e203f42` watching this work.
 
-**Status:** in progress as of 2026-06-14.
+**Status:** COMPLETE 2026-06-14 — see `loom_discipline_reconciliation_complete_option_a_2026_06_14` memory.
 
 #### Steps
 
 - [x] **A1.** Revert claude-skills-marketplace commit `2c6e292` (loom-discipline addition I incorrectly made) — committed `9fecb47`, pushed
-- [ ] **A2.** Bump `the-loom/.claude-plugin/marketplace.json` loom-discipline entry from v0.1.12 → v0.1.13 so `/plugin update` upgrades operator's v0.1.10 install
-- [ ] **A3.** Bump `the-loom/adapters/claude-code/loom-discipline/.claude-plugin/plugin.json` from v0.1.12 → v0.1.13 to match catalog (version-drift discipline)
-- [ ] **A4.** Commit + push the-loom version bumps
-- [ ] **A5.** Delete `claude-skills-marketplace/plugins/make-skills-discipline/` source dir
-- [ ] **A6.** Remove `make-skills-discipline` entry from `claude-skills-marketplace/.claude-plugin/marketplace.json`
-- [ ] **A7.** Commit + push claude-skills-marketplace cleanup
-- [ ] **A8.** Sweep **15 files** (PROBE-verified, not 13 as I initially said) replacing `make-skills-discipline@lizo-skills` → `loom-discipline@lizo-loom`:
-  - [ ] `c:/Users/Liz/classroom-hub-starter/CLAUDE.md`
-  - [ ] `c:/Users/Liz/claude-skills-marketplace/CLAUDE.md`
-  - [ ] `c:/Users/Liz/docs-agent/CLAUDE.md`
-  - [ ] `c:/Users/Liz/loom-platform/CLAUDE.md`
-  - [ ] `c:/Users/Liz/Make_Skills/CLAUDE.md`
-  - [ ] `c:/Users/Liz/project-starter/CLAUDE.md`
-  - [ ] `c:/Users/Liz/Summer 2026 Hub/CLAUDE.md`
-  - [ ] `c:/Users/Liz/tapestry/CLAUDE.md`
-  - [ ] `c:/Users/Liz/the-loom/CLAUDE.md`
-  - [ ] `c:/Users/Liz/ux-starter/CLAUDE.md`
-  - [ ] `c:/Users/Liz/web-starter/CLAUDE.md`
-  - [ ] `c:/Users/Liz/humancensys-app/AGENTS.md`
-  - [ ] `c:/Users/Liz/claude-project-starter/templates/_common/CLAUDE.md` (template source!)
-  - [ ] `c:/Users/Liz/project-starter/templates/_common/CLAUDE.md` (template source!)
-  - [ ] `c:/Users/Liz/web-project-starter/templates/_common/CLAUDE.md` (template source!)
-- [ ] **A9.** Update reconciliation-note callouts in the-loom, Make_Skills, tapestry CLAUDE.md — the "Marketplace migration deferred" notes are now wrong (Option A keeps it in lizo-loom, no migration deferred)
-- [ ] **A10.** Commit + push each of 15 repos (some may share commits within the same repo)
-- [ ] **A11.** Mark `feedback_discipline_plugin_reconciliation_deferred_2026_06_14` memory as RESOLVED via a follow-up memory
-- [ ] **A12.** Save `loom_discipline_reconciliation_complete_option_a_2026_06_14` state snapshot (signals drift-watcher to stop)
+- [x] **A2.** Bump `the-loom/.claude-plugin/marketplace.json` loom-discipline entry from v0.1.12 → v0.1.13 — committed `0d12c82`
+- [x] **A3.** Bump `the-loom/adapters/claude-code/loom-discipline/.claude-plugin/plugin.json` from v0.1.12 → v0.1.13 — same commit `0d12c82`
+- [x] **A4.** Commit + push the-loom version bumps — pushed
+- [x] **A5.** Delete `claude-skills-marketplace/plugins/make-skills-discipline/` source dir — done
+- [x] **A6.** Remove `make-skills-discipline` entry from `claude-skills-marketplace/.claude-plugin/marketplace.json` — done
+- [x] **A7.** Commit + push claude-skills-marketplace cleanup — pushed `63604cd`
+- [x] **A8.** Sweep **15 files** (PROBE-verified, not 13 as I initially said — drift-watcher catch) replacing `make-skills-discipline@lizo-skills` → `loom-discipline@lizo-loom`:
+  - [x] `c:/Users/Liz/classroom-hub-starter/CLAUDE.md`
+  - [x] `c:/Users/Liz/claude-skills-marketplace/CLAUDE.md`
+  - [x] `c:/Users/Liz/docs-agent/CLAUDE.md`
+  - [x] `c:/Users/Liz/loom-platform/CLAUDE.md`
+  - [x] `c:/Users/Liz/Make_Skills/CLAUDE.md`
+  - [x] `c:/Users/Liz/project-starter/CLAUDE.md`
+  - [x] `c:/Users/Liz/Summer 2026 Hub/CLAUDE.md`
+  - [x] `c:/Users/Liz/tapestry/CLAUDE.md`
+  - [x] `c:/Users/Liz/the-loom/CLAUDE.md`
+  - [x] `c:/Users/Liz/ux-starter/CLAUDE.md`
+  - [x] `c:/Users/Liz/web-starter/CLAUDE.md`
+  - [x] `c:/Users/Liz/humancensys-app/AGENTS.md`
+  - [x] `c:/Users/Liz/claude-project-starter/templates/_common/CLAUDE.md` (template source!)
+  - [x] `c:/Users/Liz/project-starter/templates/_common/CLAUDE.md` (template source!)
+  - [x] `c:/Users/Liz/web-project-starter/templates/_common/CLAUDE.md` (template source!)
+- [x] **A9.** Update reconciliation-note callouts in the-loom, Make_Skills, tapestry, Summer 2026 Hub, docs-agent, claude-skills-marketplace, claude-project-starter, project-starter, web-project-starter CLAUDE.md — done in the per-repo commits
+- [x] **A10.** Commit + push each repo — 13 of 14 to main on first try; web-project-starter rebased + pushed at `b46da2d`; humancensys-app + project-starter rode existing feature branches (`bump-sentry-9`, `add-skills-to-scaffold`)
+- [x] **A11.** `feedback_discipline_plugin_reconciliation_deferred_2026_06_14` marked RESOLVED by `loom_discipline_reconciliation_complete_option_a_2026_06_14`
+- [x] **A12.** State snapshot saved (this also signals drift-watcher to stop per its brief)
 - [ ] **A13.** Operator verifies: `/plugin marketplace update` then `/plugin update loom-discipline@lizo-loom` upgrades from 0.1.10 to 0.1.13
 
 #### Stop conditions / abort

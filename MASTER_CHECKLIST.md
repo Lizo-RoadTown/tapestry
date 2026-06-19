@@ -28,7 +28,7 @@ When the primary updates this document, it commits the change to tapestry repo s
 
 **Status:** UNDERSTAND phase deliverable complete this session — `docs/plans/2026-06-18-unified-integration-understanding.md` (4-researcher + reconciler fan-out → synthesis → adversarial evaluator → fixes applied). NO code, NO migration PRs (CORE DIRECTIVE 2 honored).
 
-**Awaiting:** outside-reviewer + operator ratification of the 8 decision points in §6, especially: fleet dispositions (§2), Q4 telemetry pacing, observer topology (C4/G6), G2 continuous-sync, templates source. Kickoff + synthesis in loom memory: `tapestry_agent_systematic_planning_kickoff_2026_06_18`, `tapestry_decision_unified_understanding_phase_2026_06_18`.
+**Awaiting:** outside-reviewer + operator ratification of the 8 decision points in §6, especially: fleet dispositions (§2), Q4 telemetry pacing, observer topology (C4/G6), G2 continuous-sync, templates source. Kickoff + synthesis in loom memory: `tapestry_agent_systematic_planning_kickoff_2026_06_18`, `tapestry_agent_unified_understanding_synthesis_2026_06_18` (becomes `tapestry_decision_*` only after operator ratifies §6).
 
 **Next-action queue (doc-only, from §7):** patch stale binding docs (C1–C3/C5/C7 — operator-reviewed PR); open observer-topology + cutover-sync ADR stubs; schedule PR-prep-3 (migration-toolkit v0.1.0); assign+run tenant_id audit (G5). PR-prep-2 (loom URL externalization) remains the migration blocker — loom-agent's.
 

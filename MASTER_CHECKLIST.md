@@ -34,7 +34,7 @@ When the primary updates this document, it commits the change to tapestry repo s
 
 **DONE this session (Tapestry-owned, doc-only, on branch `tapestry-unified-integration-plan`):** patched stale binding docs (UMBRELLA candidate-registry/project-observatory + observer note; what-to-keep; import-map; roadmap Step 8/7a); opened ADR-0001 (observer-topology) + ADR-0002 (cutover continuous-sync) as Proposed; queued PR-prep-3.
 
-**HANDOFFS (loom-side/operator — Tapestry-agent surfaces, does NOT execute):** (0) ROTATE the committed Render MCP token in `the-loom/.mcp.json:11` — operator (Render) + loom-agent (repo cleanup); (5) run tenant_id audit `SELECT COUNT(*), tenant_id FROM records GROUP BY tenant_id` — loom-agent + operator; (6) PR-prep-2 URL externalization — loom-agent (the migration blocker).
+**HANDOFFS (loom-side/operator — Tapestry-agent surfaces, does NOT execute):** (0) Render MCP token — **RESOLVED 2026-06-18:** operator rotated; PROBE found `the-loom/.mcp.json` is gitignored/untracked (never committed) — the audit's "committed secret" claim was wrong, no scrub needed; (5) run tenant_id audit `SELECT COUNT(*), tenant_id FROM records GROUP BY tenant_id` — loom-agent + operator; (6) PR-prep-2 URL externalization — loom-agent (the migration blocker).
 
 ---
 

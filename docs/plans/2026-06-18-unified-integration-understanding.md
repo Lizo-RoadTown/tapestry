@@ -87,7 +87,7 @@ What is deployed/running, and how each stays coherent during the parallel-build.
 4. **`LOOM_SKILL_BRIDGE_SECRET` desync** — breaks the only end-to-end-closed path (`kind=skill`); A3 dispatch dead-ends.
 5. **project_id UUIDs** hardcoded in self-observer config — reissue → mislabeled/dropped candidates.
 6. **loom-discipline per-machine install** — one machine still runs the retired make-skills-discipline subset (writes local JSONL only, never reaches the central registry).
-7. **Render MCP bearer token committed** in `the-loom/.mcp.json:11` — live secret in repo; flag for rotation (not staleness, but surfaced here).
+7. **Render MCP bearer token** in `the-loom/.mcp.json:11` — **CORRECTED 2026-06-18:** the fleet-audit's "committed secret" claim was wrong. PROBE: `.mcp.json` is gitignored (`the-loom/.gitignore:44`) and untracked (`git ls-files` empty) — it was never committed. Operator rotated the token 2026-06-18 anyway (good hygiene); no git-history scrub or the-loom edit needed. RESOLVED. (Lesson: the audit asserted "committed" without checking gitignore status.)
 
 ---
 
@@ -199,7 +199,7 @@ The outside reviewer accepted this as the integration understanding (not executi
 
 **Decision 6 — templates source:** audit real disk sources; stop citing nonexistent `Make_Skills/templates/`. Mapping: classroom-hub-starter→classroom-project; web-starter+project-starter→software-project; ux-starter→software-project variant; SDE_Extraction patterns→research-project.
 
-**Decision 7 — Render MCP token:** ROTATE NOW (security; operator action — see §7 item 0).
+**Decision 7 — Render MCP token:** RESOLVED 2026-06-18. Operator rotated. PROBE then found `the-loom/.mcp.json` is gitignored/untracked — never committed; the "committed secret" framing was inaccurate. No repo scrub needed.
 
 **Decision 8 — operating model (§4):** RATIFIED — outside reviewer reviews plans/decisions only; drift-watcher watches execution; operator owns final fleet + schema decisions.
 
@@ -209,7 +209,7 @@ The outside reviewer accepted this as the integration understanding (not executi
 
 Order per the outside reviewer (token rotation raised to 0 as a security issue):
 
-0. **Rotate the committed Render MCP bearer token** (`the-loom/.mcp.json:11`). **OPERATOR + loom-agent action** — rotation is a Render-dashboard action (operator); repo cleanup (move to env, scrub) is loom-agent's in the-loom. Tapestry-agent CANNOT and does NOT do this (it's a source-repo + dashboard action). Surfaced, not executed.
+0. ~~**Rotate the committed Render MCP bearer token**~~ — **DONE + CORRECTED 2026-06-18.** Operator rotated. PROBE then found `the-loom/.mcp.json` is gitignored/untracked — never committed, so the "committed secret" framing was wrong; no repo scrub or the-loom edit needed. Optional future nicety (loom-agent, NOT security): use `${ENV}` substitution in the local `.mcp.json` instead of a literal. CLOSED.
 1. **Patch the stale binding docs** (UMBRELLA C2/C3 + observer-topology note; what-to-keep; import-map; roadmap Step 8 + 7a) — **DONE this PR** (branch `tapestry-unified-integration-plan`, doc-only, wants operator review before merge to main).
 2. **Open ADR-0001 (observer-topology, incl. observation-decomposer) + ADR-0002 (cutover continuous-sync)** — **DONE this PR** as Proposed stubs; route to outside reviewer + operator for ratification.
 3. **Surface §6/§6.5 to the operator + outside reviewer** — DONE (ratified; see §6.5).

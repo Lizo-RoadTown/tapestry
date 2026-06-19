@@ -2,7 +2,7 @@
 
 **Date:** 2026-06-18 (proposed) · 2026-06-19 (accepted)
 **Status:** **Accepted**
-**Operator decision:** Ratified 2026-06-19 by operator ("Fair, this is good, continue") after: outside reviewer's edits (conveyed via loom-memory `tapestry_agent_outside_review_response_to_adrs_0001_0002_2026_06_19`, operator-endorsed "yes"), loom-agent's corpus drift-check, and Tapestry-agent's 3 independent adversarial reviewers (boundary / consistency / logic-feasibility).
+**Operator decision:** Ratified 2026-06-19 by operator after: outside reviewer's edits (conveyed via loom-memory `tapestry_agent_outside_review_response_to_adrs_0001_0002_2026_06_19`, operator-endorsed "yes"), loom-agent's corpus drift-check + reaction (which walked back its own engine/ assertion), and Tapestry-agent's 3 independent adversarial reviewers (boundary / consistency / logic-feasibility). **Decomposer placement: the operator accepted `services/observation-decomposer/` (Reviewer A's boundary-rule position) on 2026-06-19, superseding the initial `engine/` endorsement.**
 
 ## Context
 
@@ -19,7 +19,7 @@ Observation is named as distinct components, NOT merged into "project-observator
 | **self-observer** | static repo/document **shape-drift scanner** (the 6h cron today) | **`services/self-observer/`** (canonical per MANIFESTO §4.3, line 190). Role descriptor "static shape-drift scanner" lives in the service README/docstring — NOT a directory rename, NOT a new `observers/` top-level dir (see drift caveat below). |
 | **local-observer** | per-session / project-local **Path A** observer | **`engine/local-observer/`** (canonical per MANIFESTO §4.4, line 208). Source material: the-loom plugin `adapters/claude-code/loom-discipline/scripts/observer.py`; the plugin becomes a **collector/adapter** that feeds the engine, which owns the canonical logic. |
 | **runtime-observer** | runtime telemetry/signal observer (computes `hot_path`, `orphaned`, `degrading`) | **`services/project-observatory/`** |
-| **observation-decomposer** | splits repeated behavior into a SET of mixed artifact candidates | **`engine/observation-decomposer/`** (compute/judgment transform; does not own durable state). See boundary dissent below. |
+| **observation-decomposer** | splits repeated behavior into a SET of mixed artifact candidates | **`services/observation-decomposer/`** (operates on cross-project aggregate observations → cross-project-governance lineage per the boundary rule; canonical candidate state still in `architecture-registry`). See placement note below. |
 | **project-observatory** | read/query/visibility layer over observations + signals + dashboards | **`services/project-observatory/`** |
 | **architecture-registry** | canonical candidate state + durable structure (absorbs candidate-registry) | **`services/architecture-registry/`** |
 | **policy** | promotion + activation gate; owns risk classification + `max_auto_level` | **`services/policy/`** |
@@ -41,9 +41,15 @@ A future reader will otherwise chase a phantom "7 vs 9" mismatch. These are thre
 
 **Observation signals are NOT candidate kinds.** The 9-kind enum stays; signals go in the existing `signals` JSONB field.
 
-## Boundary dissent (recorded, not blocking)
+## Decomposer placement — resolved to `services/` (boundary rule)
 
-Tapestry-agent's boundary reviewer dissented on `engine/observation-decomposer/`: the engine-vs-services boundary rule is *local-agency vs cross-project-governance* (not compute-vs-state), and the decomposer consumes cross-project aggregated observations — arguably the-loom/services lineage. **Resolution: `engine/` stands**, because UMBRELLA defines `engine/` as "the compute layer: agent loop, **observation**, compilation, adaptation," `local-observer` (also observation) already lives in engine, and the runtime-observation followup §2.4 names `engine/observation-decomposer/` first. **Revisit trigger:** if, at decomposer build time, its data dependencies turn out to be dominated by cross-project registry/policy state rather than raw observations, reopen this placement.
+This was the one genuine operator/architecture call in this ADR; all three review sources (outside reviewer, loom-agent, Tapestry-agent's reviewers) agreed the corpus did NOT settle it. The operator chose **`services/observation-decomposer/`** on 2026-06-19.
+
+**Why services/ (the chosen position, per Reviewer A):** the engine-vs-services boundary rule is *local-agency vs cross-project-governance*, not compute-vs-state. The decomposer consumes cross-project **aggregated** observations and emits governance-shaped candidates — the the-loom/services lineage (the same reason `self-observer` is a service, not engine). Canonical candidate state remains in `architecture-registry`; the decomposer is stateless compute but lives on the cross-project-governance side.
+
+**Considered alternative — `engine/` (outside reviewer's position):** decomposition is a compute/transform like `engine/skill-compiler/`; UMBRELLA lists "observation" under the engine compute layer and `local-observer` lives in engine; the runtime-observation followup §2.4 named `engine/observation-decomposer/` first. Recorded as the minority view.
+
+**Revisit trigger:** if, at build time, the decomposer's data dependencies turn out to be dominated by raw local-session signals rather than cross-project aggregates, reopen this placement.
 
 ## Deferred to downstream ADRs (NOT blockers for this topology ADR)
 

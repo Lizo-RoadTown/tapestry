@@ -4,6 +4,8 @@ The canonical home of the enterprise-scale architecture for the project-intellig
 
 **Status:** Initial spawn 2026-06-12. Reframed 2026-06-13 per operator: Tapestry is the canonical product system; the-loom + Make_Skills are legacy prototype/source repos that will be migrated into Tapestry and retired after parity. The prior stub at `the-loom/docs/architecture/UMBRELLA.md` points forward to this document; that stub stays in place during the migration phase as a cross-link to the canonical architecture.
 
+> **2026-06-18 reconciliation patch.** This document was the stalest binding doc while CLAUDE.md routes new agents to it as authoritative. Three corrections applied below to match the v1 roadmap + PROBE'd reality (see [`../plans/2026-06-18-unified-integration-understanding.md`](../plans/2026-06-18-unified-integration-understanding.md) §5): (1) `candidate-registry/` is **absorbed by** `architecture-registry/` (they share a table), not a separate service; (2) `project-observatory/` is a **23-line `/health` stub** today, not a mature deployed service — its Phase-6 content is built in Tapestry; (3) the observer topology (self-observer / local-observer / runtime-observer / observation-decomposer / project-observatory) is being resolved in [`../adr/0001-observer-topology.md`](../adr/0001-observer-topology.md) — do not read the rows below as settling it.
+
 ## Framing rules (binding)
 
 1. **Tapestry is the canonical product system.** the-loom + Make_Skills are legacy source repos.
@@ -43,8 +45,8 @@ Each service owns one concern, has its own deploy unit, exposes a clear API.
 |---|---|---|---|
 | `agent-context/` | Memory MCP — cross-session, cross-project semantic memory | `the-loom/services/agent-context/` | `loom-agent-context.onrender.com` |
 | `project-registry/` | Project / repo / machine registration + tenant resolution | `the-loom/services/project-registry/` | `loom-project-registry.onrender.com` |
-| `project-observatory/` | Telemetry aggregation for observation (Grafana + project-formation views) | `the-loom/services/project-observatory/` | `loom-project-observatory.onrender.com` |
-| `candidate-registry/` | Path A + Path B promotion candidates (status, evidence, signals) | `the-loom/services/architecture-registry/` (may split into two) | `loom-architecture-registry.onrender.com` |
+| `project-observatory/` | Read/query/visibility layer over observations + signals (Grafana views). **STUB today: `the-loom/services/project-observatory/main.py` is 23 lines (`/health` only); Phase-6 content is built in Tapestry, not lifted.** Observer topology pending [ADR-0001](../adr/0001-observer-topology.md). | `the-loom/services/project-observatory/` (stub) | `loom-project-observatory.onrender.com` |
+| ~~`candidate-registry/`~~ **(ABSORBED)** | Path A + Path B promotion candidates — **merged into `architecture-registry/` (shared table) per v1 roadmap §3; this slot is retired, not a separate service.** Physical dir removal deferred to migration execution. | `the-loom/services/architecture-registry/` | `loom-architecture-registry.onrender.com` |
 | `architecture-registry/` | Durable ratified structure (architecture nodes, ADR records, ratified skills) | same prototype source | same |
 | `policy/` | Policy decisions: promote, hold, reject, demote. Audit-immutable | `the-loom/services/policy/` | `loom-policy.onrender.com` |
 | `audit-log/` | Cross-service audit log aggregation + retention | Partial (each service has its own audit today) | — |

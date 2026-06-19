@@ -20,7 +20,27 @@ When the primary updates this document, it commits the change to tapestry repo s
 
 ## Part 1 — Active Work
 
-### CURRENT: loom-discipline / make-skills-discipline reconciliation (Option A)
+### CURRENT: Tapestry-agent unified-integration UNDERSTAND phase (2026-06-18)
+
+**Operator directive 2026-06-18:** "start a systematic plan with researchers and evaluators... begin the task to understand what the task is and how to accomplish it... make sure loom memory, the observer, the loom agent, and all the others... are kept up to date and any that need to become part of this repo or attach are integrated properly." Outside reviewer + operator keep the agent on track.
+
+**Spawned drift-watcher:** background agent watching this effort; baseline clean (`drift_watcher_tapestry_unified_planning_baseline_2026_06_18`).
+
+**Status:** UNDERSTAND phase deliverable complete this session — `docs/plans/2026-06-18-unified-integration-understanding.md` (4-researcher + reconciler fan-out → synthesis → adversarial evaluator → fixes applied). NO code, NO migration PRs (CORE DIRECTIVE 2 honored).
+
+**Awaiting:** outside-reviewer + operator ratification of the 8 decision points in §6, especially: fleet dispositions (§2), Q4 telemetry pacing, observer topology (C4/G6), G2 continuous-sync, templates source. Kickoff + synthesis in loom memory: `tapestry_agent_systematic_planning_kickoff_2026_06_18`, `tapestry_agent_unified_understanding_synthesis_2026_06_18` (becomes `tapestry_decision_*` only after operator ratifies §6).
+
+**RATIFIED 2026-06-18** (operator + outside reviewer): accepted as integration understanding, NOT execution authority. 8 decisions recorded in plan §6.5 + memo `tapestry_decision_unified_integration_2026_06_18`. Two corrections applied (automation-level policy; observer topology incl. observation-decomposer).
+
+**DONE this session (Tapestry-owned, doc-only, on branch `tapestry-unified-integration-plan`):** patched stale binding docs (UMBRELLA candidate-registry/project-observatory + observer note; what-to-keep; import-map; roadmap Step 8/7a); opened ADR-0001 (observer-topology) + ADR-0002 (cutover continuous-sync) as Proposed; queued PR-prep-3.
+
+**ADRs RATIFIED 2026-06-19** (operator + outside reviewer + loom-agent corpus-check + Tapestry-agent 3-reviewer check): **ADR-0001 (observer topology) + ADR-0002 (cutover continuous-sync) → Accepted.** Decomposer→engine (boundary dissent recorded); self-observer→`services/self-observer/` (not new `observers/` dir); ADR-0002 has 3 runbook feasibility preconditions before first split-write step. See `tapestry_decision_adr_0001_0002_ratified_2026_06_19`.
+
+**HANDOFFS status:** (0) Render token — **RESOLVED:** rotated; PROBE found `the-loom/.mcp.json` gitignored/untracked (never committed) — "committed secret" claim was wrong; (5) tenant_id audit — **DONE 2026-06-19, CLEAN** (all rows under SELF_HOST_TENANT_ID, zero leakage; `tenant_id_audit_clean_all_under_self_host_2026_06_19`); (6) **PR-prep-2 URL externalization — loom-agent — STILL THE MIGRATION BLOCKER (only open gate).**
+
+---
+
+### PRIOR: loom-discipline / make-skills-discipline reconciliation (Option A)
 
 **Operator directive 2026-06-14:** "A" — keep loom-discipline canonical at `lizo-loom` marketplace; retire make-skills-discipline from `lizo-skills`.
 
@@ -77,8 +97,10 @@ Per `cleanup_complete_pre_tapestry_2026_06_14` — done. State clean. Tapestry m
 
 Per `tapestry/docs/proposals/2026-06-13-v1-scope-and-roadmap.md` §5 (sequenced migration):
 
-- [ ] **PR-prep-1** (Make_Skills side) — engine telemetry collector hook → existing `/skill-used` endpoint
-- [ ] **PR-prep-2** (the-loom side) — externalize loom-memory MCP URL config + extract `auth_bridge.py` into `the-loom/packages/auth/`
+- [x] **PR-prep-1** (Make_Skills side) — engine telemetry collector hook → existing `/skill-used` endpoint — DONE (commit `a61f078`, PR #76, 2026-06-13)
+- [x] **PR-prep-2a** (the-loom side) — externalize hardcoded `loom-*.onrender.com` URLs — DONE (the-loom main `6bef7ec`, 2026-06-19)
+- [ ] **PR-prep-2b** (the-loom side) — extract `auth_bridge.py` (4 dupes: agent-context/architecture-registry/policy/project-registry) into ONE canonical `the-loom/packages/auth/` — **the real remaining blocker; loom-agent's.** Handoff spec: `tapestry_agent_pr_prep_2b_auth_bridge_handoff_and_gate_correction_2026_06_19`
+- [ ] **PR-prep-3** (Tapestry side) — ship `packages/migration-toolkit/` v0.1.0 BEFORE any per-step runbook (migration-cicd doctrine has no executable substrate yet; gap G4). Tapestry-agent.
 - [ ] **Step 1** — auth consolidation into Tapestry (`packages/auth/` + `platform.tenant_id_mapping`)
 - [ ] **Step 2** — agent-context MCP lift to Tapestry
 - [ ] **Step 3** — project-registry + signup endpoint lift

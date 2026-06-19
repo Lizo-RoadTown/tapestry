@@ -20,7 +20,21 @@ When the primary updates this document, it commits the change to tapestry repo s
 
 ## Part 1 — Active Work
 
-### CURRENT: loom-discipline / make-skills-discipline reconciliation (Option A)
+### CURRENT: Tapestry-agent unified-integration UNDERSTAND phase (2026-06-18)
+
+**Operator directive 2026-06-18:** "start a systematic plan with researchers and evaluators... begin the task to understand what the task is and how to accomplish it... make sure loom memory, the observer, the loom agent, and all the others... are kept up to date and any that need to become part of this repo or attach are integrated properly." Outside reviewer + operator keep the agent on track.
+
+**Spawned drift-watcher:** background agent watching this effort; baseline clean (`drift_watcher_tapestry_unified_planning_baseline_2026_06_18`).
+
+**Status:** UNDERSTAND phase deliverable complete this session — `docs/plans/2026-06-18-unified-integration-understanding.md` (4-researcher + reconciler fan-out → synthesis → adversarial evaluator → fixes applied). NO code, NO migration PRs (CORE DIRECTIVE 2 honored).
+
+**Awaiting:** outside-reviewer + operator ratification of the 8 decision points in §6, especially: fleet dispositions (§2), Q4 telemetry pacing, observer topology (C4/G6), G2 continuous-sync, templates source. Kickoff + synthesis in loom memory: `tapestry_agent_systematic_planning_kickoff_2026_06_18`, `tapestry_decision_unified_understanding_phase_2026_06_18`.
+
+**Next-action queue (doc-only, from §7):** patch stale binding docs (C1–C3/C5/C7 — operator-reviewed PR); open observer-topology + cutover-sync ADR stubs; schedule PR-prep-3 (migration-toolkit v0.1.0); assign+run tenant_id audit (G5). PR-prep-2 (loom URL externalization) remains the migration blocker — loom-agent's.
+
+---
+
+### PRIOR: loom-discipline / make-skills-discipline reconciliation (Option A)
 
 **Operator directive 2026-06-14:** "A" — keep loom-discipline canonical at `lizo-loom` marketplace; retire make-skills-discipline from `lizo-skills`.
 

@@ -2,7 +2,7 @@
 
 **Date:** 2026-06-18
 **Author:** Tapestry-agent (Opus 4.8)
-**Status:** Reviewed (adversarial evaluator pass applied 2026-06-18: 4 should-fix corrections folded in — A3 label, docs-agent already-consolidated, timeline caveat, C4 double-mis-cite) — pending outside-reviewer + operator (Liz) ratification
+**Status:** **Ratified as the current integration understanding (NOT execution authority)** — operator + outside reviewer, 2026-06-18. Two corrections applied (automation-level policy replaces "no auto-promotion until v1"; observer topology must include the observation-decomposer). Eight §6 decisions ratified — see §6.5. Execution stays held until: stale-doc patch (this PR), Render token rotation, ADR-0001/0002, tenant_id audit, and PR-prep-2. Prior: adversarial evaluator pass (4 should-fix corrections folded in).
 **Purpose:** The single consolidated answer to "what is the unified task, and how do we accomplish it without drift." Produced from a 4-researcher + 1-reconciler fan-out + drift-watcher oversight (see loom-memory `tapestry_agent_systematic_planning_kickoff_2026_06_18`).
 
 ## How this doc relates to the existing corpus
@@ -167,23 +167,57 @@ UMBRELLA bounded-contexts table (C2/C3/C4); roadmap §7-E (C1) + §4 telemetry e
 
 1. **Fleet dispositions** — the open questions in §2 (docs-agent persona; loom-platform deferred call; ux-starter slot; humancensys-app reference-vs-external; the 3 duplicate starters → archive; Pretend-Agents eval dependency; humancensys marketing site in/out).
 2. **Q4 telemetry pacing** — Step 4 vs Step 7a (Tapestry-agent's first owned ADR; must be seeded).
-3. **Observer topology (C4/G6)** — where self-observer (static scan), local-observer (Path A), and runtime-observer (signals) each land, given project-observatory is the contested shared destination.
+3. **Observer topology (C4/G6)** — where self-observer (static scan), local-observer (Path A), runtime-observer (signals), and **the observation-decomposer** (splits repeated behavior into mixed artifact candidates — must NOT be collapsed into project-observatory) each land. Resolved via [ADR-0001](../adr/0001-observer-topology.md), not in this doc.
 4. **G2 continuous-sync strategy** — how live-produced candidates/decisions reconcile across cutover.
-5. **Accept "no auto-promotion until Tapestry v1 ships"** — the deferral pushes ~10 capabilities to Tapestry, none in v1.
+5. **Automation-level policy (NOT "no auto-promotion until v1")** — the binary framing is wrong. Define which automation *levels* are allowed before v1: Levels 0–3 (observe / create candidate / decompose / draft artifact) auto when implementation exists; Level 4 (stage inactive artifact) auto only for low/medium-risk supported kinds; Levels 5–7 (activate read-only / activate write-network-shell-db / cross-project default) policy- or approval-gated. The boundary is *live autonomous activation*, not all automation.
 6. **Templates source** — `Make_Skills/templates/` doesn't exist on disk; locate or author.
 7. **Render MCP token rotation** — committed secret in `the-loom/.mcp.json`.
 8. **Operating-model ratification** — §4's filled gaps (fleet-disposition rights, drift-watcher spawn authority, outside-reviewer role) are design choices pending sign-off → `tapestry_decision_operating_model_*`.
 
 ---
 
+## §6.5. Ratified decisions (operator + outside reviewer, 2026-06-18)
+
+The outside reviewer accepted this as the integration understanding (not execution authority) and returned decisions; the operator "generally agrees." Recorded here and in loom-memory `tapestry_decision_unified_integration_2026_06_18`.
+
+**Fleet dispositions (decision 1):**
+- **docs-agent** → ATTACH as a future docs/research *adapter*, not a standalone product repo (skills/agents already in `liz-patterns`; only the persona remains).
+- **loom-platform** → RETIRE unless a concrete consumer role is identified (no vague "deferred" repos kept alive).
+- **duplicate starters** (`claude-project-starter`, `web-project-starter`, `paper-explainer`) → ARCHIVE unless one holds unique code not in `project-starter`/`web-starter`.
+- **ux-starter** → fold into a `software-project` variant unless it proves genuinely distinct (then `templates/software-project/variants/ux-first`, not a top-level template yet).
+- **humancensys-app** → keep as an EXTERNAL reference / customer-style integration — the proof Tapestry can serve an external consumer, not only itself.
+- **humancensys** (marketing site) → OUT of Tapestry core scope; link only.
+- **Pretend-Agents** → OUT of scope unless an active eval/test depends on it.
+
+**Decision 2 — Q4 telemetry pacing:** engine lift (Step 4) NOT blocked on telemetry; telemetry **Postgres rollup (Step 7a) MUST land before runtime observation/decomposition is considered active**. Rollup is in v1, ahead of promotion automation. (Applied to roadmap §5 Step 7a.)
+
+**Decision 3 — observer topology:** OPEN ADR ([ADR-0001](../adr/0001-observer-topology.md)), seeded with the 7-component target **including the observation-decomposer**; the static self-observer's role is named "static shape-drift scanner," not "the observer."
+
+**Decision 4 — continuous-sync:** REQUIRED ADR ([ADR-0002](../adr/0002-cutover-continuous-sync.md)) before any split-write migration step. Preferred default: short cutover freeze for promotion/candidate writes + replay/export; no CDC yet.
+
+**Decision 5 — automation-level policy** replaces "no auto-promotion until v1" (see §6 item 5 above).
+
+**Decision 6 — templates source:** audit real disk sources; stop citing nonexistent `Make_Skills/templates/`. Mapping: classroom-hub-starter→classroom-project; web-starter+project-starter→software-project; ux-starter→software-project variant; SDE_Extraction patterns→research-project.
+
+**Decision 7 — Render MCP token:** ROTATE NOW (security; operator action — see §7 item 0).
+
+**Decision 8 — operating model (§4):** RATIFIED — outside reviewer reviews plans/decisions only; drift-watcher watches execution; operator owns final fleet + schema decisions.
+
+---
+
 ## §7. Immediate next actions (no migration; understand/prepare only)
 
-1. **Patch the stale binding docs** (C1–C3, C5, C7 + staleness list) so UMBRELLA stops being the stalest-yet-most-authoritative doc. One small docs PR. (Tapestry-agent owns; doc-only, safe under CORE DIRECTIVE 2.) **This doc-patch PR itself wants operator review before merge** — some corrections (e.g. C2's "delete the candidate-registry slot") touch structure, not just prose.
-2. **Open two ADR stubs:** `00xx-observer-topology` (C4/G6) and `00xx-cutover-continuous-sync` (G2). Draft, route to outside reviewer + operator.
-3. **Surface §6 to the operator + outside reviewer** as explicit decision points.
-4. **Schedule PR-prep-3** (migration-toolkit v0.1.0) into the readiness-plan §8 sprint (G4).
-5. **Assign + run the tenant_id audit** (G5) — loom-agent + operator.
-6. PR-prep-2 (loom URL externalization) remains the migration blocker — loom-agent's, unchanged.
+Order per the outside reviewer (token rotation raised to 0 as a security issue):
+
+0. **Rotate the committed Render MCP bearer token** (`the-loom/.mcp.json:11`). **OPERATOR + loom-agent action** — rotation is a Render-dashboard action (operator); repo cleanup (move to env, scrub) is loom-agent's in the-loom. Tapestry-agent CANNOT and does NOT do this (it's a source-repo + dashboard action). Surfaced, not executed.
+1. **Patch the stale binding docs** (UMBRELLA C2/C3 + observer-topology note; what-to-keep; import-map; roadmap Step 8 + 7a) — **DONE this PR** (branch `tapestry-unified-integration-plan`, doc-only, wants operator review before merge to main).
+2. **Open ADR-0001 (observer-topology, incl. observation-decomposer) + ADR-0002 (cutover continuous-sync)** — **DONE this PR** as Proposed stubs; route to outside reviewer + operator for ratification.
+3. **Surface §6/§6.5 to the operator + outside reviewer** — DONE (ratified; see §6.5).
+4. **Schedule PR-prep-3** (migration-toolkit v0.1.0) before any per-step runbook (G4) — queued in MASTER_CHECKLIST Part 2.
+5. **Assign + run the tenant_id audit** (`SELECT COUNT(*), tenant_id FROM records GROUP BY tenant_id`, G5) — **loom-agent + operator** action.
+6. **PR-prep-2** (loom URL externalization) remains the migration blocker — **loom-agent's**, unchanged.
+
+Items 0, 5, 6 are loom-side/operator handoffs Tapestry-agent surfaces but does not execute (CORE DIRECTIVE 2). Items 1–4 are Tapestry-owned and done/queued here.
 
 ---
 

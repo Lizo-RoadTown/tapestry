@@ -30,7 +30,11 @@ When the primary updates this document, it commits the change to tapestry repo s
 
 **Awaiting:** outside-reviewer + operator ratification of the 8 decision points in §6, especially: fleet dispositions (§2), Q4 telemetry pacing, observer topology (C4/G6), G2 continuous-sync, templates source. Kickoff + synthesis in loom memory: `tapestry_agent_systematic_planning_kickoff_2026_06_18`, `tapestry_agent_unified_understanding_synthesis_2026_06_18` (becomes `tapestry_decision_*` only after operator ratifies §6).
 
-**Next-action queue (doc-only, from §7):** patch stale binding docs (C1–C3/C5/C7 — operator-reviewed PR); open observer-topology + cutover-sync ADR stubs; schedule PR-prep-3 (migration-toolkit v0.1.0); assign+run tenant_id audit (G5). PR-prep-2 (loom URL externalization) remains the migration blocker — loom-agent's.
+**RATIFIED 2026-06-18** (operator + outside reviewer): accepted as integration understanding, NOT execution authority. 8 decisions recorded in plan §6.5 + memo `tapestry_decision_unified_integration_2026_06_18`. Two corrections applied (automation-level policy; observer topology incl. observation-decomposer).
+
+**DONE this session (Tapestry-owned, doc-only, on branch `tapestry-unified-integration-plan`):** patched stale binding docs (UMBRELLA candidate-registry/project-observatory + observer note; what-to-keep; import-map; roadmap Step 8/7a); opened ADR-0001 (observer-topology) + ADR-0002 (cutover continuous-sync) as Proposed; queued PR-prep-3.
+
+**HANDOFFS (loom-side/operator — Tapestry-agent surfaces, does NOT execute):** (0) ROTATE the committed Render MCP token in `the-loom/.mcp.json:11` — operator (Render) + loom-agent (repo cleanup); (5) run tenant_id audit `SELECT COUNT(*), tenant_id FROM records GROUP BY tenant_id` — loom-agent + operator; (6) PR-prep-2 URL externalization — loom-agent (the migration blocker).
 
 ---
 
@@ -91,8 +95,9 @@ Per `cleanup_complete_pre_tapestry_2026_06_14` — done. State clean. Tapestry m
 
 Per `tapestry/docs/proposals/2026-06-13-v1-scope-and-roadmap.md` §5 (sequenced migration):
 
-- [ ] **PR-prep-1** (Make_Skills side) — engine telemetry collector hook → existing `/skill-used` endpoint
-- [ ] **PR-prep-2** (the-loom side) — externalize loom-memory MCP URL config + extract `auth_bridge.py` into `the-loom/packages/auth/`
+- [x] **PR-prep-1** (Make_Skills side) — engine telemetry collector hook → existing `/skill-used` endpoint — DONE (commit `a61f078`, PR #76, 2026-06-13)
+- [ ] **PR-prep-2** (the-loom side) — externalize loom-memory MCP URL config + extract `auth_bridge.py` into `the-loom/packages/auth/` — **the single blocker; loom-agent's**
+- [ ] **PR-prep-3** (Tapestry side) — ship `packages/migration-toolkit/` v0.1.0 BEFORE any per-step runbook (migration-cicd doctrine has no executable substrate yet; gap G4). Tapestry-agent.
 - [ ] **Step 1** — auth consolidation into Tapestry (`packages/auth/` + `platform.tenant_id_mapping`)
 - [ ] **Step 2** — agent-context MCP lift to Tapestry
 - [ ] **Step 3** — project-registry + signup endpoint lift

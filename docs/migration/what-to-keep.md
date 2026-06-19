@@ -4,10 +4,10 @@ Candidates for migration (per [`legacy-repo-inventory.md`](legacy-repo-inventory
 
 ## From `the-loom`
 
-- **All deployed services** (`services/agent-context/`, `services/project-registry/`, `services/project-observatory/`, `services/architecture-registry/`, `services/policy/`) — they're production-validated as of 2026-06-12
+- **Deployed services** (`services/agent-context/`, `services/project-registry/`, `services/architecture-registry/`) — production-validated. NOTE (2026-06-18): `services/policy/` is deployed but **inert** (records decisions, doesn't write status); `services/project-observatory/` is a **23-line `/health` stub** (Phase-6 content built in Tapestry, not lifted). Don't treat all five as mature substance.
 - **Migrations** under each `services/*/migrations/` — durable schema history
 - **Render deploy configs** (`render.yaml`) — adapt to Tapestry layout
-- **The discipline plugin** (`adapters/claude-code/loom-discipline/`) — v0.1.12 with Stop hook + observer
+- **The discipline plugin** (`adapters/claude-code/loom-discipline/`) — v0.1.13 with Stop hook + observer
 - **The Project Observatory Grafana dashboards** — if shipped as JSON in repo
 - **Architecture proposal docs** (`docs/proposals/`) — provenance for the architecture model
 - **The scaffolder** (`scripts/new-loom-project.ps1`) — gets Refactored into `packages/cli/`

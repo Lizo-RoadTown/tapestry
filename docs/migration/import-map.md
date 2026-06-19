@@ -26,7 +26,7 @@ Each row:
 
 ## Empty (2026-06-12 spawn)
 
-No imports yet. Add a row when scoping a migration. First migrations expected when one of the prototype pieces stabilizes — likely the `services/policy/` first (just shipped, smoke-verified, audit-immutable contract clear) once Liz says go.
+No imports yet. Add a row when scoping a migration. **The ratified migration order (per the readiness plan §5 + v1 roadmap §5) is auth → agent-context → project-registry → engine → templates+CLI → web-dashboard → architecture-registry+policy → telemetry — NOT policy-first.** The single blocker before any import is PR-prep-2 (loom-side URL externalization). First import is `packages/auth/` + `services/agent-context/` once PR-prep-2 lands and Liz says go.
 
 ## Template
 

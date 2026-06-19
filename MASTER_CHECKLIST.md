@@ -98,7 +98,8 @@ Per `cleanup_complete_pre_tapestry_2026_06_14` — done. State clean. Tapestry m
 Per `tapestry/docs/proposals/2026-06-13-v1-scope-and-roadmap.md` §5 (sequenced migration):
 
 - [x] **PR-prep-1** (Make_Skills side) — engine telemetry collector hook → existing `/skill-used` endpoint — DONE (commit `a61f078`, PR #76, 2026-06-13)
-- [ ] **PR-prep-2** (the-loom side) — externalize loom-memory MCP URL config + extract `auth_bridge.py` into `the-loom/packages/auth/` — **the single blocker; loom-agent's**
+- [x] **PR-prep-2a** (the-loom side) — externalize hardcoded `loom-*.onrender.com` URLs — DONE (the-loom main `6bef7ec`, 2026-06-19)
+- [ ] **PR-prep-2b** (the-loom side) — extract `auth_bridge.py` (4 dupes: agent-context/architecture-registry/policy/project-registry) into ONE canonical `the-loom/packages/auth/` — **the real remaining blocker; loom-agent's.** Handoff spec: `tapestry_agent_pr_prep_2b_auth_bridge_handoff_and_gate_correction_2026_06_19`
 - [ ] **PR-prep-3** (Tapestry side) — ship `packages/migration-toolkit/` v0.1.0 BEFORE any per-step runbook (migration-cicd doctrine has no executable substrate yet; gap G4). Tapestry-agent.
 - [ ] **Step 1** — auth consolidation into Tapestry (`packages/auth/` + `platform.tenant_id_mapping`)
 - [ ] **Step 2** — agent-context MCP lift to Tapestry

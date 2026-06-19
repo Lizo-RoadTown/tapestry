@@ -34,7 +34,9 @@ When the primary updates this document, it commits the change to tapestry repo s
 
 **DONE this session (Tapestry-owned, doc-only, on branch `tapestry-unified-integration-plan`):** patched stale binding docs (UMBRELLA candidate-registry/project-observatory + observer note; what-to-keep; import-map; roadmap Step 8/7a); opened ADR-0001 (observer-topology) + ADR-0002 (cutover continuous-sync) as Proposed; queued PR-prep-3.
 
-**HANDOFFS (loom-side/operator — Tapestry-agent surfaces, does NOT execute):** (0) Render MCP token — **RESOLVED 2026-06-18:** operator rotated; PROBE found `the-loom/.mcp.json` is gitignored/untracked (never committed) — the audit's "committed secret" claim was wrong, no scrub needed; (5) run tenant_id audit `SELECT COUNT(*), tenant_id FROM records GROUP BY tenant_id` — loom-agent + operator; (6) PR-prep-2 URL externalization — loom-agent (the migration blocker).
+**ADRs RATIFIED 2026-06-19** (operator + outside reviewer + loom-agent corpus-check + Tapestry-agent 3-reviewer check): **ADR-0001 (observer topology) + ADR-0002 (cutover continuous-sync) → Accepted.** Decomposer→engine (boundary dissent recorded); self-observer→`services/self-observer/` (not new `observers/` dir); ADR-0002 has 3 runbook feasibility preconditions before first split-write step. See `tapestry_decision_adr_0001_0002_ratified_2026_06_19`.
+
+**HANDOFFS status:** (0) Render token — **RESOLVED:** rotated; PROBE found `the-loom/.mcp.json` gitignored/untracked (never committed) — "committed secret" claim was wrong; (5) tenant_id audit — **DONE 2026-06-19, CLEAN** (all rows under SELF_HOST_TENANT_ID, zero leakage; `tenant_id_audit_clean_all_under_self_host_2026_06_19`); (6) **PR-prep-2 URL externalization — loom-agent — STILL THE MIGRATION BLOCKER (only open gate).**
 
 ---
 

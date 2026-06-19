@@ -191,9 +191,9 @@ The outside reviewer accepted this as the integration understanding (not executi
 
 **Decision 2 — Q4 telemetry pacing:** engine lift (Step 4) NOT blocked on telemetry; telemetry **Postgres rollup (Step 7a) MUST land before runtime observation/decomposition is considered active**. Rollup is in v1, ahead of promotion automation. (Applied to roadmap §5 Step 7a.)
 
-**Decision 3 — observer topology:** OPEN ADR ([ADR-0001](../adr/0001-observer-topology.md)), seeded with the 7-component target **including the observation-decomposer**; the static self-observer's role is named "static shape-drift scanner," not "the observer."
+**Decision 3 — observer topology:** **RATIFIED 2026-06-19** via [ADR-0001 (Accepted)](../adr/0001-observer-topology.md). 7-component topology; resolutions: decomposer→`engine/observation-decomposer/` (boundary dissent recorded), self-observer→`services/self-observer/` (per MANIFESTO §4.3; role "static shape-drift scanner" in docs, NOT a new `observers/` dir), local-observer→engine w/ plugin as adapter, risk classifier owned by policy. The 3 sub-component caveats defer to the downstream policy-daemon-activation ADR.
 
-**Decision 4 — continuous-sync:** REQUIRED ADR ([ADR-0002](../adr/0002-cutover-continuous-sync.md)) before any split-write migration step. Preferred default: short cutover freeze for promotion/candidate writes + replay/export; no CDC yet.
+**Decision 4 — continuous-sync:** **RATIFIED 2026-06-19** via [ADR-0002 (Accepted)](../adr/0002-cutover-continuous-sync.md). Per-table mechanisms set (candidates/policy freeze+replay; records dual-write 14d; projects freeze+controlled import; telemetry explicit cutover timestamp); 8-item verification checklist + hard rule (augments the `parity-verified→prod-rolling` gate). 3 runbook feasibility preconditions (freeze surface, IaC-commit freeze, replay re-fires dispatch) must close before the FIRST split-write step.
 
 **Decision 5 — automation-level policy** replaces "no auto-promotion until v1" (see §6 item 5 above).
 
@@ -214,7 +214,7 @@ Order per the outside reviewer (token rotation raised to 0 as a security issue):
 2. **Open ADR-0001 (observer-topology, incl. observation-decomposer) + ADR-0002 (cutover continuous-sync)** — **DONE this PR** as Proposed stubs; route to outside reviewer + operator for ratification.
 3. **Surface §6/§6.5 to the operator + outside reviewer** — DONE (ratified; see §6.5).
 4. **Schedule PR-prep-3** (migration-toolkit v0.1.0) before any per-step runbook (G4) — queued in MASTER_CHECKLIST Part 2.
-5. **Assign + run the tenant_id audit** (`SELECT COUNT(*), tenant_id FROM records GROUP BY tenant_id`, G5) — **loom-agent + operator** action.
+5. ~~**Assign + run the tenant_id audit**~~ — **DONE 2026-06-19 (loom-agent), CLEAN.** All rows under `SELF_HOST_TENANT_ID`, zero cross-tenant leakage (records 209, candidates 105, policy_decisions 22, projects 8). Migration inherits a clean tenant envelope. See `tenant_id_audit_clean_all_under_self_host_2026_06_19`.
 6. **PR-prep-2** (loom URL externalization) remains the migration blocker — **loom-agent's**, unchanged.
 
 Items 0, 5, 6 are loom-side/operator handoffs Tapestry-agent surfaces but does not execute (CORE DIRECTIVE 2). Items 1–4 are Tapestry-owned and done/queued here.

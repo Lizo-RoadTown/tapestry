@@ -5,7 +5,7 @@
 **Source path:** `services/agent-context/`
 **Destination:** `tapestry/services/agent-context/`
 **Decision:** [x] Lift  (verbatim; schema forklift per [ADR-0003](../../adr/0003-shared-postgres-schema-source-of-truth.md))
-**Status:** proposed
+**Status:** approved (operator 2026-06-20 "step 2 is approved") — code lifted; next gate is `approved → staging-deployed`, which needs operator Render actions (staging service + DB snapshot + secrets). Production stays gated.
 **ADR:** [ADR-0002](../../adr/0002-cutover-continuous-sync.md) (cutover), [ADR-0003](../../adr/0003-shared-postgres-schema-source-of-truth.md) (schema source-of-truth)
 
 > **⚠️ CORE DIRECTIVE 1 — highest blast radius in the system.** This service hosts the loom-memory MCP that EVERY session in EVERY repo depends on. A bad cutover breaks all agents everywhere. This runbook's whole design goal is to make the change a **near-no-op for consumers** and **instantly reversible**.
@@ -91,8 +91,9 @@ The change is a **re-source of ONE service**, not a parallel fleet cutover:
 
 ## Sign-off
 
-- [ ] Operator: Liz @ ____
-- [ ] Tapestry-agent: ____ @ ____
+- [x] Operator: Liz @ 2026-06-20 (proposed → approved)
+- [x] Tapestry-agent: code lift complete @ 2026-06-20
+- [ ] Operator: prod authorization (parity-verified → prod-rolling) — PENDING
 - [ ] Source steward (loom-agent): ____ @ ____
 
 ## Post-deployment monitoring

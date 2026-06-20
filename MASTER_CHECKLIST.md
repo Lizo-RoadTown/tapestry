@@ -99,9 +99,9 @@ Per `tapestry/docs/proposals/2026-06-13-v1-scope-and-roadmap.md` §5 (sequenced 
 
 - [x] **PR-prep-1** (Make_Skills side) — engine telemetry collector hook → existing `/skill-used` endpoint — DONE (commit `a61f078`, PR #76, 2026-06-13)
 - [x] **PR-prep-2a** (the-loom side) — externalize hardcoded `loom-*.onrender.com` URLs — DONE (the-loom main `6bef7ec`, 2026-06-19)
-- [ ] **PR-prep-2b** (the-loom side) — extract `auth_bridge.py` (4 dupes: agent-context/architecture-registry/policy/project-registry) into ONE canonical `the-loom/packages/auth/` — **the real remaining blocker; loom-agent's.** Handoff spec: `tapestry_agent_pr_prep_2b_auth_bridge_handoff_and_gate_correction_2026_06_19`
+- [x] **PR-prep-2b** (the-loom side) — extract `auth_bridge.py` into ONE canonical `the-loom/packages/auth/python/loom_auth/` — DONE (the-loom `23b3055` + `77aaabc` fix, 2026-06-19; all 4 services live). See `session_state_pr_prep_2b_shipped_2026_06_19`.
 - [ ] **PR-prep-3** (Tapestry side) — ship `packages/migration-toolkit/` v0.1.0 BEFORE any per-step runbook (migration-cicd doctrine has no executable substrate yet; gap G4). Tapestry-agent.
-- [ ] **Step 1** — auth consolidation into Tapestry (`packages/auth/` + `platform.tenant_id_mapping`)
+- [~] **Step 1** — auth consolidation into Tapestry — **lift DONE 2026-06-20** (branch `tapestry-step-1-auth-consolidation`, PR open): `packages/auth/` (verbatim Lift of `loom_auth`) + `infra/migrations/000_init_platform.sql` (`platform.tenants` + `tenant_id_mapping` forklift). No deploy (Tapestry has no DB yet). Awaiting operator PR review.
 - [ ] **Step 2** — agent-context MCP lift to Tapestry
 - [ ] **Step 3** — project-registry + signup endpoint lift
 - [ ] **Step 4** — engine lift (skill-compiler + skill-making receiver)

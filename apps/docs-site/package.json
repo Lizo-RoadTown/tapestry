@@ -1,0 +1,19 @@
+{
+  "name": "tapestry-docs-site",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Public docs site for Tapestry: what keeps a consuming project on track.",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/starlight": "^0.36.0",
+    "astro": "^5.16.0",
+    "astro-mermaid": "^1.0.0",
+    "mermaid": "^11.0.0",
+    "sharp": "^0.34.0"
+  }
+}

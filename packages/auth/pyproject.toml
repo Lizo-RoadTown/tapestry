@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "loom-auth"
+version = "0.1.0"
+description = "Shared JWT auth + tenant resolution for loom services (FastAPI verify_bearer + MCP LoomTokenVerifier)"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.115",
+    "python-jose[cryptography]>=3.3",
+    "mcp>=1.20",
+]
+
+# Shape-for-lift: this package is structured to migrate verbatim to
+# tapestry/packages/auth/ at Step 1 (auth consolidation). The directory
+# layout, package name (`loom_auth`), and module shape (`auth_bridge.py`)
+# mirror the eventual Tapestry destination. Rename `loom_auth` -> the
+# Tapestry name at migration time; everything else stays.
+
+[tool.setuptools.packages.find]
+where = ["python"]
+include = ["loom_auth*"]

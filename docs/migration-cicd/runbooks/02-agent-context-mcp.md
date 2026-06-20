@@ -5,7 +5,7 @@
 **Source path:** `services/agent-context/`
 **Destination:** `tapestry/services/agent-context/`
 **Decision:** [x] Lift  (verbatim; schema forklift per [ADR-0003](../../adr/0003-shared-postgres-schema-source-of-truth.md))
-**Status:** approved (operator 2026-06-20 "step 2 is approved") — code lifted; next gate is `approved → staging-deployed`, which needs operator Render actions (staging service + DB snapshot + secrets). Production stays gated.
+**Status:** **parity-verified** (2026-06-20) — staging deployed (`tapestry-agent-context-staging`, srv-d8rfng37uimc73f5c7gg) + full smoke GREEN. Next gate is `parity-verified → prod-rolling` = operator authorization + the the-loom blueprint handover. Production stays gated until the operator says go.
 **ADR:** [ADR-0002](../../adr/0002-cutover-continuous-sync.md) (cutover), [ADR-0003](../../adr/0003-shared-postgres-schema-source-of-truth.md) (schema source-of-truth)
 
 > **⚠️ CORE DIRECTIVE 1 — highest blast radius in the system.** This service hosts the loom-memory MCP that EVERY session in EVERY repo depends on. A bad cutover breaks all agents everywhere. This runbook's whole design goal is to make the change a **near-no-op for consumers** and **instantly reversible**.
@@ -100,12 +100,14 @@ curl -fsS -X POST https://<staging>/v1/recall -H "Content-Type: application/json
   -d '{"context":"staging smoke serving","n":3}'
 ```
 
-Go/no-go:
-- [ ] `/health` 200
-- [ ] `/v1/write` → `inserted:1`
-- [ ] `/v1/read` returns the written record (round-trip)
-- [ ] `/v1/recall` returns it via vector search (pgvector + embedding work)
-- [ ] MCP handshake from a real client against `/mcp/memory/` (Tapestry-agent runs this)
+Go/no-go — **RESULT 2026-06-20: ALL GREEN** (Tapestry-agent ran it against `tapestry-agent-context-staging`):
+- [x] `/health` 200 — `{"status":"ok"}`
+- [x] `/v1/write` → `{"ok":true,"name":"staging_smoke_step2","inserted":1}`
+- [x] `/v1/read` returns the written record; `tenant_id` = `1d8ec1b3…` (self-host scoping correct)
+- [x] `/v1/recall` returns it via pgvector semantic search
+- [x] MCP `initialize` handshake → 200, `serverInfo: loom-memory v1.28.0`, tools capability advertised
+
+**Note (cold-start):** the very first `/v1/write` returned a transient 400 while the embedding model (fastembed BAAI/bge-small-en-v1.5) loaded; the immediate retry succeeded. Prod (`loom-agent-context`) is on `plan: starter` (kept warm), so this cold-load is a staging-only artifact.
 
 **Go:** all green → operator authorizes prod (re-source preserving name/URL/DB). **No-go:** any red → back to `approved`.
 

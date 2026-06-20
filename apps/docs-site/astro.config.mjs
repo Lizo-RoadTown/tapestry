@@ -1,0 +1,57 @@
+// @ts-check
+import { defineConfig } from "astro/config";
+import starlight from "@astrojs/starlight";
+import mermaid from "astro-mermaid";
+
+// Tapestry documentation (Astro Starlight). Public site for an operator setting up a
+// project that plugs into the Tapestry platform. Explains the discipline stack (plugins,
+// MCP, hooks, project-intelligence) so that nothing breaks silently when a load-bearing
+// piece goes missing.
+export default defineConfig({
+  site: "https://tapestry-docs.vercel.app",
+  integrations: [
+    // astro-mermaid must precede starlight so ```mermaid blocks render as diagrams.
+    mermaid({ theme: "dark" }),
+    starlight({
+      title: "Tapestry",
+      description:
+        "What keeps a project on track when it plugs into the Tapestry platform: the discipline stack of plugins, MCP wiring, hooks, and project intelligence — and how to recover when one piece goes missing.",
+      social: [
+        {
+          icon: "github",
+          label: "GitHub",
+          href: "https://github.com/Lizo-RoadTown/tapestry",
+        },
+      ],
+      // Explicit sidebar. The full v1 scope is visible.
+      sidebar: [
+        {
+          label: "Start here",
+          items: [
+            { label: "Overview", slug: "index" },
+            { label: "What keeps a project on track", slug: "start/what-stays-on-track" },
+          ],
+        },
+        {
+          label: "How it works",
+          items: [
+            { label: "The discipline stack", slug: "explanation/discipline-stack" },
+          ],
+        },
+        {
+          label: "Use it",
+          items: [
+            { label: "Set up a new project", slug: "how-to/set-up-a-new-project" },
+            { label: "Recover from common failures", slug: "how-to/recover-from-common-failures" },
+          ],
+        },
+        {
+          label: "Reference",
+          items: [
+            { label: "Load-bearing files", slug: "reference/load-bearing-files" },
+          ],
+        },
+      ],
+    }),
+  ],
+});

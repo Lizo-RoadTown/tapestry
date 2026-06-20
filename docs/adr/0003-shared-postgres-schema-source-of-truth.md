@@ -1,8 +1,8 @@
 # 0003 — shared Postgres schema: source-of-truth + forklift-vs-redesign
 
 **Date:** 2026-06-20
-**Status:** Proposed — pending operator ratification
-**Operator decision:** Not yet ratified. Drafted after the 2026-06-20 researcher + evaluator pass on the re-homing approach; operator directive: "safest, most efficient, time-tested, best-practices… don't want catastrophe down the road" (`feedback_operator_wants_safest_best_practice_not_shortcuts_2026_06_20`).
+**Status:** **Accepted**
+**Operator decision:** Ratified 2026-06-20 by operator ("Yes, you can continue"). Drafted after the 2026-06-20 researcher + evaluator pass on the re-homing approach; operator directive: "safest, most efficient, time-tested, best-practices… don't want catastrophe down the road" (`feedback_operator_wants_safest_best_practice_not_shortcuts_2026_06_20`).
 
 ## Context
 

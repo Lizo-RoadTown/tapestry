@@ -1,15 +1,120 @@
 ---
 title: The discipline stack
-description: Orientation map of the five-piece discipline stack — what each piece does at a glance, with links to the deep-dive explanation pages.
+description: Why Tapestry's mechanisms exist — each is a structural reinforcement against a specific kind of weak bond in the user-agent interface. Orientation map of the discipline stack with links to deep-dive pages.
 ---
 
-The Tapestry discipline stack is five cooperating pieces. None of them is heavy on its own. The discipline emerges from the COMBINATION — every piece is small but load-bearing.
+## The real shape of the problem
 
-This page is the orientation map. Each piece links to its deep-dive page where you'll find what it actually does, why it exists, how it fits with the others, and how to keep it healthy.
+A project is what gets built when a user and an agent work together. The project sits between them; the quality of the project is determined by the quality of the interface between them.
 
-For the file-by-file reference, see [Load-bearing files](/reference/load-bearing-files/). To set up a project, see [Set up a new project](/how-to/set-up-a-new-project/). For diagnosis when something breaks, see [Recover from common failures](/how-to/recover-from-common-failures/).
+```mermaid
+flowchart LR
+  USER([User]) -.->|"weak interface"| AGENT([Agent])
+  USER -.-> PROJECT([Poor project])
+  AGENT -.-> PROJECT
+  classDef weak stroke-dasharray: 5 5,stroke:#888
+  class USER,AGENT,PROJECT weak
+```
 
-## The five pieces
+Most of the failures in agent-assisted projects aren't agent failures or user failures in isolation. They're failures of the interface BETWEEN them — the channel through which intent flows from user to agent and from agent back to user. When that interface is weak, the project that emerges is also weak.
+
+The weakness shows up as specific recurring failure modes:
+
+```mermaid
+flowchart TB
+  IFACE[/"User ↔ Agent interface"/]
+
+  IFACE --> W1["Memory loss across sessions"]
+  IFACE --> W2["Drift from the user's framing"]
+  IFACE --> W3["Silent assumptions about the codebase"]
+  IFACE --> W4["Forgotten corrections"]
+  IFACE --> W5["Architectural blindness"]
+  IFACE --> W6["Repeated mistakes across sessions"]
+  IFACE --> W7["Invisible tool absence"]
+  IFACE --> W8["Cross-agent coordination loss"]
+
+  W1 --> POOR([Poor project])
+  W2 --> POOR
+  W3 --> POOR
+  W4 --> POOR
+  W5 --> POOR
+  W6 --> POOR
+  W7 --> POOR
+  W8 --> POOR
+```
+
+Each of these is a specific bond in the interface that wants to fail. Left unaddressed, every one of them feeds back into the project as accumulated weakness — corrections that get re-litigated, decisions that get re-made, mistakes that recur because no one remembered the prior session.
+
+## What Tapestry actually is
+
+Tapestry is the proposition that **each of those weak bonds can be reinforced by a specific structural mechanism**, and that the mechanisms together convert miscommunications into architecture rather than letting them dissolve into churn.
+
+The reinforcements are not generic. Each one targets a specific failure mode:
+
+```mermaid
+flowchart LR
+  IFACE[/"User ↔ Agent interface"/]
+
+  subgraph REINFORCEMENT["Tapestry mechanisms"]
+    direction TB
+    M1["loom-memory MCP<br/>(cross-session persistence)"]
+    M2["Per-project guard plugins<br/>(framing-clarification gates)"]
+    M3["PROBE-discipline reminders<br/>(per-turn hook)"]
+    M4["Friction-as-memory rule<br/>(write feedback at moment of correction)"]
+    M5["Architecture snapshots<br/>(SessionStart pipeline)"]
+    M6["Upskilling audit<br/>(Stop hook, CORE DIRECTIVE 2)"]
+    M7["CORE DIRECTIVE 1<br/>(HALT if MCP unavailable)"]
+    M8["Cross-agent shared MCP<br/>(memos coordinate across agents)"]
+  end
+
+  M1 ==>|"reinforces"| IFACE
+  M2 ==>|"reinforces"| IFACE
+  M3 ==>|"reinforces"| IFACE
+  M4 ==>|"reinforces"| IFACE
+  M5 ==>|"reinforces"| IFACE
+  M6 ==>|"reinforces"| IFACE
+  M7 ==>|"reinforces"| IFACE
+  M8 ==>|"reinforces"| IFACE
+
+  IFACE ==> STRONG([Robust project])
+```
+
+## The map: weakness to reinforcement
+
+| Weak bond | What goes wrong | The reinforcement |
+|---|---|---|
+| **Memory loss across sessions** | The user said something important last session; the agent doesn't have it next session; correction is lost or has to be re-said. | The **loom-memory MCP** + the SessionStart auto-recall hook. Persistent cross-session memory; top-N relevant memories injected at conversation start. → [Memory MCP](/explanation/memory-mcp/) |
+| **Drift from the user's framing** | The user asks for a "layer" and the agent builds a separate deployed system. The user's load-bearing words get re-interpreted into the agent's default ontology. | **Per-project guard plugins** with framing-clarification gates that force the agent to restate the request in the user's words before building. The `sde-extraction-guard` UserPromptSubmit hook is the canonical example. → [Plugins](/explanation/plugins/) |
+| **Silent assumptions about the codebase** | The agent cites facts about the code that come from training-data defaults, not from the actual files. The user trusts the citation; the citation is wrong. | The **PROBE-discipline reminder** injected at the top of every user message by the `loom-discipline` UserPromptSubmit hook. "Cite file:line. Don't assert without grep/read." → [Plugins](/explanation/plugins/) |
+| **Forgotten corrections** | The user corrects the agent at minute 10 of a session; by minute 40, the agent has drifted back to the original behavior; by next session, the correction is gone entirely. | The **friction-as-memory rule** — every correction MUST be saved as a `feedback` memory immediately, at the moment of correction, not deferred. The discipline reminder reinforces it; the memory itself preserves it across sessions. → [Memory MCP](/explanation/memory-mcp/) |
+| **Architectural blindness** | The agent has no idea what's deployed, what changed since last session, what services exist, what depends on what. Every conversation starts from zero structural awareness. | The **architecture-snapshot pipeline** at SessionStart. Produces a structural snapshot + diff against prior baseline + narrative summary, injected as session context. → [Architecture snapshots](/explanation/architecture-snapshots/) |
+| **Repeated mistakes across sessions** | The same pattern recurs — same misunderstanding, same wrong architectural choice, same forgotten rule. Each session starts cold so the patterns don't accumulate into learning. | The **upskilling audit** (Stop hook, CORE DIRECTIVE 2). When a session crosses a substantive-work threshold without producing an upskilling report, it surfaces loudly. Pushes the loop: do work → notice patterns → codify into skills → next session is sharper. → [Plugins](/explanation/plugins/) |
+| **Invisible tool absence** | The MCP server is down, or `.mcp.json` isn't wiring it, or the plugin isn't enabled. The agent has no `memory_recall` available but doesn't know it — there's no negative-space awareness for a missing tool. | **CORE DIRECTIVE 1** — if memory tools are unavailable, HALT and report. Treat absence as a P0 application failure, not a degraded mode. → [Memory MCP](/explanation/memory-mcp/) |
+| **Cross-agent coordination loss** | One agent makes a decision in `the-loom`; another agent in `tapestry` doesn't know about it; both redo the same work or worse, contradict each other. | The **shared loom-memory MCP as cross-agent channel**. Memos written by one agent are readable by another via universal recall. Coordination happens through memory, not through DM or hope. → [Memory MCP](/explanation/memory-mcp/) |
+
+## The recursive loop: miscommunication becomes architecture
+
+The most important property of this system is that it doesn't just defend against communication weakness — it **converts the weakness into structure**. Each miscommunication, when caught and processed through the discipline, becomes a piece of the platform's reinforcement going forward.
+
+```mermaid
+flowchart LR
+  MISC([Miscommunication<br/>between user and agent])
+  MISC -->|"discipline plugin catches"| CORR([Correction])
+  CORR -->|"friction-as-memory rule"| MEM([Feedback memory written])
+  MEM -->|"auto-recall at next SessionStart"| NEXT([Next session starts with the rule loaded])
+  NEXT -->|"discipline applied automatically"| INT([Interface reinforced])
+  INT -->|"strengthens"| ALL([User-agent communication overall])
+
+  ALL -.->|"next miscommunication"| MISC
+```
+
+A correction is not a one-time event. It enters the system as a memory, surfaces in future sessions as recall context, and becomes a binding rule the agent operates under. Over months, this is how the agent's behavior in YOUR project converges on YOUR way of working — not through training, but through accumulated friction-as-memory.
+
+The platform's value compounds the longer you use it, but only if the reinforcement mechanisms are in place. A project missing the discipline plugin doesn't just have less memory — it has no mechanism for converting today's frustration into tomorrow's structure.
+
+## How the parts compose
+
+The five concrete pieces of the discipline stack you wire into your project — plus the platform-side pieces hosted for you — are how the above mechanisms actually exist:
 
 ```mermaid
 flowchart TB
@@ -40,6 +145,12 @@ flowchart TB
   PI -->|"per-project<br/>agent profile"| AGENT
   SNAP -->|"snapshot pipeline<br/>at SessionStart"| AGENT
 ```
+
+For the file-by-file reference, see [Load-bearing files](/reference/load-bearing-files/). To set up a project, see [Set up a new project](/how-to/set-up-a-new-project/). For diagnosis when something breaks, see [Recover from common failures](/how-to/recover-from-common-failures/).
+
+## What each piece does (at a glance)
+
+The diagram above shows how the pieces interconnect. The five summaries below say what each piece DOES, with a link to its deep-dive page.
 
 ### 1. The plugins → [Read more](/explanation/plugins/)
 

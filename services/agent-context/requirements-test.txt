@@ -1,0 +1,11 @@
+# Test-only deps for services/agent-context/tests/.
+# Install ON TOP of requirements.txt:
+#   pip install -r requirements.txt -r requirements-test.txt
+#
+# Production deploy (Render) does NOT install these — they're test-only.
+# render.yaml's buildCommand only references requirements.txt.
+
+pytest>=8.0,<9
+pytest-asyncio>=0.24
+httpx>=0.27,<1
+asgi-lifespan>=2.1,<3

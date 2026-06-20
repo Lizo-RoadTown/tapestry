@@ -1,0 +1,18 @@
+fastapi==0.115.4
+uvicorn[standard]==0.32.0
+
+# Postgres + pgvector (Phase 2)
+psycopg[binary]==3.2.3
+psycopg-pool==3.2.4
+pgvector==0.3.6
+
+# Embedding (BAAI/bge-small-en-v1.5, 384-dim ONNX, local — no API)
+fastembed==0.4.2
+
+# JWT signing + verification (Phase 2 auth_bridge)
+python-jose[cryptography]==3.3.0
+
+# MCP SDK (Phase 2 transport — wired in mcp/memory-server)
+# Need >=1.2 for mcp.server.auth.middleware (Make_Skills uses >=1.20,<2;
+# matching to stay in lockstep with their HTTP transport path).
+mcp>=1.20,<2

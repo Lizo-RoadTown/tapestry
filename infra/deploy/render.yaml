@@ -1,0 +1,89 @@
+# render.yaml — Tapestry deploy blueprint
+#
+# ============================================================================
+# STATUS: STAGING-FIRST DRAFT for Step 2 (agent-context MCP). NOT a prod deploy.
+# Governed by docs/migration-cicd/runbooks/02-agent-context-mcp.md. Do NOT sync
+# the production block until that runbook clears its parity + prod gates.
+# ============================================================================
+#
+# CRITICAL mechanics (from the 2026-06-20 research/eval pass):
+#
+#  - NO `databases:` block. Tapestry does NOT create a new Postgres. It reuses
+#    the EXISTING `loom-postgres`. Per Render IaC docs, a `fromDatabase:` ref in
+#    a second blueprint would spawn a NEW empty suffixed DB (data divergence) —
+#    so the DB connection is supplied as a `sync:false` SECRET (the raw
+#    connection string), NOT `fromDatabase`.
+#
+#  - ONE-BLUEPRINT invariant: only ONE blueprint may deploy a given service at a
+#    time. Before the production `loom-agent-context` block below is enabled, the
+#    the-loom blueprint must stop deploying it (set autoDeploy:false / remove it).
+#
+#  - SERVICE NAME PRESERVED at prod (`loom-agent-context`) → same URL → every
+#    consumer `.mcp.json` is unchanged. Rollback = re-point Render at the-loom.
+#
+#  - Secrets COPIED byte-identical from loom-shared-secrets (no rotation):
+#    LOOM_JWT_PUBLIC_KEY, LOOM_JWT_PRIVATE_KEY (issuer only). SELF_HOST_TENANT_ID
+#    stays the in-code constant (1d8ec1b3-…) — must not drift or RLS returns empty.
+
+envVarGroups:
+  - name: tapestry-shared-secrets
+    envVars:
+      - key: LOOM_JWT_PUBLIC_KEY
+        sync: false                  # copy byte-identical from loom-shared-secrets
+      # OTEL_* telemetry vars added when project-observatory/telemetry migrate (Step 7a)
+
+services:
+
+  # --------------------------------------------------------------------------
+  # STAGING — agent-context MCP. Distinct name (never collides with prod).
+  # Points at a RESTORED SNAPSHOT / read replica of loom-postgres, NOT prod.
+  # This is the `approved → staging-deployed` artifact. Operator provisions the
+  # staging DB + sets the secrets; then run the runbook parity check.
+  # --------------------------------------------------------------------------
+  - type: web
+    name: tapestry-agent-context-staging
+    runtime: python
+    plan: starter
+    region: oregon
+    branch: main                     # deploys from tapestry main once Step 2 merges
+    rootDir: services/agent-context
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    autoDeploy: false                # manual — operator triggers staging deploys
+    healthCheckPath: /health
+    envVars:
+      - fromGroup: tapestry-shared-secrets
+      - key: PYTHON_VERSION
+        value: "3.12"
+      - key: LOOM_JWT_PRIVATE_KEY
+        sync: false                  # copy from loom (issuer)
+      - key: LOOM_DB_URL
+        sync: false                  # raw connection string to a STAGING copy of loom-postgres (NOT prod)
+
+  # --------------------------------------------------------------------------
+  # PRODUCTION re-source of loom-agent-context — DISABLED.
+  # Enable ONLY at the runbook's `parity-verified → prod-rolling` gate, AFTER:
+  #   (1) parity check green, (2) operator written authorization,
+  #   (3) the-loom blueprint stops deploying loom-agent-context (one-blueprint).
+  # Same name/URL/DB as the live service → consumers unchanged; rollback =
+  # re-enable the-loom's deploy of this service.
+  # --------------------------------------------------------------------------
+  # - type: web
+  #   name: loom-agent-context        # SAME name → same URL → consumers unchanged
+  #   runtime: python
+  #   plan: starter                   # keep warm — CORE DIRECTIVE 1
+  #   region: oregon
+  #   branch: main
+  #   rootDir: services/agent-context
+  #   buildCommand: pip install -r requirements.txt
+  #   startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+  #   autoDeploy: true
+  #   healthCheckPath: /health
+  #   envVars:
+  #     - fromGroup: tapestry-shared-secrets
+  #     - key: PYTHON_VERSION
+  #       value: "3.12"
+  #     - key: LOOM_JWT_PRIVATE_KEY
+  #       sync: false
+  #     - key: LOOM_DB_URL
+  #       sync: false                 # raw connection string to the LIVE loom-postgres

@@ -35,7 +35,10 @@ export default defineConfig({
         {
           label: "How it works",
           items: [
-            { label: "The discipline stack", slug: "explanation/discipline-stack" },
+            { label: "The discipline stack (orientation)", slug: "explanation/discipline-stack" },
+            { label: "The plugins", slug: "explanation/plugins" },
+            { label: "The memory MCP", slug: "explanation/memory-mcp" },
+            { label: "Architecture snapshots", slug: "explanation/architecture-snapshots" },
           ],
         },
         {

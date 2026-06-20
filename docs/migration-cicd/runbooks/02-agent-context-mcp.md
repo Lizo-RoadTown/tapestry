@@ -66,21 +66,48 @@ The change is a **re-source of ONE service**, not a parallel fleet cutover:
 
 ## Staging deploy
 
-1. Branch: `migration/02-agent-context-mcp`
-2. Render staging service: `tapestry-agent-context-staging` (DISTINCT name; never collides with prod)
-3. Env vars (check existing first): copy `LOOM_JWT_*`, OTEL group; set `LOOM_DB_URL` to a **read replica or restored snapshot** of loom-postgres (NOT prod write)
-4. Migrations: apply `001_init_memory.sql` to the staging DB
-5. Deploy: tapestry blueprint, staging service only
+**Decision (2026-06-20): staging uses a FRESH EMPTY Postgres, not a snapshot of loom-postgres.** Rationale: prod cutover re-uses the *same real* `loom-postgres` (data identical by construction), so staging only needs to prove the lifted code boots + serves correctly. Avoids any restore/replica/restart of the live DB.
 
-## Parity check (go/no-go) — ≥1h or N requests
+1. New Render Postgres `tapestry-agent-context-staging-db` (PG 16, oregon). Done 2026-06-20: `dpg-d8rcol3eo5us73d7ejcg-a`.
+2. Apply the schema once via the staging DB's **external** connection: `psql "<external db url>" -f infra/migrations/001_init_memory.sql` (creates the `vector` extension + `records` table).
+3. New Render web service `tapestry-agent-context-staging` from the **tapestry** repo, branch `main`, rootDir `services/agent-context`.
+4. Env (see `services/agent-context/.env.example`): `LOOM_DB_URL` = staging DB **internal** url; `PYTHON_VERSION=3.12`. Self-host smoke needs nothing else — the service does NOT read the private key; `LOOM_JWT_PUBLIC_KEY` is optional (hosted/auth path only).
+5. Deploy → `/health` = 200.
 
-- [ ] `memory_read`/`recall` body diff < 0.1% (excl. UUIDs/timestamps) vs source
-- [ ] MCP handshake succeeds from a real client
-- [ ] Latency p95 within 20% of source
-- [ ] Row count matches (209 baseline)
-- [ ] `/v1/write` + `/v1/read` round-trip identical
+## Parity / smoke check (go/no-go)
 
-**Go:** all green → operator authorizes prod. **No-go:** any red → back to `approved`.
+Staging runs on a FRESH EMPTY DB → this validates the **lifted code serves correctly** (not data-identity — that's a prod invariant: prod reuses the same `loom-postgres`, so the 209 rows are identical by construction).
+
+Turnkey commands (replace `<staging>` with the staging service URL):
+
+```bash
+# 1. health
+curl -fsS https://<staging>/health
+
+# 2. write a test memory (self-host mode, no auth header)
+curl -fsS -X POST https://<staging>/v1/write -H "Content-Type: application/json" -d '{
+  "name":"staging_smoke_step2","record_type":"reference",
+  "content":"Step 2 staging smoke — lifted agent-context serving correctly.",
+  "project_tags":["tapestry"],"why":"runbook parity check","actor":"tapestry-agent"
+}'                                          # expect: {"ok":true,"name":"staging_smoke_step2","inserted":1}
+
+# 3. read it back (exact-name)
+curl -fsS -X POST https://<staging>/v1/read -H "Content-Type: application/json" \
+  -d '{"name":"staging_smoke_step2"}'      # expect: {"memory":{...}}
+
+# 4. semantic recall (exercises pgvector + embedding)
+curl -fsS -X POST https://<staging>/v1/recall -H "Content-Type: application/json" \
+  -d '{"context":"staging smoke serving","n":3}'
+```
+
+Go/no-go:
+- [ ] `/health` 200
+- [ ] `/v1/write` → `inserted:1`
+- [ ] `/v1/read` returns the written record (round-trip)
+- [ ] `/v1/recall` returns it via vector search (pgvector + embedding work)
+- [ ] MCP handshake from a real client against `/mcp/memory/` (Tapestry-agent runs this)
+
+**Go:** all green → operator authorizes prod (re-source preserving name/URL/DB). **No-go:** any red → back to `approved`.
 
 ## Production rollout
 

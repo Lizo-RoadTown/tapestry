@@ -38,6 +38,7 @@ export default defineConfig({
           label: "How it works",
           items: [
             { label: "The discipline stack (orientation)", slug: "explanation/discipline-stack" },
+            { label: "Sharing intelligence across projects", slug: "explanation/sharing-intelligence-across-projects" },
             { label: "The plugins", slug: "explanation/plugins" },
             { label: "The memory MCP", slug: "explanation/memory-mcp" },
             { label: "The observer", slug: "explanation/the-observer" },

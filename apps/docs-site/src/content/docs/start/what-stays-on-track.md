@@ -35,10 +35,6 @@ Tapestry is the proposition that each of those weak bonds can be reinforced by a
 
 ```mermaid
 flowchart TB
-  USER([User])
-  AGENT([Agent])
-  PROJECT([Robust project])
-
   subgraph TAPESTRY["Tapestry mechanisms"]
     direction TB
     M1["loom-memory MCP<br/>→ memory loss"]
@@ -51,11 +47,17 @@ flowchart TB
     M8["CORE DIRECTIVE 1<br/>→ invisible absence"]
   end
 
-  TAPESTRY ==>|"reinforces"| USER
-  TAPESTRY ==>|"reinforces"| AGENT
-  USER ==>|"reinforced interface"| AGENT
-  USER ==> PROJECT
-  AGENT ==> PROJECT
+  subgraph IFACE["Reinforced user ↔ agent interface"]
+    direction LR
+    USER([User])
+    AGENT([Agent])
+    USER <==> AGENT
+  end
+
+  PROJECT([Robust project])
+
+  TAPESTRY ==>|"reinforces"| IFACE
+  IFACE ==> PROJECT
 ```
 
 Each mechanism is small. Each targets a specific failure mode. The discipline emerges from the COMBINATION — every piece is small but load-bearing.

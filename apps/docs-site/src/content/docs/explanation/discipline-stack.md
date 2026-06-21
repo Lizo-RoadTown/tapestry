@@ -52,9 +52,7 @@ Tapestry is the proposition that **each of those weak bonds can be reinforced by
 The reinforcements are not generic. Each one targets a specific failure mode:
 
 ```mermaid
-flowchart LR
-  IFACE[/"User ↔ Agent interface"/]
-
+flowchart TB
   subgraph REINFORCEMENT["Tapestry mechanisms"]
     direction TB
     M1["loom-memory MCP<br/>(cross-session persistence)"]
@@ -68,17 +66,17 @@ flowchart LR
     M9["Cross-agent shared MCP<br/>(memos coordinate across agents)"]
   end
 
-  M1 ==>|"reinforces"| IFACE
-  M2 ==>|"reinforces"| IFACE
-  M3 ==>|"reinforces"| IFACE
-  M4 ==>|"reinforces"| IFACE
-  M5 ==>|"reinforces"| IFACE
-  M6 ==>|"reinforces"| IFACE
-  M7 ==>|"reinforces"| IFACE
-  M8 ==>|"reinforces"| IFACE
-  M9 ==>|"reinforces"| IFACE
+  subgraph IFACE["User ↔ Agent interface"]
+    direction LR
+    USER([User])
+    AGENT([Agent])
+    USER <==> AGENT
+  end
 
-  IFACE ==> STRONG([Robust project])
+  STRONG([Robust project])
+
+  REINFORCEMENT ==>|"reinforces"| IFACE
+  IFACE ==> STRONG
 ```
 
 ## The map: weakness to reinforcement

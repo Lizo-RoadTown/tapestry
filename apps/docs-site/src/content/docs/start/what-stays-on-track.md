@@ -1,19 +1,65 @@
 ---
 title: What keeps a project on track
-description: A one-page overview of the discipline stack — every load-bearing piece that makes your agent behave like the agents in Liz's other projects.
+description: A project is what gets built when a user and an agent work together. Tapestry's mechanisms reinforce the interface between them so the project doesn't degrade as the interface frays.
 ---
 
-When you start a Claude Code session in `the-loom`, `Make_Skills`, or `tapestry`, the agent does several things automatically that an agent in a stock-config repo would NOT do:
+## A project is what the interface produces
 
-- Recalls the top-N relevant memories from prior sessions and injects them as context at conversation start.
-- Sees a PROBE-discipline reminder at the top of every one of your messages ("cite file:line, distinguish dev-tooling from runtime, save corrections as feedback memory immediately").
-- Has access to `memory_recall`, `memory_write`, `memory_read`, `memory_search` MCP tools.
-- HALTs and reports if those memory tools become unavailable mid-session (CORE DIRECTIVE 1).
-- Emits an upskilling audit if it crosses a substantive-work threshold without recording a learning report (CORE DIRECTIVE 2).
+When you build a project with an agent, the project sits between you and the agent. The quality of the project is determined by the quality of the interface between you — by how well intent flows from you to the agent and back. When that interface is weak, the project is weak.
 
-None of this is built into Claude Code. It comes from a stack of four cooperating pieces. If any one of them is missing or misconfigured, the agent in your project quietly drops back to stock behavior — no error, no warning. It just starts checking memory less, citing less, drifting more.
+```mermaid
+flowchart LR
+  USER([User]) -.->|"weak interface"| AGENT([Agent])
+  USER -.-> PROJECT([Poor project])
+  AGENT -.-> PROJECT
+```
 
-## The four cooperating pieces
+Most of the failures in agent-assisted projects aren't agent failures or user failures in isolation. They're failures of the channel between them — specific, recurring, predictable ways that interface degrades:
+
+| Weak bond | What it looks like in practice |
+|---|---|
+| Memory loss across sessions | You said something important last week; the agent doesn't have it this week. |
+| Drift from your framing | You asked for a "layer in the dashboard"; the agent built a separate deployed system. |
+| Silent assumptions | The agent cites a file that doesn't actually say what the agent says it says. |
+| Forgotten corrections | You corrected the agent at minute 10; by minute 40, the same drift is back. |
+| Architectural blindness | The agent has no idea what's deployed, what changed, or what depends on what. |
+| Repeated mistakes | Same misunderstanding, same wrong architectural choice, across sessions and projects. |
+| Invisible tool absence | The memory MCP is down or unwired and nothing tells anyone. |
+
+Each is a specific way the interface fails. Left unaddressed, they compound into projects that get worse over time, not better.
+
+## What Tapestry does
+
+Tapestry is the proposition that each of those weak bonds can be reinforced by a specific mechanism, and that the mechanisms together convert miscommunications into architecture rather than letting them dissolve into churn.
+
+```mermaid
+flowchart LR
+  USER([User]) ==>|"reinforced interface"| AGENT([Agent])
+  USER ==> PROJECT([Robust project])
+  AGENT ==> PROJECT
+
+  subgraph TAPESTRY["Tapestry mechanisms"]
+    direction TB
+    M1["loom-memory MCP<br/>→ memory loss"]
+    M2["Per-project guard plugins<br/>→ framing drift"]
+    M3["PROBE-discipline reminders<br/>→ silent assumptions"]
+    M4["Friction-as-memory rule<br/>→ forgotten corrections"]
+    M5["Architecture snapshots<br/>→ architectural blindness"]
+    M6["Upskilling audit<br/>→ repeated mistakes"]
+    M7["CORE DIRECTIVE 1<br/>→ invisible absence"]
+  end
+
+  TAPESTRY ==>|"reinforces"| USER
+  TAPESTRY ==>|"reinforces"| AGENT
+```
+
+Each mechanism is small. Each targets a specific failure mode. The discipline emerges from the COMBINATION — every piece is small but load-bearing.
+
+For why each mechanism exists and how they form a recursive loop where miscommunications become architecture, see [The discipline stack](/explanation/discipline-stack/).
+
+## What this looks like concretely in your repo
+
+The mechanisms above don't exist in the abstract — they're concrete pieces wired into your project repo plus pieces hosted on the platform side.
 
 ```mermaid
 flowchart TB
@@ -22,53 +68,64 @@ flowchart TB
     SETTINGS[".claude/settings.json<br/>enables plugins"]
     ENV[".env<br/>LOOM_PROJECT_ID"]
     PI[".project-intelligence/<br/>per-project agent config"]
+    SNAP["scripts/architecture_*.py<br/>+ docs/architecture-snapshots/"]
   end
 
   subgraph PLATFORM["Tapestry platform"]
-    PLUGIN["loom-discipline plugin<br/>(installed via marketplace)"]
+    PLUGIN1["loom-discipline plugin"]
+    PLUGIN2["liz-patterns plugin"]
+    PLUGIN3["per-project guard plugin (optional)"]
     MEMORY["loom-memory MCP server<br/>(hosted)"]
   end
 
   MCP -->|"wires"| MEMORY
-  SETTINGS -->|"enables"| PLUGIN
-  PLUGIN -->|"declares"| MEMORY
-  PLUGIN -->|"SessionStart hook<br/>auto-recalls memory"| MEMORY
-  PLUGIN -->|"UserPromptSubmit hook<br/>injects PROBE reminder"| AGENT["Agent session"]
-  PLUGIN -->|"PreToolUse hook<br/>dual-mode boundary check"| AGENT
-  PLUGIN -->|"Stop hook<br/>upskilling audit"| AGENT
-  ENV -->|"scopes hooks +<br/>tags memory writes"| PLUGIN
+  SETTINGS -->|"enables"| PLUGIN1
+  SETTINGS -->|"enables"| PLUGIN2
+  SETTINGS -->|"enables"| PLUGIN3
+  PLUGIN1 -->|"declares"| MEMORY
+  PLUGIN1 -->|"4 hooks"| AGENT["Agent session"]
+  PLUGIN3 -->|"project-specific hooks"| AGENT
+  PLUGIN2 -->|"hosts canonical scripts"| SNAP
+  ENV -->|"scopes hooks +<br/>tags memory writes"| PLUGIN1
   PI -->|"per-project<br/>agent profile"| AGENT
+  SNAP -->|"snapshot pipeline<br/>at SessionStart"| AGENT
 ```
 
-## What each piece does in one sentence
+The five concrete pieces in your repo:
 
-1. **The `loom-discipline` plugin** is the source of the discipline behavior — its hooks fire at session start, per turn, before tool use, and at stop.
-2. **The `loom-memory` MCP server** is the cross-session memory store, hosted at `loom-agent-context.onrender.com`. The plugin declares it; your project's `.mcp.json` can also declare it as belt-and-suspenders.
-3. **Your project's `.claude/settings.json`** enables the plugin. If this entry is missing, the plugin doesn't load and none of the hooks fire.
-4. **Your project's `.env` `LOOM_PROJECT_ID`** scopes the hooks to your project (the plugin honors it for activation) and tags every memory write so the agent in your project sees memories tagged for your project on recall.
+1. **`.mcp.json`** declares the loom-memory MCP server.
+2. **`.claude/settings.json`** enables the loom-discipline plugin (and any per-project guards).
+3. **`.env`** holds `LOOM_PROJECT_ID` — the scope gate for hook activation and the tag applied to every memory write.
+4. **`.project-intelligence/<project-id>/`** holds the per-project agent profile (role, observatory config).
+5. **`scripts/architecture_*.py`** are thin wrappers that dispatch to the canonical snapshot scripts in the `liz-patterns` plugin.
 
-Plus one supporting piece:
+The two platform-side pieces (hosted, not in your repo):
 
-5. **`.project-intelligence/<project-id>/`** holds the per-project agent profile — what the agent IS in your project (researcher? developer? operator?), what events it should log, what makes a candidate worth surfacing. The plugin reads these to specialize behavior per project.
+- **The `loom-discipline` plugin** — installed once per machine; enabled per project; provides the four lifecycle hooks (SessionStart, UserPromptSubmit, PreToolUse, Stop).
+- **The `loom-memory` MCP server** — hosted at `loom-agent-context.onrender.com/mcp/memory/`; shared across every Tapestry-consuming project, scoped per-project via `project_tags`.
 
 ## What the agent loses if a piece goes missing
 
+The recurring failure mode is **silent absence**. The agent doesn't crash when something's missing — it just stops doing one thing it should be doing. You only notice when you compare it to a properly-wired agent.
+
 | If this is missing or wrong | The agent loses |
 |---|---|
-| `.mcp.json` not declaring `loom-memory` AND plugin not enabled | All memory tools. The agent has no way to call `memory_recall` or `memory_write`. |
-| Plugin not enabled in `.claude/settings.json` | All four hooks. No auto-recall at session start, no PROBE reminder per turn, no PreToolUse check, no Stop audit. |
-| Plugin enabled but `LOOM_PROJECT_ID` unset | Hooks may no-op because the scope gate finds nothing to activate against. |
-| `LOOM_PROJECT_ID` drifted (different value than expected) | Memory writes tag the "wrong" project; the agent recalls memories that don't match its operating context. |
-| `.project-intelligence/` deleted or moved | The agent loses per-project specialization — it doesn't know what role it plays in this repo. |
-| Architecture-snapshot scripts deleted from `scripts/` | The SessionStart snapshot pipeline silently no-ops (the hook reads from these scripts and skips when absent). The agent loses the architecture context at session start. |
+| `.mcp.json` not declaring `loom-memory` AND plugin not enabled | All memory tools. No `memory_recall` or `memory_write` available. |
+| Plugin not enabled in `.claude/settings.json` | All four hooks. No auto-recall, no PROBE reminder, no boundary check, no upskilling audit. |
+| Plugin enabled but `LOOM_PROJECT_ID` unset | Hooks may no-op. Scope gate has nothing to activate against. |
+| `LOOM_PROJECT_ID` drifted | Memory writes tag the wrong project. Recall surfaces the wrong context. |
+| `.project-intelligence/` deleted or moved | Agent loses per-project specialization. |
+| `scripts/architecture_snapshot.py` deleted | Snapshot pipeline silently no-ops at session start. Architecture awareness across sessions disappears. |
 
-The recurring failure mode: **silent absence.** The agent doesn't know what tool it's missing, because it never had it. It just starts answering questions without checking memory and you wonder why it feels different than the agent you talked to last week.
+## Read next
 
-## How to verify your project is wired correctly
+To audit an existing project: [Recover from common failures](/how-to/recover-from-common-failures/).
 
-Use the [Set up a new project](/how-to/set-up-a-new-project/) checklist for a fresh project. For an existing project, see [Recover from common failures](/how-to/recover-from-common-failures/) and check each "symptom" row — even if you don't have the symptom yet, the table tells you what to inspect.
+To set up a new project from scratch: [Set up a new project](/how-to/set-up-a-new-project/).
 
-For a full file-by-file breakdown, see [Load-bearing files](/reference/load-bearing-files/).
+To understand WHY each mechanism exists at the structural level (the user-agent interface, the reinforcement model, the recursive miscommunication-becomes-architecture loop): [The discipline stack](/explanation/discipline-stack/).
+
+For the file-by-file reference: [Load-bearing files](/reference/load-bearing-files/).
 
 ## Why this site exists
 
@@ -76,4 +133,4 @@ In June 2026, the SDE_Extraction agent had been running without the `loom-discip
 
 The fix was three lines of JSON. The reason it wasn't caught for three weeks is that absence is invisible: the agent had no negative-space awareness, the operator had no checklist to run, and nothing in the system loudly said "this is broken."
 
-This site exists so that the next time someone creates a project that plugs into Tapestry, they have an explicit reference for what every piece is and what its absence looks like.
+This site exists so that the next time someone creates a project that plugs into Tapestry, they have an explicit reference for what every piece is and what its absence looks like — and why each piece is there in the first place.

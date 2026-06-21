@@ -19,15 +19,19 @@ hero:
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
 
+:::note[First-time reader?]
+These docs reference a few transitional names from the platform's beta period — `the-loom`, `Make_Skills`, `SDE_Extraction`, plugin marketplaces called `lizo-loom` and `lizo-skills`. **If any name feels unfamiliar, see [Names you'll see in these docs](/start/names-you-will-see/) first.** It's a one-page glossary that explains every name in plain terms.
+:::
+
 ## Who this is for
 
-You are creating a project that plugs into the Tapestry platform — for example, the way SDE_Extraction plugs in. You want the agent working in your project to behave like the agent working in `the-loom` or `Make_Skills`: it checks memory at the start of a task, follows PROBE discipline, knows what's a runtime concern vs a dev-tooling concern, and writes friction to memory the moment you correct it.
+You are setting up a project that plugs into the Tapestry platform. You want the AI agent working in your project to check memory at the start of a task, follow PROBE discipline (cite sources rather than guess), distinguish runtime concerns from dev tooling, and write friction to memory the moment you correct it.
 
 You do not need to know every internal mechanic. You need to know which files are load-bearing, what each one does, and how to recover when one of them goes missing.
 
 ## What this site explains
 
-- The stack of plugins, MCP wiring, hooks, and configuration files that make the agent in your project behave like the agents in Liz's other projects.
+- The stack of plugins, MCP wiring, hooks, and configuration files that make the agent in your project behave consistently across sessions.
 - Why each piece exists. (If you don't know what something does, you will eventually delete or move it. Knowing why prevents that.)
 - How to set up a new project so the stack is wired correctly from day one.
 - How to recover when the agent starts drifting — usually because something small went missing.

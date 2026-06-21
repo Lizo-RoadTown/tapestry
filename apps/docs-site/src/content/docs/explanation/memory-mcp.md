@@ -21,7 +21,7 @@ It runs as a Render web service backed by Postgres + pgvector. The Postgres rows
 
 It is not one-MCP-per-project — every project shares the same hosted MCP instance, and the project scoping happens at the row level via `project_tags`.
 
-It also serves as a **cross-agent channel**. A memory written by the agent in your project is readable by the agent in `the-loom`, the agent in `Make_Skills`, and the Tapestry-agent. When those agents write memos tagged for cross-project context, the agent in your project reads them at the next session start.
+It also serves as a **cross-agent channel**. A memory written by the agent in your project is readable by agents working in other projects that share the same memory store. When those other agents write memos tagged for cross-project context, the agent in your project reads them at the next session start. This is how decisions and learnings made in one project become available to agents elsewhere.
 
 ## What ends up in memory
 
@@ -46,9 +46,9 @@ The most common in practice are `feedback`, `lesson`, `project`, and `decision`.
 
 Every memory row has an optional `project_tags` array that determines who sees it on recall.
 
-- A memory tagged `["sde-extraction-dev"]` is scoped to the SDE_Extraction project. It surfaces when the agent in that project calls memory recall, but not in other projects' sessions.
-- A memory tagged `["the-loom", "tapestry"]` is dual-scoped — both projects see it.
-- A memory with NO tags (empty or omitted) is **universal**. It surfaces in every project's recall. This scope is reserved for discipline rules that apply to all projects.
+- A memory tagged `["your-project-id"]` is scoped to a single project. It surfaces when the agent in that project calls memory recall, but not in other projects' sessions.
+- A memory tagged `["project-a", "project-b"]` is dual-scoped — both projects see it. Useful for decisions or coordination memos that affect multiple projects.
+- A memory with NO tags (empty or omitted) is **universal**. It surfaces in every project's recall. This scope is reserved for discipline rules that apply to all projects, not for project-specific notes.
 
 The discipline plugin handles the tagging automatically. It reads `LOOM_PROJECT_ID` from your `.env` and applies that as the tag on any memory the agent writes during sessions in your project. If `LOOM_PROJECT_ID` is wrong or missing, memory writes land in the wrong scope — your project either pollutes other projects' memory or loses its own at next session.
 

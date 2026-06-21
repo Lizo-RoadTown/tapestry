@@ -132,7 +132,7 @@ For the file-by-file reference: [Load-bearing files](/reference/load-bearing-fil
 
 ## Why this site exists
 
-In June 2026, the SDE_Extraction agent had been running without the `loom-discipline` plugin enabled and without `loom-memory` wired in its `.mcp.json` for about three weeks before anyone noticed. The CLAUDE.md in that repo told the agent to use `memory_recall` and `memory_write`, but the tools were never available in the session. The agent silently did what it could — reading the CLAUDE.md, accepting the framing, and never confirming the tools actually existed.
+In June 2026, a consuming project's agent had been running without the `loom-discipline` plugin enabled and without the memory MCP wired in its `.mcp.json` for about three weeks before anyone noticed. The project's `CLAUDE.md` told the agent to use the memory tools, but the tools were never actually available in the session. The agent silently did what it could — reading the `CLAUDE.md`, accepting the framing, and never confirming the tools actually existed.
 
 The fix was three lines of JSON. The reason it wasn't caught for three weeks is that absence is invisible: the agent had no negative-space awareness, the operator had no checklist to run, and nothing in the system loudly said "this is broken."
 

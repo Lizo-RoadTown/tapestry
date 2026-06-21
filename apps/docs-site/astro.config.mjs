@@ -30,6 +30,7 @@ export default defineConfig({
           label: "Start here",
           items: [
             { label: "Overview", slug: "index" },
+            { label: "Names you'll see in these docs", slug: "start/names-you-will-see" },
             { label: "What keeps a project on track", slug: "start/what-stays-on-track" },
           ],
         },

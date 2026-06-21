@@ -21,26 +21,26 @@ Most of the failures in agent-assisted projects aren't agent failures or user fa
 The weakness shows up as specific recurring failure modes:
 
 ```mermaid
-flowchart TB
-  IFACE[/"User ↔ Agent interface"/]
+flowchart LR
+  IFACE[/"User ↔ Agent<br/>interface"/]
 
-  IFACE --> W1["Memory loss across sessions"]
-  IFACE --> W2["Drift from the user's framing"]
-  IFACE --> W3["Silent assumptions about the codebase"]
-  IFACE --> W4["Forgotten corrections"]
-  IFACE --> W5["Architectural blindness"]
-  IFACE --> W6["Repeated mistakes across sessions"]
-  IFACE --> W7["Invisible tool absence"]
-  IFACE --> W8["Cross-agent coordination loss"]
+  subgraph BONDS["Weak bonds"]
+    direction TB
+    W1["Memory loss across sessions"]
+    W2["Drift from the user's framing"]
+    W3["Silent assumptions about the codebase"]
+    W4["Forgotten corrections"]
+    W5["Architectural blindness"]
+    W6["Repeated mistakes across sessions"]
+    W7["Patterns invisible across sessions"]
+    W8["Invisible tool absence"]
+    W9["Cross-agent coordination loss"]
+  end
 
-  W1 --> POOR([Poor project])
-  W2 --> POOR
-  W3 --> POOR
-  W4 --> POOR
-  W5 --> POOR
-  W6 --> POOR
-  W7 --> POOR
-  W8 --> POOR
+  POOR([Poor project])
+
+  IFACE --> BONDS
+  BONDS --> POOR
 ```
 
 Each of these is a specific bond in the interface that wants to fail. Left unaddressed, every one of them feeds back into the project as accumulated weakness — corrections that get re-litigated, decisions that get re-made, mistakes that recur because no one remembered the prior session.
@@ -128,8 +128,9 @@ The platform's value compounds the longer you use it, but only if the reinforcem
 The five concrete pieces of the discipline stack you wire into your project — plus the platform-side pieces hosted for you — are how the above mechanisms actually exist:
 
 ```mermaid
-flowchart TB
+flowchart LR
   subgraph PROJECT["Your project repo"]
+    direction TB
     MCP[".mcp.json<br/>declares MCP servers"]
     SETTINGS[".claude/settings.json<br/>enables plugins"]
     ENV[".env<br/>LOOM_PROJECT_ID"]
@@ -138,23 +139,26 @@ flowchart TB
   end
 
   subgraph PLATFORM["Tapestry platform"]
+    direction TB
     PLUGIN1["loom-discipline plugin"]
     PLUGIN2["liz-patterns plugin"]
-    PLUGIN3["per-project guard plugin (optional)"]
+    PLUGIN3["per-project guard plugin<br/>(optional)"]
     MEMORY["loom-memory MCP server<br/>(hosted)"]
   end
+
+  AGENT(["Agent session"])
 
   MCP -->|"wires"| MEMORY
   SETTINGS -->|"enables"| PLUGIN1
   SETTINGS -->|"enables"| PLUGIN2
   SETTINGS -->|"enables"| PLUGIN3
   PLUGIN1 -->|"declares"| MEMORY
-  PLUGIN1 -->|"4 hooks"| AGENT["Agent session"]
-  PLUGIN3 -->|"project-specific hooks"| AGENT
   PLUGIN2 -->|"hosts canonical scripts"| SNAP
   ENV -->|"scopes hooks +<br/>tags memory writes"| PLUGIN1
-  PI -->|"per-project<br/>agent profile"| AGENT
-  SNAP -->|"snapshot pipeline<br/>at SessionStart"| AGENT
+  PLUGIN1 -->|"4 hooks"| AGENT
+  PLUGIN3 -->|"project-specific hooks"| AGENT
+  PI -->|"per-project agent profile"| AGENT
+  SNAP -->|"snapshot pipeline at SessionStart"| AGENT
 ```
 
 For the file-by-file reference, see [Load-bearing files](/reference/load-bearing-files/). To set up a project, see [Set up a new project](/how-to/set-up-a-new-project/). For diagnosis when something breaks, see [Recover from common failures](/how-to/recover-from-common-failures/).

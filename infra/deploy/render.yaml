@@ -36,9 +36,9 @@ services:
 
   # --------------------------------------------------------------------------
   # STAGING — agent-context MCP. Distinct name (never collides with prod).
-  # Points at a RESTORED SNAPSHOT / read replica of loom-postgres, NOT prod.
-  # This is the `approved → staging-deployed` artifact. Operator provisions the
-  # staging DB + sets the secrets; then run the runbook parity check.
+  # Points at a FRESH EMPTY staging Postgres (NOT a snapshot of loom-postgres;
+  # prod reuses the real DB, so data-identity is a prod invariant).
+  # DEPLOYED + parity GREEN 2026-06-20 (srv-d8rfng37uimc73f5c7gg).
   # --------------------------------------------------------------------------
   - type: web
     name: tapestry-agent-context-staging
@@ -59,6 +59,29 @@ services:
         sync: false                  # copy from loom (issuer)
       - key: LOOM_DB_URL
         sync: false                  # raw connection string to a STAGING copy of loom-postgres (NOT prod)
+
+  # --------------------------------------------------------------------------
+  # STAGING — project-registry (Step 3). Distinct name. Fresh empty staging DB.
+  # Governed by runbooks/03-project-registry.md. No deploy until that runbook's
+  # gates clear. project-registry does not issue tokens (no private key).
+  # --------------------------------------------------------------------------
+  - type: web
+    name: tapestry-project-registry-staging
+    runtime: python
+    plan: free
+    region: oregon
+    branch: main
+    rootDir: services/project-registry
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    autoDeploy: false
+    healthCheckPath: /health
+    envVars:
+      - fromGroup: tapestry-shared-secrets
+      - key: PYTHON_VERSION
+        value: "3.12"
+      - key: LOOM_DB_URL
+        sync: false                  # raw connection string to a STAGING Postgres (NOT prod)
 
   # --------------------------------------------------------------------------
   # PRODUCTION re-source of loom-agent-context — DISABLED.

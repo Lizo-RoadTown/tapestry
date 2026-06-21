@@ -79,36 +79,37 @@ A typical session start with all three enabled:
 
 ```mermaid
 flowchart TB
-  start([Claude Code session opens])
+  start(["Claude Code session opens"])
 
-  start --> ldsess[loom-discipline<br/>SessionStart hook]
-  ldsess --> recall[/v1/recall → loom-memory MCP]
-  ldsess --> snapshot[architecture_snapshot.py<br/>via wrapper → liz-patterns]
-  recall --> inject1[inject memories as additionalContext]
-  snapshot --> inject2[inject snapshot/diff/narrative as additionalContext]
-  inject1 --> ready
-  inject2 --> ready[Agent ready with full context]
+  start --> ldsess["loom-discipline<br/>SessionStart hook"]
+  ldsess --> recall["calls v1/recall on loom-memory MCP"]
+  ldsess --> snapshot["runs architecture_snapshot.py<br/>(wrapper to liz-patterns)"]
+  recall --> inject1["injects memories as additionalContext"]
+  snapshot --> inject2["injects snapshot diff narrative as additionalContext"]
+  inject1 --> ready["Agent ready with full context"]
+  inject2 --> ready
 
-  ready --> prompt[Operator sends a message]
+  ready --> prompt["Operator sends a message"]
 
-  prompt --> ldprompt[loom-discipline<br/>UserPromptSubmit]
-  prompt --> guardprompt[per-project guard<br/>UserPromptSubmit]
-  ldprompt --> probe[inject PROBE-discipline reminder]
-  guardprompt --> clarify[inject framing-clarification gate]
+  prompt --> ldprompt["loom-discipline<br/>UserPromptSubmit hook"]
+  prompt --> guardprompt["per-project guard<br/>UserPromptSubmit hook"]
+  ldprompt --> probe["injects PROBE-discipline reminder"]
+  guardprompt --> clarify["injects framing-clarification gate"]
 
-  probe --> agent[Agent responds]
+  probe --> agent["Agent responds"]
   clarify --> agent
 
-  agent --> edit[Agent performs Edit/Write/MultiEdit]
+  agent --> edit["Agent performs an edit"]
 
-  edit --> ldedit[loom-discipline<br/>PreToolUse boundary check]
-  edit --> guardedit[per-project guard<br/>PostToolUse schema check]
-  ldedit --> dualmode[dual-mode boundary confirmation]
-  guardedit --> schema[check_schema.py validation]
+  edit --> ldedit["loom-discipline<br/>PreToolUse hook"]
+  edit --> guardedit["per-project guard<br/>PostToolUse hook"]
+  ldedit --> dualmode["dual-mode boundary check"]
+  guardedit --> schema["schema validation"]
 
-  agent --> stop[Turn ends]
-  stop --> ldstop[loom-discipline<br/>Stop hook]
-  ldstop --> audit[upskilling audit]
+  agent --> stop["Turn ends"]
+  stop --> ldstop["loom-discipline<br/>Stop hook"]
+  ldstop --> audit["upskilling audit"]
+  ldstop --> observer["Path A observer<br/>updates candidates"]
 ```
 
 The plugins run independently. They don't share state or call each other. Each plugin's hook fires for its own concern. If one plugin's hook fails or times out, the others still run.

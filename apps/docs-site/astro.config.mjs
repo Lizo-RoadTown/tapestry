@@ -16,6 +16,7 @@ export default defineConfig({
       title: "Tapestry",
       description:
         "What keeps a project on track when it plugs into the Tapestry platform: the discipline stack of plugins, MCP wiring, hooks, and project intelligence — and how to recover when one piece goes missing.",
+      customCss: ["./src/styles/custom.css"],
       social: [
         {
           icon: "github",
@@ -38,6 +39,7 @@ export default defineConfig({
             { label: "The discipline stack (orientation)", slug: "explanation/discipline-stack" },
             { label: "The plugins", slug: "explanation/plugins" },
             { label: "The memory MCP", slug: "explanation/memory-mcp" },
+            { label: "The observer", slug: "explanation/the-observer" },
             { label: "Architecture snapshots", slug: "explanation/architecture-snapshots" },
           ],
         },

@@ -1,0 +1,27 @@
+/* Tapestry docs site — custom styles */
+
+/* Inline code inside table cells should not break mid-token.
+ * Without this, narrow first-column cells split identifiers like
+ * `skill_idea` across two lines as "skill_i / dea". The cell grows
+ * to fit the token; other columns wrap normally.
+ */
+:where(table) code {
+  white-space: nowrap;
+}
+
+/* Same for the first column of any table — short single-token labels
+ * (like "Type" enum values) should not wrap mid-word. Multi-word
+ * column-1 content (which may have spaces) wraps normally.
+ */
+:where(table) th:first-child,
+:where(table) td:first-child {
+  white-space: nowrap;
+}
+
+/* Re-allow wrapping when the first column genuinely needs it.
+ * Apply by class on individual tables that have long-prose column 1.
+ */
+:where(table.wrap-first) th:first-child,
+:where(table.wrap-first) td:first-child {
+  white-space: normal;
+}

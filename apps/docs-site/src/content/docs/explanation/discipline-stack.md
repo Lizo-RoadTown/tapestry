@@ -63,8 +63,9 @@ flowchart LR
     M4["Friction-as-memory rule<br/>(write feedback at moment of correction)"]
     M5["Architecture snapshots<br/>(SessionStart pipeline)"]
     M6["Upskilling audit<br/>(Stop hook, CORE DIRECTIVE 2)"]
-    M7["CORE DIRECTIVE 1<br/>(HALT if MCP unavailable)"]
-    M8["Cross-agent shared MCP<br/>(memos coordinate across agents)"]
+    M7["The observer<br/>(local + cron; converts patterns to candidates)"]
+    M8["CORE DIRECTIVE 1<br/>(HALT if MCP unavailable)"]
+    M9["Cross-agent shared MCP<br/>(memos coordinate across agents)"]
   end
 
   M1 ==>|"reinforces"| IFACE
@@ -75,6 +76,7 @@ flowchart LR
   M6 ==>|"reinforces"| IFACE
   M7 ==>|"reinforces"| IFACE
   M8 ==>|"reinforces"| IFACE
+  M9 ==>|"reinforces"| IFACE
 
   IFACE ==> STRONG([Robust project])
 ```
@@ -88,7 +90,8 @@ flowchart LR
 | **Silent assumptions about the codebase** | The agent cites facts about the code that come from training-data defaults, not from the actual files. The user trusts the citation; the citation is wrong. | The **PROBE-discipline reminder** injected at the top of every user message by the `loom-discipline` UserPromptSubmit hook. "Cite file:line. Don't assert without grep/read." → [Plugins](/explanation/plugins/) |
 | **Forgotten corrections** | The user corrects the agent at minute 10 of a session; by minute 40, the agent has drifted back to the original behavior; by next session, the correction is gone entirely. | The **friction-as-memory rule** — every correction MUST be saved as a `feedback` memory immediately, at the moment of correction, not deferred. The discipline reminder reinforces it; the memory itself preserves it across sessions. → [Memory MCP](/explanation/memory-mcp/) |
 | **Architectural blindness** | The agent has no idea what's deployed, what changed since last session, what services exist, what depends on what. Every conversation starts from zero structural awareness. | The **architecture-snapshot pipeline** at SessionStart. Produces a structural snapshot + diff against prior baseline + narrative summary, injected as session context. → [Architecture snapshots](/explanation/architecture-snapshots/) |
-| **Repeated mistakes across sessions** | The same pattern recurs — same misunderstanding, same wrong architectural choice, same forgotten rule. Each session starts cold so the patterns don't accumulate into learning. | The **upskilling audit** (Stop hook, CORE DIRECTIVE 2). When a session crosses a substantive-work threshold without producing an upskilling report, it surfaces loudly. Pushes the loop: do work → notice patterns → codify into skills → next session is sharper. → [Plugins](/explanation/plugins/) |
+| **Repeated mistakes across sessions** | The same pattern recurs — same misunderstanding, same wrong architectural choice, same forgotten rule. Each session starts cold so the patterns don't accumulate into learning. | The **upskilling audit** (Stop hook, CORE DIRECTIVE 2). When a session crosses a substantive-work threshold without producing an upskilling report, it surfaces loudly. The audit RAISES the pattern; the observer PERSISTS it (see next row). → [Plugins](/explanation/plugins/) |
+| **Patterns invisible across sessions** | A behavior recurs across five sessions, but no individual session is long enough for the agent (or operator) to surface it. The cross-session signal exists but no one is watching for it. | The **observer** — two mechanisms together: a local observer in the discipline plugin parses each session's upskilling report + counts skill invocations + updates per-project longitudinal state; a Render cron scans registered repos every 6h applying signal rules. Both emit candidates to the architecture-registry with `draft → observed → recurring` status as evidence accumulates. → [The observer](/explanation/the-observer/) |
 | **Invisible tool absence** | The MCP server is down, or `.mcp.json` isn't wiring it, or the plugin isn't enabled. The agent has no `memory_recall` available but doesn't know it — there's no negative-space awareness for a missing tool. | **CORE DIRECTIVE 1** — if memory tools are unavailable, HALT and report. Treat absence as a P0 application failure, not a degraded mode. → [Memory MCP](/explanation/memory-mcp/) |
 | **Cross-agent coordination loss** | One agent makes a decision in `the-loom`; another agent in `tapestry` doesn't know about it; both redo the same work or worse, contradict each other. | The **shared loom-memory MCP as cross-agent channel**. Memos written by one agent are readable by another via universal recall. Coordination happens through memory, not through DM or hope. → [Memory MCP](/explanation/memory-mcp/) |
 
@@ -97,15 +100,25 @@ flowchart LR
 The most important property of this system is that it doesn't just defend against communication weakness — it **converts the weakness into structure**. Each miscommunication, when caught and processed through the discipline, becomes a piece of the platform's reinforcement going forward.
 
 ```mermaid
-flowchart LR
+flowchart TB
   MISC([Miscommunication<br/>between user and agent])
-  MISC -->|"discipline plugin catches"| CORR([Correction])
-  CORR -->|"friction-as-memory rule"| MEM([Feedback memory written])
-  MEM -->|"auto-recall at next SessionStart"| NEXT([Next session starts with the rule loaded])
-  NEXT -->|"discipline applied automatically"| INT([Interface reinforced])
-  INT -->|"strengthens"| ALL([User-agent communication overall])
+  CORR([Correction surfaces])
+  MEM([Feedback memory written])
+  RECALL([Memory auto-recalled<br/>at next SessionStart])
+  OBSERVED([Observer counts the pattern<br/>across sessions])
+  CAND([Candidate emitted<br/>to architecture-registry])
+  RULE([Discipline applied automatically<br/>next time])
+  STRONG([Interface reinforced])
 
-  ALL -.->|"next miscommunication"| MISC
+  MISC -->|"discipline plugin catches"| CORR
+  CORR -->|"friction-as-memory rule"| MEM
+  MEM -->|"SessionStart hook"| RECALL
+  CORR -.->|"observer counts in transcript"| OBSERVED
+  OBSERVED -->|"3+ sessions"| CAND
+  RECALL --> RULE
+  CAND --> RULE
+  RULE --> STRONG
+  STRONG -.->|"next miscommunication carries less weight"| MISC
 ```
 
 A correction is not a one-time event. It enters the system as a memory, surfaces in future sessions as recall context, and becomes a binding rule the agent operates under. Over months, this is how the agent's behavior in YOUR project converges on YOUR way of working — not through training, but through accumulated friction-as-memory.

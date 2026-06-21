@@ -24,6 +24,7 @@ Most of the failures in agent-assisted projects aren't agent failures or user fa
 | Forgotten corrections | You corrected the agent at minute 10; by minute 40, the same drift is back. |
 | Architectural blindness | The agent has no idea what's deployed, what changed, or what depends on what. |
 | Repeated mistakes | Same misunderstanding, same wrong architectural choice, across sessions and projects. |
+| Patterns invisible across sessions | A behavior recurs across many sessions but no single session is long enough to surface it. |
 | Invisible tool absence | The memory MCP is down or unwired and nothing tells anyone. |
 
 Each is a specific way the interface fails. Left unaddressed, they compound into projects that get worse over time, not better.
@@ -33,10 +34,10 @@ Each is a specific way the interface fails. Left unaddressed, they compound into
 Tapestry is the proposition that each of those weak bonds can be reinforced by a specific mechanism, and that the mechanisms together convert miscommunications into architecture rather than letting them dissolve into churn.
 
 ```mermaid
-flowchart LR
-  USER([User]) ==>|"reinforced interface"| AGENT([Agent])
-  USER ==> PROJECT([Robust project])
-  AGENT ==> PROJECT
+flowchart TB
+  USER([User])
+  AGENT([Agent])
+  PROJECT([Robust project])
 
   subgraph TAPESTRY["Tapestry mechanisms"]
     direction TB
@@ -46,11 +47,15 @@ flowchart LR
     M4["Friction-as-memory rule<br/>→ forgotten corrections"]
     M5["Architecture snapshots<br/>→ architectural blindness"]
     M6["Upskilling audit<br/>→ repeated mistakes"]
-    M7["CORE DIRECTIVE 1<br/>→ invisible absence"]
+    M7["The observer<br/>→ patterns invisible across sessions"]
+    M8["CORE DIRECTIVE 1<br/>→ invisible absence"]
   end
 
   TAPESTRY ==>|"reinforces"| USER
   TAPESTRY ==>|"reinforces"| AGENT
+  USER ==>|"reinforced interface"| AGENT
+  USER ==> PROJECT
+  AGENT ==> PROJECT
 ```
 
 Each mechanism is small. Each targets a specific failure mode. The discipline emerges from the COMBINATION — every piece is small but load-bearing.

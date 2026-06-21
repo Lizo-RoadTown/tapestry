@@ -102,11 +102,11 @@ python scripts/architecture_diff.py
 
 If the wrapper exits 127 with "canonical architecture_snapshot.py not found", install the patterns plugin.
 
-## Why this matters in the dashboard story
+## Why this gets its own page
 
-You named architecture snapshots in your original request as the canonical example of "something that quietly breaks if accidentally moved or deleted, and the operator has no idea what it was." That's exactly the failure shape. The wrappers look like normal Python files in your `scripts/` directory; they could plausibly be deleted as cleanup. The output directory looks like generated noise that could plausibly be wiped.
+The architecture-snapshot pipeline is the canonical example of something that quietly breaks if accidentally moved or deleted, with no obvious indication of what it was for. The wrappers look like normal Python files in the `scripts/` directory; they could plausibly be deleted as cleanup. The output directory looks like generated noise that could plausibly be wiped.
 
-Neither is actually expensive to lose — both are recoverable. But losing them is invisible until you notice the agent has stopped mentioning recent architectural changes at session start. By the time you notice, you've already lost weeks of baseline. This page exists so that the first time someone looks at those files and wonders "what is this", they have an answer that's better than "delete it and see what breaks."
+Neither is actually expensive to lose — both are recoverable. But losing them is invisible until the agent stops mentioning recent architectural changes at session start. By the time the symptom shows up, weeks of baseline are already gone. This page exists so the first time someone looks at those files and wonders "what is this", they have an answer that's better than "delete it and see what breaks."
 
 ## Related
 

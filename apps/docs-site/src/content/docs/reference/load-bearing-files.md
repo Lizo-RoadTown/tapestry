@@ -129,6 +129,18 @@ LOOM_PROJECT_ID=your-project-id
 
 **Reference:** SDE_Extraction PR #1 (commit `2325e67`) for the wrapper pattern.
 
+### `.project-intelligence/<project-id>/workflow-candidates/`
+
+**Location:** `.project-intelligence/<project-id>/workflow-candidates/` at repo root.
+
+**What it is:** per-project longitudinal state for the Path A observer (see [The observer](/explanation/the-observer/)). One JSON file per skill the observer has surfaced in any session; each file tracks cumulative `sessions_seen`, the most-recent `status`, and the prior session IDs where the skill appeared.
+
+**Why it exists:** the observer runs at the end of every session, but candidates only make sense over time. This directory keeps the count across sessions so the observer can dedup and advance status (`draft → observed → recurring`) without re-reading every prior transcript.
+
+**If missing:** the observer recreates the directory on next emission. Cumulative state from prior sessions is lost — every skill in repeated sessions emits as a new candidate every time, status never advances past `draft`.
+
+**Gitignore status:** committed (it's intentional cumulative state, useful as an audit trail).
+
 ### `docs/architecture-snapshots/` directory
 
 **Location:** `docs/architecture-snapshots/` at repo root.
@@ -180,6 +192,24 @@ LOOM_PROJECT_ID=your-project-id
 **If missing:** consuming projects can still wrap their own architecture-snapshot scripts but lose access to the canonical agents and skills via the `liz-patterns:` namespace.
 
 **Install:** `/plugin install liz-patterns@lizo-skills` after `/plugin marketplace add Lizo-RoadTown/claude-skills-marketplace`.
+
+### The Path A observer (inside the `loom-discipline` plugin)
+
+**Location:** `~/.claude/plugins/cache/lizo-loom/loom-discipline/<version>/scripts/observer.py`.
+
+**What it is:** the Stop-hook observer that parses session transcripts, counts skill invocations, dedups against `.project-intelligence/<project-id>/workflow-candidates/`, and POSTs candidates to the architecture-registry as evidence accumulates. See [The observer](/explanation/the-observer/).
+
+**If missing:** candidates from session activity stop emitting. Manual operator POSTs become the only path into the registry.
+
+### The self-observer Render cron
+
+**Location:** hosted as Render cron `crn-d8n2q4ernols73d7upbg` (`loom-self-observer`), starter plan, every 6h. Source at `services/self-observer/` (currently in `the-loom`; eventual destination `tapestry/services/self-observer/`).
+
+**What it is:** the cross-repo drift scanner. Walks registered repos via GitHub API, applies signal rules (agent / tool / skill / orphan), emits drift candidates to the architecture-registry, writes a synthesis memo to the loom-memory MCP as `self_observer_synthesis_latest`. See [The observer](/explanation/the-observer/).
+
+**Health check:** read `self_observer_synthesis_latest` from the MCP. Should be within the last 6 hours. If older, check the Render dashboard for the `loom-self-observer` service.
+
+**If down:** Pillar-1 violations (duplicates of canonical patterns in non-canonical homes) and cross-repo drift accumulate undetected.
 
 ## Environment variables
 

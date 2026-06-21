@@ -1,11 +1,11 @@
 ---
 title: The memory MCP and your project's memory
-description: What the loom-memory MCP is, the six tools it exposes, how project_tags scope memory per project, and how to maintain your project's memory over time.
+description: What the loom-memory MCP is, what gets stored in it, how the memory for your project stays scoped and organized, and what you can do as the operator to keep it healthy.
 ---
 
-The `loom-memory` MCP is the canonical cross-session, cross-agent memory store for everything in the Tapestry platform. Every Tapestry-consuming project shares ONE hosted instance of it. Your project gets its own slice of that store via the `project_tags` scoping mechanism.
+The loom-memory MCP is the cross-session, cross-agent memory store for everything on the Tapestry platform. Every Tapestry-consuming project shares one hosted instance; each project gets its own slice via the `project_tags` scoping mechanism.
 
-This page explains what the MCP is, what tools it exposes, how memory scoping works, and how to maintain your project's memory so it stays useful (not bloated, not stale, not silently wrong).
+This page explains what's stored there, how it gets organized, what behavior you should see from the agent when memory is wired correctly, and what you can do to keep your project's memory clean over time.
 
 For how the MCP gets wired into your project, see [The plugins](/explanation/plugins/) and [Set up a new project](/how-to/set-up-a-new-project/).
 
@@ -19,169 +19,127 @@ https://loom-agent-context.onrender.com/mcp/memory/
 
 It runs as a Render web service backed by Postgres + pgvector. The Postgres rows ARE the memories. The pgvector index enables semantic search via embeddings of memory content.
 
-It's the platform's canonical memory layer. It's NOT one-MCP-per-project — every project shares the same hosted MCP instance, and the project scoping happens at the row level via `project_tags`.
+It is not one-MCP-per-project — every project shares the same hosted MCP instance, and the project scoping happens at the row level via `project_tags`.
 
-It's also a **cross-agent channel**. When you write a memory from your project, the loom-agent (working in `the-loom`) and the Make_Skills agent and the Tapestry-agent can all read it via universal recall. When they write memos tagged for cross-project context, your project's agent reads them at the next session start.
+It also serves as a **cross-agent channel**. A memory written by the agent in your project is readable by the agent in `the-loom`, the agent in `Make_Skills`, and the Tapestry-agent. When those agents write memos tagged for cross-project context, the agent in your project reads them at the next session start.
 
-## The six tools
+## What ends up in memory
 
-| Tool | Purpose |
-|---|---|
-| `memory_recall(context, n=5, project_tags?)` | Semantic search returning top-N memories most relevant to the given context. Default scope: all of your memories cross-project. Scope to a specific project via `project_tags`. **This is what fires automatically at SessionStart.** |
-| `memory_read(name)` | Fetch one memory by exact name. Returns the full body. |
-| `memory_write(name, record_type, content, project_tags?, why?, actor?)` | Upsert a memory row. If a memory with the same `name` exists, it's replaced. |
-| `memory_search(query, ...)` | Lexical search across memory content. Use when you know roughly what to grep for. |
-| `memory_list(record_type?)` | Index entries (names only, no bodies) for browsing what exists. |
-| `memory_delete(name)` | Hard delete by name. Use sparingly — most "deletion" should be replacing content with a "this is wrong, see X" pointer. |
+Six categories of content accumulate over time. You don't author these directly — the agent writes them in response to specific events. Your role is to recognize what each type is when you see it surfaced at session start, and to flag the agent when something durable should be saved.
 
-The agent calls these via the MCP HTTP transport at session-relevant moments. You can also call them by asking the agent: "memory_recall for X", "memory_write that down as a feedback memory", etc.
+| Type | What goes here | Triggered by |
+|---|---|---|
+| decision | An architectural or design choice and the reasons it was made. | A non-obvious decision the agent makes (or you make and the agent records). |
+| fact | Stable information about the project (e.g., the project's Supabase URL). | The agent learns something durable about the codebase or infrastructure. |
+| feedback | A correction you gave the agent. This is the highest-leverage memory type — it is how the agent gets sharper over time. | You correct the agent. The discipline plugin enforces immediate save. |
+| lesson | A pattern that worked or an anti-pattern that didn't, learned by doing the work. | A session produces a generalizable learning. |
+| project | The current state of the project — what landed, what's pending, who owns what. | A significant deliverable lands, or the session's understanding of project state shifts. |
+| preference | An operator preference about style, tone, format, or process. Lighter than a feedback correction. | You express a preference. |
+| reference | A pointer to something durable elsewhere (a doc URL, a commit SHA, a runbook). | The agent encounters an external resource worth bookmarking. |
+| skill_idea | An emerging pattern worth becoming a reusable skill someday. | The upskilling audit surfaces a candidate. |
+| topic | A topic placeholder that will be expanded later. | A subject comes up that warrants future exploration. |
+| user | Information about you — your role, preferences, context. | The agent learns something durable about you. |
+
+The most common in practice are `feedback`, `lesson`, `project`, and `decision`.
 
 ## How project_tags scope memory
 
-Every memory row has an optional `project_tags` array. The platform uses this for the recall scoping logic:
+Every memory row has an optional `project_tags` array that determines who sees it on recall.
 
-- A memory with `project_tags: ["sde-extraction-dev"]` is a SDE-Extraction-scoped memory. It surfaces when the SDE agent calls `memory_recall` with no filter (cross-project default) OR explicitly with `project_tags=["sde-extraction-dev"]`.
-- A memory with `project_tags: ["the-loom", "tapestry"]` is dual-scoped. It surfaces for the loom-agent and the Tapestry-agent.
-- A memory with NO `project_tags` (empty array or omitted) is **universal** — it surfaces in EVERY project's recall. Use sparingly; this is the right scope for discipline rules that apply to all projects (e.g., the PROBE rule itself).
+- A memory tagged `["sde-extraction-dev"]` is scoped to the SDE_Extraction project. It surfaces when the agent in that project calls memory recall, but not in other projects' sessions.
+- A memory tagged `["the-loom", "tapestry"]` is dual-scoped — both projects see it.
+- A memory with NO tags (empty or omitted) is **universal**. It surfaces in every project's recall. This scope is reserved for discipline rules that apply to all projects.
 
-When you set up your project, you decide what `LOOM_PROJECT_ID` to use. From then on, every memory you write should be tagged with that project ID UNLESS the memory is genuinely universal (then no tags) or genuinely cross-project (then multiple tags listing each).
+The discipline plugin handles the tagging automatically. It reads `LOOM_PROJECT_ID` from your `.env` and applies that as the tag on any memory the agent writes during sessions in your project. If `LOOM_PROJECT_ID` is wrong or missing, memory writes land in the wrong scope — your project either pollutes other projects' memory or loses its own at next session.
 
-The discipline plugin handles the tagging automatically when the agent calls `memory_write` — it reads `LOOM_PROJECT_ID` from `.env` and applies the tag.
+## What the agent does with memory (so you know what to expect)
 
-## What memories to write
+When the discipline stack is wired correctly, the agent's behavior around memory follows a predictable pattern:
 
-The platform has six record types. Each has a slightly different shape and recall behavior:
+**At the start of every session:** the SessionStart hook calls the platform's `/v1/recall` REST endpoint with the project's tag and fetches the top-N most relevant memories. These appear as `additionalContext` in the conversation before your first message. You see this as a block of accumulated context at the top of the chat — past decisions, prior feedback, current project state.
 
-| Type | When to use |
-|---|---|
-| `decision` | An architectural or design choice was made and the reasons matter. Capture immediately when the choice is made, not later. |
-| `fact` | Stable information you'll want to recall later (e.g., "the project's Supabase URL is X"). Different from a decision because it's not a choice, just a true statement. |
-| `feedback` | The operator corrected you. Capture IMMEDIATELY at the moment of correction. This is the highest-leverage memory type — it's how the agent gets sharper over time. |
-| `lesson` | You learned something from doing the work. Pattern that worked, anti-pattern that didn't. |
-| `project` | Current state of the project — what landed, what's pending, who owns what. Often supersedes prior project memories of the same name. |
-| `preference` | Operator preference about style, tone, format, or process. Lighter than a `feedback` correction. |
-| `reference` | A pointer to something durable elsewhere (a doc URL, a commit SHA, a runbook). |
-| `skill_idea` | An emerging pattern worth becoming a skill someday. Surfaced by the upskilling audit. |
-| `topic` | A topic placeholder you'll later expand. |
-| `user` | Information about the operator themself (preferences, role, context). |
+**During a substantive task:** the agent recalls memory explicitly when it judges the task is large enough to warrant the lookup. You can also tell it to: "check loom memory for what we did last session on this" is the canonical phrasing.
 
-The most common and important types in practice: `feedback` (when corrected), `lesson` (when you learn), `project` (current state snapshots), `decision` (architectural choices).
+**When you correct the agent:** the discipline plugin's per-turn reminder enforces immediate save as a feedback memory, at the moment of correction, not deferred to end-of-session. You should see the agent acknowledge the correction AND write a memory before continuing the task.
 
-## When to write a memory
+**When a deliverable lands:** the agent writes a project memory snapshotting state. You should see this happen alongside the deliverable — a commit, a finished doc, a deployed service.
 
-**Always:**
+**Before answering questions about the codebase:** the agent should PROBE the actual files (grep / read) AND check memory. Memory tells what was true at a point in time; the files tell what's true now. If the agent cites memory without checking the code, that's drift — flag it.
 
-- The operator corrects you on something. Save a `feedback` memory IMMEDIATELY, before continuing the task. Defer-until-end-of-session = lose the moment, get vague memory.
-- A significant deliverable lands (a PR, a deployed service, a finished docs site). Save a `project` memory snapshotting the current state.
-- An architectural decision is made (use X library, deploy to Y, structure data as Z). Save a `decision` memory with the WHY at the moment the choice is made.
-- You learned a pattern through doing the work. Save a `lesson` memory.
+## How to inspect memory directly
 
-**Sometimes:**
+The MCP exposes a REST surface (commit `9262943`) so you can read, write, and recall without going through an agent session. Useful when you want to audit what's actually in storage.
 
-- You PROBE'd something and learned non-obvious information about the codebase that's worth recalling next session. `fact` memory.
-- You noticed an emerging pattern that could become a reusable skill. `skill_idea` memory.
-
-**Rarely or never:**
-
-- Restating something that's already obvious from the code or docs. The memory exists for things that AREN'T in the code.
-- Logging routine actions ("I ran the tests, they passed"). Memory is not a transcript.
-- Anything that becomes stale quickly (current commit SHA, open browser tabs, what you're thinking about right now). Memory is for things with shelf life.
-
-## When to recall
-
-**Always at session start:** the discipline plugin's SessionStart hook does this automatically via `/v1/recall`. You don't have to call `memory_recall` manually — the top-N relevant memories appear in your conversation's initial context.
-
-**At the start of a substantive task:** explicitly call `memory_recall(context="...")` with a description of what you're about to do. This pulls in past memories specific to the task.
-
-**When the operator says "check memory":** they're saying "your context is missing something I know is in memory — go look." Always honor.
-
-**When the operator references prior work you don't remember:** `memory_recall` before guessing.
-
-**Before making claims about the codebase, plus PROBE the files.** Memory tells you what was true at a point in time; the files tell you what's true now. Both matter.
-
-## Memory naming conventions
-
-The name field is the primary key for `memory_read` and `memory_write`. Pick names that future-you (or another agent) can guess.
-
-Good name shapes:
-
-- `<type>_<topic>_<date>` for time-bound work: `feedback_consolidating_modules_check_per_service_deps_2026_06_19`
-- `<type>_<topic>` for evergreen rules: `feedback_cite_files_not_memory`
-- `<project>_state_<date>` for session snapshots: `session_state_2026_06_20_sde_diagnosis_fixes_and_tapestry_docs_site`
-- `<agent>_<topic>_<date>` for cross-agent memos: `loom_agent_built_tapestry_docs_site_v1_2026_06_20`
-
-Bad name shapes:
-
-- Generic names that collide (`notes`, `decisions`, `memo`)
-- Names without enough specificity to disambiguate (`fix`, `update`, `note_2026_06_20`)
-- Names that include transient state (`current_branch_name`, `latest_pr_number`)
-
-## How to maintain memory over time
-
-Memory grows. After a few months of active work, a project may have hundreds of memories. Without maintenance, recall becomes noisy and the operator (or agent) starts ignoring it.
-
-**The natural lifecycle:**
-
-- **`project` memories supersede.** When a new `session_state_<date>` memory is written, prior session-state memories become history. They're not deleted (they're still useful for audit), but the most recent supersedes. The `Related` section at the bottom of the new memory points back at the prior one for trail.
-- **`feedback` memories accumulate.** Each correction adds a binding rule. They don't supersede — they stack. The agent's discipline gets richer over time.
-- **`decision` memories don't get edited.** When a decision is overturned, write a NEW decision memory (`decision_<topic>_v2_<date>`) that supersedes the prior. Reference the prior. Never edit a decision memory in place.
-
-**Active maintenance tasks (do every few months):**
-
-1. **Recall in your project's scope.** `memory_recall(context="recent state", project_tags=["your-project-id"], n=20)`. Read through the top 20. Anything that's clearly wrong now? Anything that's been superseded but the new version doesn't point at it?
-2. **Search for outdated facts.** `memory_search(query="<old_render_url>")` — finds memories that reference a thing that no longer exists. Update or supersede.
-3. **Look for unconnected memories.** Memories without a `Related` section, or with broken `[[reference]]` links. Strengthen the linking so recall surfaces clusters.
-4. **Spot-check naming.** Memories with generic names (`notes`, `update_3`) won't be findable by future you. Rename via write-with-new-name + delete-old.
-
-**Don't:**
-
-- Don't bulk-delete memories to "clean up." Most "clutter" is actually history. Better to write a `project_state_<date>` memory that supersedes a cluster of old ones — the cluster becomes history; the new one is canonical.
-- Don't edit a memory in place to "correct" it. Write a new one and mark the old as superseded. The audit trail matters.
-
-## What goes wrong if memory isn't maintained per project
-
-| Failure mode | Symptom |
-|---|---|
-| LOOM_PROJECT_ID is wrong | Memories tag for the wrong project. Cross-project recall surfaces the wrong memories at session start. |
-| LOOM_PROJECT_ID is unset | Memories may be untagged. Universal recall surfaces them everywhere — pollutes other projects' contexts. |
-| Memories never written | Each session starts cold. The agent re-learns the same things every time. Discipline doesn't compound. |
-| Memories written but never recalled | The agent has the data but isn't checking. CLAUDE.md should remind it; the plugin's hooks should enforce it. |
-| Memories written with generic names | Recall finds them but you can't tell them apart. Names like `update` and `notes` collide and become useless. |
-| Memories that contradict the code | Memory says one thing; the code says another. Discipline rule: PROBE the code before trusting the memory. |
-
-## How to access memory directly (no agent)
-
-The MCP exposes a REST surface for non-MCP clients (added in commit `9262943`):
+Recall the top relevant memories for a context:
 
 ```sh
-# Recall
 curl -X POST https://loom-agent-context.onrender.com/v1/recall \
   -H "Content-Type: application/json" \
-  -d '{"context": "what is X?", "n": 5, "project_tags": ["your-project-id"]}'
+  -d '{"context": "what was decided about X", "n": 5, "project_tags": ["your-project-id"]}'
+```
 
-# Read one by name
+Read one memory by exact name:
+
+```sh
 curl -X POST https://loom-agent-context.onrender.com/v1/read \
   -H "Content-Type: application/json" \
   -d '{"name": "exact_memory_name"}'
+```
 
-# Write one
+Write a memory directly (rarely needed — the agent usually does this for you, but useful for seeding or backfilling):
+
+```sh
 curl -X POST https://loom-agent-context.onrender.com/v1/write \
   -H "Content-Type: application/json" \
   -d '{"name": "...", "record_type": "fact", "content": "...", "project_tags": ["your-project-id"]}'
 ```
 
-For self-host mode (no Authorization header), the tenant resolves to the deterministic UUID `1d8ec1b3-d62a-5fab-9a52-eb6a3e09f1c8` — every consuming project lands in this single tenant envelope for the self-host deployment. For hosted-multitenant mode, a Bearer JWT is required; the `tenant_id` claim drives row-level scoping.
+In self-host mode (no Authorization header), the tenant resolves to a deterministic UUID — every consuming project lands in one tenant envelope. In hosted-multitenant mode, a Bearer JWT is required; the `tenant_id` claim drives row-level scoping.
+
+## How to keep your project's memory healthy
+
+Memory grows. After a few months of active work, a project may have hundreds of memories. Without maintenance, recall becomes noisy and the value compounds less.
+
+**The lifecycles to be aware of:**
+
+- `project` memories supersede each other. Each new session-state snapshot makes the prior one history. They aren't deleted (still useful for audit) but the most recent is canonical. You should see new `session_state_<date>` memories appear over time, with the older ones still readable for context.
+- `feedback` memories accumulate. Each correction adds a binding rule the agent will operate under going forward. The set grows; nothing supersedes. The agent's discipline gets richer over time.
+- `decision` memories don't get edited in place. When a decision is overturned, a NEW decision memory is written with `v2` or a similar marker, referencing the prior. Editing in place would destroy the audit trail.
+
+**Things to do every few months:**
+
+1. **Spot-check what's in scope.** Ask the agent: "list the most recent 20 memories tagged for this project." Read through. Anything obviously wrong? Anything superseded but the new version isn't linked?
+2. **Search for outdated facts.** If a Render URL, an API key reference, or a service name changed, memories that still reference the old value will mislead future sessions. Flag them and ask the agent to write superseding memories.
+3. **Look for unconnected memories.** Memories without cross-references or with broken `[[link]]` markers don't surface in recall as clusters. The agent can strengthen the linking on request.
+4. **Spot-check names.** Memories named `notes` or `update_3` aren't findable. Renaming = write-with-new-name + delete-old. The agent can do this batch.
+
+**What not to do:**
+
+- Don't bulk-delete memories to "clean up." Most of what looks like clutter is actually audit history. Better to ask the agent to write a new `project_state_<date>` memory that supersedes a cluster of older ones — the older ones become history; the new one is canonical.
+- Don't edit a memory directly to "correct" it (via the REST surface). Write a new one and mark the old as superseded. The audit trail is part of the value.
+
+## What goes wrong when memory isn't maintained per project
+
+| Failure mode | Symptom you'd see |
+|---|---|
+| `LOOM_PROJECT_ID` wrong | Memories tag for the wrong project. Recall at session start surfaces memories from a different project's context, which feels off but isn't immediately obvious. |
+| `LOOM_PROJECT_ID` unset | Memories may be untagged. Universal recall pulls them everywhere — your project's specifics start polluting other projects' contexts. |
+| Memories never written | The agent doesn't seem to remember anything across sessions. Each conversation starts cold. Corrections you gave last week aren't reflected this week. |
+| Memories written but never recalled | The data is in storage but the agent isn't pulling it into context. Usually this is a SessionStart hook failure — see [Recover from common failures](/how-to/recover-from-common-failures/). |
+| Memories with generic names | Recall finds them but they collide with similarly-named memories from other contexts. The agent can't tell them apart. |
+| Memories contradicting current code | The agent cites a memory as fact when the code has changed. Flag immediately — this is drift; the agent should be PROBE-ing the code, not trusting memory blindly. |
 
 ## CORE DIRECTIVE 1: memory unavailability is a P0
 
-If `memory_recall` or `memory_write` is unavailable in the agent's session — because the MCP server is down, the agent's `.mcp.json` isn't wiring it, the plugin isn't enabled, or the network is failing — the discipline rule (enforced by the plugin's hooks) is to **HALT and report**. Do not silently fall back to "I'll do my best without memory." Memory unavailability is treated as a P0 application failure.
+If the memory MCP is unreachable — because the hosted service is down, your `.mcp.json` isn't wiring it, the plugin isn't enabled, or the network is failing — the discipline rule (enforced by the plugin's hooks) is for the agent to HALT and report rather than continue without memory. The platform's primary value proposition is cross-session memory; treating its absence as a degraded mode that's silently accepted would erode that value.
 
-This is intentionally aggressive. The platform's primary value proposition is cross-session, cross-agent memory. Treating its absence as a degraded mode that's acceptable would erode that value silently.
+You should expect to see the agent loudly surface MCP unavailability rather than quietly working around it. If a session is going on without memory and the agent isn't flagging it, that's itself a discipline failure worth correcting.
 
 ## Related
 
-- [The discipline stack](/explanation/discipline-stack/) — how MCP fits with plugins and per-project config
+- [The discipline stack](/explanation/discipline-stack/) — how the MCP fits with the plugins, the observer, and the recursive miscommunication-becomes-architecture loop
 - [The plugins](/explanation/plugins/) — `loom-discipline` is what wires the MCP into your project
+- [The observer](/explanation/the-observer/) — how patterns in your session activity become candidates that compound across sessions
 - [Set up a new project](/how-to/set-up-a-new-project/) — get the MCP wired into a new repo
-- [Recover from common failures](/how-to/recover-from-common-failures/) — when MCP tools don't appear in your tool list
+- [Recover from common failures](/how-to/recover-from-common-failures/) — when the agent stops checking memory
 - [Load-bearing files](/reference/load-bearing-files/) — file-by-file reference of the MCP wiring

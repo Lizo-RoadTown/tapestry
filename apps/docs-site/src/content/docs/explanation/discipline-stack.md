@@ -22,26 +22,23 @@ The weakness shows up as specific recurring failure modes:
 
 ```mermaid
 flowchart LR
-  IFACE[/"User ↔ Agent<br/>interface"/]
-
-  subgraph BONDS["Weak bonds"]
-    direction TB
-    W1["Memory loss across sessions"]
-    W2["Drift from the user's framing"]
-    W3["Silent assumptions about the codebase"]
-    W4["Forgotten corrections"]
-    W5["Architectural blindness"]
-    W6["Repeated mistakes across sessions"]
-    W7["Patterns invisible across sessions"]
-    W8["Invisible tool absence"]
-    W9["Cross-agent coordination loss"]
-  end
-
-  POOR([Poor project])
-
-  IFACE --> BONDS
-  BONDS --> POOR
+  A(["Unreinforced<br/>user ↔ agent interface"])
+  B(["Specific weak bonds<br/>(listed below)"])
+  C(["Poor project"])
+  A --> B --> C
 ```
+
+The specific weak bonds:
+
+- **Memory loss across sessions** — last week's important context is gone this week.
+- **Drift from the user's framing** — a "layer" turns into a separate deployed system.
+- **Silent assumptions about the codebase** — the agent cites files it didn't actually check.
+- **Forgotten corrections** — a correction at minute 10 is gone by minute 40.
+- **Architectural blindness** — no idea what's deployed, what changed, what depends on what.
+- **Repeated mistakes across sessions** — same wrong choice, recurring.
+- **Patterns invisible across sessions** — recurring behavior no single session is long enough to surface.
+- **Invisible tool absence** — the memory MCP is down or unwired and nothing tells anyone.
+- **Cross-agent coordination loss** — agents in different projects don't see each other's decisions.
 
 Each of these is a specific bond in the interface that wants to fail. Left unaddressed, every one of them feeds back into the project as accumulated weakness — corrections that get re-litigated, decisions that get re-made, mistakes that recur because no one remembered the prior session.
 
@@ -52,32 +49,14 @@ Tapestry is the proposition that **each of those weak bonds can be reinforced by
 The reinforcements are not generic. Each one targets a specific failure mode:
 
 ```mermaid
-flowchart TB
-  subgraph REINFORCEMENT["Tapestry mechanisms"]
-    direction TB
-    M1["loom-memory MCP<br/>(cross-session persistence)"]
-    M2["Per-project guard plugins<br/>(framing-clarification gates)"]
-    M3["PROBE-discipline reminders<br/>(per-turn hook)"]
-    M4["Friction-as-memory rule<br/>(write feedback at moment of correction)"]
-    M5["Architecture snapshots<br/>(SessionStart pipeline)"]
-    M6["Upskilling audit<br/>(Stop hook, CORE DIRECTIVE 2)"]
-    M7["The observer<br/>(local + cron; converts patterns to candidates)"]
-    M8["CORE DIRECTIVE 1<br/>(HALT if MCP unavailable)"]
-    M9["Cross-agent shared MCP<br/>(memos coordinate across agents)"]
-  end
-
-  subgraph IFACE["User ↔ Agent interface"]
-    direction LR
-    USER([User])
-    AGENT([Agent])
-    USER <==> AGENT
-  end
-
-  STRONG([Robust project])
-
-  REINFORCEMENT ==>|"reinforces"| IFACE
-  IFACE ==> STRONG
+flowchart LR
+  A(["Tapestry mechanisms<br/>(listed below)"])
+  B(["Reinforced<br/>user ↔ agent interface"])
+  C(["Robust project"])
+  A ==> B ==> C
 ```
+
+The mechanisms, paired with the specific weak bond each one reinforces, are in the mapping table immediately below.
 
 ## The map: weakness to reinforcement
 

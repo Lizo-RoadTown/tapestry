@@ -34,31 +34,23 @@ Each is a specific way the interface fails. Left unaddressed, they compound into
 Tapestry is the proposition that each of those weak bonds can be reinforced by a specific mechanism, and that the mechanisms together convert miscommunications into architecture rather than letting them dissolve into churn.
 
 ```mermaid
-flowchart TB
-  subgraph TAPESTRY["Tapestry mechanisms"]
-    direction TB
-    M1["loom-memory MCP<br/>→ memory loss"]
-    M2["Per-project guard plugins<br/>→ framing drift"]
-    M3["PROBE-discipline reminders<br/>→ silent assumptions"]
-    M4["Friction-as-memory rule<br/>→ forgotten corrections"]
-    M5["Architecture snapshots<br/>→ architectural blindness"]
-    M6["Upskilling audit<br/>→ repeated mistakes"]
-    M7["The observer<br/>→ patterns invisible across sessions"]
-    M8["CORE DIRECTIVE 1<br/>→ invisible absence"]
-  end
-
-  subgraph IFACE["Reinforced user ↔ agent interface"]
-    direction LR
-    USER([User])
-    AGENT([Agent])
-    USER <==> AGENT
-  end
-
-  PROJECT([Robust project])
-
-  TAPESTRY ==>|"reinforces"| IFACE
-  IFACE ==> PROJECT
+flowchart LR
+  A(["Tapestry mechanisms"])
+  B(["Reinforced<br/>user ↔ agent interface"])
+  C(["Robust project"])
+  A ==> B ==> C
 ```
+
+The mechanisms, paired one-to-one with the weak bonds they target:
+
+- **`loom-memory` MCP** → memory loss across sessions
+- **Per-project guard plugins** (framing-clarification gates) → drift from your framing
+- **PROBE-discipline reminders** (per-turn hook) → silent assumptions about the codebase
+- **Friction-as-memory rule** (save feedback at moment of correction) → forgotten corrections
+- **Architecture snapshots** (SessionStart pipeline) → architectural blindness
+- **Upskilling audit** (Stop hook, CORE DIRECTIVE 2) → repeated mistakes
+- **The observer** (local + cron; turns patterns into candidates) → patterns invisible across sessions
+- **CORE DIRECTIVE 1** (HALT if MCP unavailable) → invisible tool absence
 
 Each mechanism is small. Each targets a specific failure mode. The discipline emerges from the COMBINATION — every piece is small but load-bearing.
 

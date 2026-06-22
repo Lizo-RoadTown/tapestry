@@ -58,7 +58,7 @@ The line between subagent and agent is the one called out in the migration docs 
 A candidate progresses through statuses as evidence accumulates:
 
 ```mermaid
-flowchart LR
+flowchart TB
   draft([draft])
   observed([observed])
   recurring([recurring])
@@ -67,14 +67,14 @@ flowchart LR
   promoted([promoted])
   rejected([rejected])
 
-  draft -->|"2 sessions seen"| observed
-  observed -->|"3+ sessions seen"| recurring
-  recurring -->|"operator approves<br/>or policy daemon"| stable
-  stable -->|"operator decides<br/>to codify"| pr
-  pr -->|"authoring agent<br/>builds the artifact"| promoted
+  draft -->|"observer: 2 sessions seen"| observed
+  observed -->|"observer: 3+ sessions seen"| recurring
+  recurring -->|"operator approves<br/>(or policy daemon)"| stable
+  stable -->|"operator decides to codify"| pr
+  pr -->|"authoring agent builds the artifact"| promoted
 
-  draft -.->|"operator decides<br/>not to capture"| rejected
-  observed -.->|"won't pursue"| rejected
+  draft -.->|"operator: don't capture"| rejected
+  observed -.->|"operator: won't pursue"| rejected
 ```
 
 | Status | What it means | Who advances it |

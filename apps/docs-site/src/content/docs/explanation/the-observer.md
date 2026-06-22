@@ -1,15 +1,70 @@
 ---
 title: The observer
-description: How the platform watches sessions and repos for recurring patterns, converts them into candidates, and lets the recursive miscommunication-becomes-architecture loop actually compound across sessions.
+description: The central character of Tapestry. The component that watches project shape change over time and decides what's worth surfacing. Everything else in the platform exists to feed or consume the observer.
 ---
 
-The observer is the mechanism that converts cross-session signal into structure. Feedback memories preserve individual corrections; the observer notices when patterns recur across many sessions and emits candidates for the platform to act on. Without the observer, every session's learning stays in that session's transcript — patterns happen but never become architecture.
+The observer is the central character of the platform. Read [Project shape](/start/project-shape/) and [What Tapestry is not](/start/what-tapestry-is-not/) before this page if you haven't already — the observer doesn't make sense outside that frame.
 
-There are TWO observers cooperating. They watch different surfaces. Together they're the discipline stack's pattern-recognition layer.
+## Why the observer is first-class
 
-For where the observer fits in the conceptual model, see [The discipline stack — the recursive loop](/explanation/discipline-stack/#the-recursive-loop-miscommunication-becomes-architecture).
+Most platforms organize around their storage. *"We're a memory system."* *"We're a metrics database."* *"We're a vector store."* The storage is the noun; everything else is a feature on top.
 
-## The two observers
+Tapestry inverts that. The observer is the noun. Memory is one of its sensors. Telemetry is another. Architecture snapshots are a third. The candidate registry is its output. The policy gate is what acts on its decisions. The skill compiler is what materializes the result.
+
+If you draw the platform with the observer at the center, the rest of the architecture falls into place:
+
+```mermaid
+flowchart TB
+    P[Project<br/>shape evolves over time]
+    OBS[Observer<br/>watches shape change<br/>decides what to surface]
+    CR[Candidate registry<br/>holds shape changes<br/>awaiting structure]
+    POL[Policy<br/>decides when a candidate<br/>has earned structure]
+    SC[Skill compiler<br/>materializes earned<br/>structure into callable form]
+    PL[Plugin distribution<br/>ships the structure<br/>back to every project]
+    P -.signals.-> OBS
+    OBS --> CR
+    CR --> POL
+    POL --> SC
+    SC --> PL
+    PL -.applied.-> P
+```
+
+The observer's sensors:
+
+- **Memory** — what the agent has learned about project shape (corrections, decisions, recurring friction)
+- **Telemetry** — what executed, what failed, what was called (the runtime view of shape)
+- **Architecture snapshots** — what structure exists at a point in time (the static view of shape)
+- **Session transcripts** — what happened inside a session (the behavioral view of shape)
+- **Cross-project signals** — what patterns repeat across the fleet (the portfolio view of shape)
+
+None of those sensors *is* the platform. They feed the platform's central reasoner: the observer.
+
+## What the observer watches for
+
+The observer is interested in *shape change* — the four verbs from [project shape](/start/project-shape/#the-four-shape-verbs):
+
+| Verb | What the observer surfaces |
+|---|---|
+| **Drift** | Memos that say one thing while code does another; runbooks that no longer match what the system does; assumptions encoded in plugins that don't hold |
+| **Stabilize** | Patterns becoming candidates becoming skills; corrections that stop firing because the agent learned them |
+| **Fragment** | Duplicate logic in non-canonical homes; competing patterns solving the same problem; subagents losing context across handoffs |
+| **Cohere** | Duplicate logic collapsing into a shared library; competing patterns reconciling into one canonical home |
+
+What the observer is **not** interested in:
+
+- Individual raw events (telemetry ingestion handles those)
+- Single-event state ("did this call succeed?" — that's observability's job, not the observer's)
+- Current architecture snapshots in isolation (those are inputs; the observer cares about *deltas*)
+
+The observer sits at the *patterns* level of the [signal hierarchy](/explanation/signal-hierarchy/) — events flow through telemetry → signals → patterns before the observer touches them.
+
+## The two observer implementations
+
+There are TWO observers cooperating. They watch different surfaces. Together they're the platform's pattern-recognition layer.
+
+For where the observer fits in the recursive learning loop, see [The discipline stack — the recursive loop](/explanation/discipline-stack/#the-recursive-loop-miscommunication-becomes-architecture).
+
+## The two observers in detail
 
 ```mermaid
 flowchart TB
@@ -146,8 +201,11 @@ None of those exist yet. The current observer is the foundation; future work add
 
 ## Related
 
+- [Project shape](/start/project-shape/) — the underlying object the observer watches
+- [What Tapestry is not](/start/what-tapestry-is-not/) — why "observability system" is a misleading frame for Tapestry
+- [The signal hierarchy](/explanation/signal-hierarchy/) — the levels of telemetry the observer consumes
 - [The discipline stack](/explanation/discipline-stack/) — the recursive loop where the observer pathway joins the memory pathway
 - [Plugins](/explanation/plugins/) — `loom-discipline` is what hosts the Path A observer in its Stop hook
-- [Memory MCP](/explanation/memory-mcp/) — where the self-observer cron writes synthesis memos
-- [Architecture snapshots](/explanation/architecture-snapshots/) — the structural-snapshot complement to the observer's behavioral-snapshot
+- [Memory MCP](/explanation/memory-mcp/) — one of the observer's sensors; substrate for project-shape state
+- [Architecture snapshots](/explanation/architecture-snapshots/) — the structural-snapshot sensor complementing the observer's behavioral sensors
 - [Load-bearing files](/reference/load-bearing-files/) — file-by-file reference of observer components

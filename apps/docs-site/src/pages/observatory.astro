@@ -1,99 +1,18 @@
 ---
+export const prerender = false;
 /**
- * The Observatory — the coordination-support view over OTEL telemetry.
+ * The Observatory — the coordination console.
  *
- * Inside the docs site (same Astro project / deploy / domain), at /observatory.
- * Canon: docs/canon/user-agent-coordination-reinforcement.md.
- * Contract: docs-site reference/otel-coordination-contract.md.
+ * Reads the live episode feed (/api/episodes.json) and renders coordination
+ * EPISODES — one operator-agent working cycle each — not raw event counts.
+ * Per docs/reference/coordination-episode-model.md + the canon.
  *
- * Reads OTEL-backed telemetry; it is not Grafana. Grafana is the substrate;
- * this is the coordination-support layer over it.
- *
- * State rule (binding): healthy / degraded / blind / unknown. Blind means the
- * signal is not instrumented yet — never "nothing is wrong." Missing signal is
- * never shown as healthy.
- *
- * Today the coordination contract is not emitted yet, so coordination health is
- * mostly blind. What IS real is instrumentation coverage: which contract
- * attributes the hooks emit now (PROBE'd from _observability.py + hooks.jsonl).
+ * The feed is wired to the hooks (central store when set, else this machine's
+ * hooks.jsonl in dev, else a real bundled snapshot). The interpretation runs
+ * server-side; this page renders it. Honest: intent is uncertain and
+ * memory/friction are blind until the observer/contract land — shown, not faked.
  */
-
-type State = "healthy" | "degraded" | "blind" | "unknown";
-const STATE_GLYPH: Record<State, string> = { healthy: "●", degraded: "◐", blind: "⊘", unknown: "○" };
-const STATE_LABEL: Record<State, string> = {
-  healthy: "healthy",
-  degraded: "degraded",
-  blind: "blind — signal not instrumented yet",
-  unknown: "unknown — no reading yet",
-};
-
-// Instrumentation coverage = the one real reading today. PROBE'd:
-//   _observability.py:154+ pushes OTLP/HTTP to Grafana Cloud; hooks.jsonl mirrors.
-//   Today's events carry hook/tool/project/session + a free-text `note`.
-type Cov = "emitted" | "in_note" | "blind";
-const COV_GLYPH: Record<Cov, string> = { emitted: "●", in_note: "◐", blind: "⊘" };
-const COV_LABEL: Record<Cov, string> = {
-  emitted: "emitted as a typed field",
-  in_note: "present, but as free-text in note",
-  blind: "not emitted",
-};
-
-const COVERAGE: { group: string; attrs: { name: string; cov: Cov; note?: string }[] }[] = [
-  {
-    group: "Anchor",
-    attrs: [{ name: "tapestry.coordination_context_id", cov: "blind", note: "events anchor on session_id + project_id today" }],
-  },
-  {
-    group: "Required context",
-    attrs: [
-      { name: "tapestry.project_id", cov: "emitted" },
-      { name: "tapestry.session_id", cov: "emitted" },
-      { name: "tapestry.agent_id", cov: "blind" },
-      { name: "tapestry.agent_role", cov: "blind" },
-      { name: "tapestry.surface_id / workflow_surface", cov: "blind" },
-      { name: "tapestry.surface_type", cov: "blind" },
-    ],
-  },
-  {
-    group: "Mechanism attributes",
-    attrs: [
-      { name: "tapestry.hook_name", cov: "emitted" },
-      { name: "tapestry.tool_name", cov: "emitted", note: "PreToolUse" },
-      { name: "tapestry.architecture_snapshot_id", cov: "in_note", note: "snapshot filename in note" },
-      { name: "tapestry.diff_report_id", cov: "in_note", note: "diff filename in note" },
-      { name: "tapestry.observer_ran", cov: "in_note" },
-      { name: "tapestry.observer_detected_count", cov: "in_note" },
-      { name: "tapestry.observer_created_count", cov: "in_note" },
-      { name: "tapestry.observer_updated_count", cov: "in_note" },
-      { name: "tapestry.friction_present", cov: "in_note", note: "stop-audit detects; transient warning" },
-      { name: "tapestry.friction_type", cov: "blind" },
-      { name: "tapestry.correction_present", cov: "in_note", note: "stop-audit detects; transient warning" },
-      { name: "tapestry.memory_read_count", cov: "blind" },
-      { name: "tapestry.memory_write_count", cov: "blind" },
-      { name: "tapestry.memory_miss", cov: "blind" },
-      { name: "tapestry.upskill_candidate_present", cov: "in_note", note: "observer counts" },
-    ],
-  },
-];
-
-const covCount = (c: Cov) => COVERAGE.flatMap((g) => g.attrs).filter((a) => a.cov === c).length;
-const totalAttrs = COVERAGE.flatMap((g) => g.attrs).length;
-
-// Coordination health, today. Honest: the contract is not emitted, so per-mechanism
-// coordination quality is blind. The structure is shown; the readings are not faked.
-const MECHANISMS: { label: string; state: State; why: string }[] = [
-  { label: "Memory", state: "blind", why: "read/write/miss counts not emitted yet" },
-  { label: "Architecture", state: "unknown", why: "snapshots produced; not yet read as a coordination signal" },
-  { label: "Policy & audit", state: "unknown", why: "decisions recorded; not yet attributed to coordination" },
-  { label: "Friction / correction", state: "blind", why: "detected as transient warnings; no typed signal" },
-  { label: "Observability", state: "blind", why: "observer counts in note; not coordination-attributed" },
-  { label: "Upskilling", state: "blind", why: "candidate counts in note; not attributed" },
-  { label: "Telemetry", state: "degraded", why: "transport live; coordination shape not emitted" },
-  { label: "Runtime", state: "blind", why: "invocation/session signals not coordination-anchored" },
-];
-
-const CANON_URL = "https://github.com/Lizo-RoadTown/tapestry/blob/main/docs/canon/user-agent-coordination-reinforcement.md";
-const CONTRACT_URL = "/reference/otel-coordination-contract/";
+const CANON = "https://github.com/Lizo-RoadTown/tapestry/blob/main/docs/canon/user-agent-coordination-reinforcement.md";
 ---
 
 <!doctype html>
@@ -102,7 +21,6 @@ const CONTRACT_URL = "/reference/otel-coordination-contract/";
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>The Observatory — Tapestry</title>
-    <meta name="description" content="The coordination-support view over OTEL telemetry: how healthy operator-agent coordination is across projects, and which signals are instrumented yet." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -110,203 +28,118 @@ const CONTRACT_URL = "/reference/otel-coordination-contract/";
   <body>
     <header class="topbar">
       <a class="wordmark" href="/">Tapestry</a>
-      <nav class="topnav" aria-label="primary">
-        <a href="/">Docs</a>
-        <a class="here" aria-current="page" href="/observatory">Observatory</a>
-      </nav>
+      <nav class="topnav"><a href="/">Docs</a><a class="here" href="/observatory">Observatory</a></nav>
     </header>
 
     <main>
       <section class="hero">
-        <p class="eyebrow mono">coordination-support view · over OTEL telemetry</p>
-        <h1 class="display">The <span class="display-accent">Observatory</span></h1>
-        <p class="lede">
-          How healthy is coordination between you and your agents — across projects — and which signals are
-          instrumented enough to tell. OTEL carries the signal; this reads it as coordination quality.
-        </p>
+        <p class="eyebrow mono" id="src">coordination console · loading…</p>
+        <h1 class="display">The <span class="ac">Observatory</span></h1>
+        <p class="lede">Each line is a <strong>working episode</strong> — one cycle of you and an agent working together. Not event counts.</p>
       </section>
 
-      <!-- the state vocabulary, stated once, up front -->
-      <section class="states" aria-label="state legend">
-        <span class="st healthy"><span class="g mono">●</span> healthy</span>
-        <span class="st degraded"><span class="g mono">◐</span> degraded</span>
-        <span class="st blind"><span class="g mono">⊘</span> blind</span>
-        <span class="st unknown"><span class="g mono">○</span> unknown</span>
-        <p class="states-note"><strong>Blind ≠ healthy.</strong> Blind means the signal isn't instrumented yet. Missing signal is never shown as healthy.</p>
+      <section class="summary" id="summary" aria-live="polite"></section>
+
+      <section class="meaning-note" id="meaning">
+        <span class="g mono">○</span>
+        <p>Intent is <strong>not yet observer-derived</strong> (shown as the coarse prompt category, marked uncertain). <strong>Memory</strong> and <strong>friction</strong> are blind until instrumented. These get real as the observer + contract land — they are shown here, never faked.</p>
       </section>
 
-      <!-- L0: coordination health today (honest: mostly blind) -->
-      <section aria-labelledby="health-h">
-        <div class="section-head">
-          <h2 id="health-h" class="display">Coordination health</h2>
-          <p class="hint">Per reinforcement mechanism, across the fleet. The contract isn't emitted yet, so most readings are blind — the structure is shown, the readings are not faked.</p>
-        </div>
-        <ul class="mech-grid">
-          {MECHANISMS.map((m) => (
-            <li class={`mech ${m.state}`}>
-              <div class="mech-top">
-                <span class="mech-name">{m.label}</span>
-                <span class={`state-pill ${m.state}`} title={STATE_LABEL[m.state]}>
-                  <span class="g mono" aria-hidden="true">{STATE_GLYPH[m.state]}</span>{m.state}
-                </span>
-              </div>
-              <p class="mech-why">{m.why}</p>
-            </li>
-          ))}
-        </ul>
-      </section>
+      <section><h2 class="display sec">Working episodes</h2><div id="episodes" class="episodes"><p class="loading mono">loading episodes…</p></div></section>
 
-      <!-- the one real reading today: instrumentation coverage -->
-      <section aria-labelledby="cov-h">
-        <div class="section-head">
-          <h2 id="cov-h" class="display">Instrumentation coverage</h2>
-          <p class="hint">
-            What the hooks emit today (PROBE'd from <code>_observability.py</code> + <code>hooks.jsonl</code>) against the
-            <a href={CONTRACT_URL}>coordination contract</a>. This is real: <strong>{covCount("emitted")} emitted</strong> ·
-            <strong>{covCount("in_note")} in note</strong> · <strong>{covCount("blind")} blind</strong> of {totalAttrs}.
-          </p>
-        </div>
-        <div class="cov-legend">
-          <span class="cov emitted"><span class="g mono">●</span> {COV_LABEL.emitted}</span>
-          <span class="cov in_note"><span class="g mono">◐</span> {COV_LABEL.in_note}</span>
-          <span class="cov blind"><span class="g mono">⊘</span> {COV_LABEL.blind}</span>
-        </div>
-        {COVERAGE.map((grp) => (
-          <div class="cov-group">
-            <h3 class="cov-group-h">{grp.group}</h3>
-            <ul class="cov-list">
-              {grp.attrs.map((a) => (
-                <li class={`cov-row ${a.cov}`}>
-                  <span class="g mono" aria-hidden="true" title={COV_LABEL[a.cov]}>{COV_GLYPH[a.cov]}</span>
-                  <span class="cov-name mono">{a.name}</span>
-                  {a.note && <span class="cov-note">{a.note}</span>}
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </section>
-
-      <!-- L2 structure: coordination contexts (blind until the anchor is emitted) -->
-      <section aria-labelledby="ctx-h">
-        <div class="section-head">
-          <h2 id="ctx-h" class="display">Coordination contexts</h2>
-          <p class="hint">Each instance of coordination, anchored on <code>coordination_context_id</code>, drills down to its events. The anchor isn't emitted yet, so this is blind.</p>
-        </div>
-        <div class="blind-panel">
-          <span class="g mono" aria-hidden="true">⊘</span>
-          <p>
-            <strong>Blind.</strong> No coordination contexts yet — <code>tapestry.coordination_context_id</code> is not emitted.
-            Once the hooks carry the anchor, contexts appear here (fleet → project → context → event), each with its
-            coordination-quality state.
-          </p>
-        </div>
-      </section>
-
-      <footer class="foot">
-        <p class="mono">
-          Canon: <a href={CANON_URL}>user-agent-coordination-reinforcement</a> · Contract:
-          <a href={CONTRACT_URL}>otel-coordination-contract</a>. Coordination quality is correction frequency,
-          friction recurrence, memory-miss rate, and time-to-durable-structure — not request rate or latency.
-        </p>
-      </footer>
+      <footer class="foot"><p class="mono">Episodes built from real hook telemetry via the coordination episode model. Canon: <a href={CANON}>user-agent-coordination-reinforcement</a>.</p></footer>
     </main>
 
+    <script>
+      type Ep = {
+        session: string; project: string; start: string | null; end: string | null;
+        durationMs: number | null; intent: string; intentCertain: boolean;
+        tools: { name: string; count: number }[]; toolCalls: number;
+        snapshot: string | null; durableCandidates: number; verdict: string;
+      };
+      const esc = (s: string) => s.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]!));
+      const ago = (iso: string | null) => {
+        if (!iso) return "";
+        const s = Math.floor((Date.now() - Date.parse(iso)) / 1000);
+        if (s < 60) return s + "s ago";
+        if (s < 3600) return Math.floor(s / 60) + "m ago";
+        if (s < 86400) return Math.floor(s / 3600) + "h ago";
+        return Math.floor(s / 86400) + "d ago";
+      };
+      const dur = (ms: number | null) => (ms == null ? "" : ms < 1000 ? ms + "ms" : Math.round(ms / 1000) + "s");
+
+      async function load() {
+        const r = await fetch("/api/episodes.json", { cache: "no-store" });
+        const d = await r.json();
+        const srcLabel: Record<string, string> = {
+          "live:central-store": "live · central store",
+          "dev:hooks.jsonl": "live · this machine's hooks",
+          "snapshot:events-sample": "real snapshot (wire the hooks for live)",
+        };
+        (document.getElementById("src") as HTMLElement).textContent = "coordination console · " + (srcLabel[d.source] || d.source);
+
+        const s = d.summary;
+        (document.getElementById("summary") as HTMLElement).innerHTML = [
+          ["episodes", s.episodes], ["sessions", s.sessions], ["projects", s.projects],
+          ["produced durable structure", s.withDurable], ["tool calls", s.toolCalls],
+        ].map(([k, v]) => `<div class="stat"><span class="num mono">${v}</span><span class="lab">${k}</span></div>`).join("")
+          + `<div class="stat blind"><span class="num mono">${s.episodes}</span><span class="lab">intent uncertain · memory + friction blind</span></div>`;
+
+        const eps: Ep[] = d.episodes;
+        const host = document.getElementById("episodes") as HTMLElement;
+        if (!eps.length) { host.innerHTML = '<p class="loading mono">no episodes yet</p>'; return; }
+        host.innerHTML = eps.slice(0, 60).map((e) => {
+          const tools = e.tools.length ? e.tools.map((t) => `${esc(t.name)}${t.count > 1 ? "·" + t.count : ""}`).join("  ") : "—";
+          const verdict = e.verdict === "strengthened"
+            ? '<span class="v ok">● strengthened</span>'
+            : '<span class="v unk">○ can\'t assess yet</span>';
+          const meta = [
+            e.snapshot ? `shape: snapshot` : "",
+            e.durableCandidates ? `${e.durableCandidates} durable candidate${e.durableCandidates > 1 ? "s" : ""}` : "",
+          ].filter(Boolean).join("  ·  ");
+          return `<article class="ep">
+            <div class="ep-top">
+              <span class="intent">${esc(e.intent)} <span class="unc" title="not observer-derived yet">intent unclear</span></span>
+              <span class="when mono">${ago(e.start)}${e.durationMs != null ? " · " + dur(e.durationMs) : ""}</span>
+            </div>
+            <div class="did"><span class="k">agent did</span> <span class="mono">${tools}</span> <span class="tc mono">${e.toolCalls} call${e.toolCalls === 1 ? "" : "s"}</span></div>
+            ${meta ? `<div class="extra mono">${meta}</div>` : ""}
+            <div class="ep-foot"><span class="proj mono">${esc(e.project)} · ${esc(e.session)}</span><span class="blindset mono">memory ⊘ · friction ⊘</span>${verdict}</div>
+          </article>`;
+        }).join("");
+      }
+      load().catch((e) => { (document.getElementById("episodes") as HTMLElement).innerHTML = '<p class="loading mono">feed error: ' + esc(String(e)) + "</p>"; });
+    </script>
+
     <style is:global>
-      :root {
-        color-scheme: dark;
-        --surface: #0a0d0e; --surface-raised: #16191b; --edge: #2a2f31;
-        --ink: #f3f5f4; --ink-dim: #c4ccca; --ink-faint: #8b9492;
-        --font-display: "Instrument Serif", Georgia, serif;
-        --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-        --font-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
-        --brand: #5fd3da;
-        --healthy: #8fa99b; --healthy-soft: #8fa99b14; --healthy-edge: #8fa99b40;
-        --degraded: #d8b06a; --degraded-soft: #d8b06a16; --degraded-edge: #d8b06a40;
-        --blind: #b98a8a; --blind-soft: #b98a8a14; --blind-edge: #b98a8a3a;
-        --unknown: #8b9492; --unknown-soft: #2a2f3155;
-      }
-      * { box-sizing: border-box; }
-      html, body { height: 100%; }
-      body {
-        margin: 0; font-size: 16px; line-height: 1.55; color: var(--ink);
-        font-family: var(--font-sans); -webkit-font-smoothing: antialiased;
-        background: radial-gradient(120% 80% at 50% 120%, #5fd3da12 0%, transparent 60%), var(--surface);
-        background-attachment: fixed;
-      }
-      a { color: inherit; }
-      .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
-      .display { font-family: var(--font-display); font-weight: 400; letter-spacing: 0.01em; }
-      .display-accent { font-family: var(--font-display); font-style: italic; color: var(--brand); }
-
-      .topbar { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; border-bottom: 1px solid var(--edge); position: sticky; top: 0; z-index: 10; background: #0a0d0ecc; backdrop-filter: blur(8px); }
-      .wordmark { font-family: var(--font-display); font-size: 20px; text-decoration: none; }
-      .topnav { display: flex; gap: 18px; font-size: 14px; }
-      .topnav a { color: var(--ink-faint); text-decoration: none; padding: 4px 2px; }
-      .topnav a:hover { color: var(--ink); }
-      .topnav a.here { color: var(--ink); border-bottom: 2px solid var(--brand); }
-
-      main { max-width: 1000px; margin: 0 auto; padding: 44px 24px 96px; }
-      section { margin-bottom: 48px; }
-      .hero { margin-bottom: 24px; }
-      .eyebrow { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faint); margin: 0 0 6px; }
-      .hero h1 { font-size: clamp(44px, 7vw, 70px); margin: 0 0 12px; line-height: 1.03; }
-      .lede { font-size: 18px; color: var(--ink-dim); max-width: 66ch; margin: 0; }
-
-      .states { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 14px 16px; border: 1px solid var(--edge); border-radius: 14px; background: var(--surface-raised); }
-      .st { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
-      .st .g { font-size: 12px; }
-      .st.healthy { color: var(--healthy); } .st.degraded { color: var(--degraded); }
-      .st.blind { color: var(--blind); } .st.unknown { color: var(--ink-faint); }
-      .states-note { flex-basis: 100%; margin: 4px 0 0; font-size: 13px; color: var(--ink-dim); }
-      .states-note strong { color: var(--ink); }
-
-      .section-head { margin: 0 0 16px; }
-      .section-head h2 { font-size: 28px; margin: 0; }
-      .hint { font-size: 14px; color: var(--ink-faint); margin: 5px 0 0; max-width: 78ch; }
-      .hint a { color: var(--brand); text-decoration: none; } .hint a:hover { text-decoration: underline; }
-      .hint strong { color: var(--ink-dim); }
-      code { font-family: var(--font-mono); font-size: 0.86em; color: var(--ink-dim); background: var(--unknown-soft); padding: 1px 5px; border-radius: 5px; }
-
-      .mech-grid { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; grid-template-columns: repeat(2, 1fr); }
-      .mech { border: 1px solid var(--edge); border-left-width: 3px; border-radius: 14px; padding: 14px 16px; background: color-mix(in srgb, var(--surface-raised) 55%, transparent); }
-      .mech.healthy { border-left-color: var(--healthy-edge); }
-      .mech.degraded { border-left-color: var(--degraded-edge); }
-      .mech.blind { border-left-color: var(--blind-edge); }
-      .mech.unknown { border-left-color: var(--edge); }
-      .mech-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
-      .mech-name { font-size: 16px; font-weight: 600; }
-      .mech-why { font-size: 13px; color: var(--ink-dim); margin: 7px 0 0; }
-      .state-pill { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; white-space: nowrap; }
-      .state-pill.healthy { color: var(--healthy); } .state-pill.degraded { color: var(--degraded); }
-      .state-pill.blind { color: var(--blind); } .state-pill.unknown { color: var(--ink-faint); }
-
-      .cov-legend { display: flex; flex-wrap: wrap; gap: 14px; margin: 0 0 16px; font-size: 12px; }
-      .cov { display: inline-flex; align-items: center; gap: 6px; }
-      .cov.emitted { color: var(--healthy); } .cov.in_note { color: var(--degraded); } .cov.blind { color: var(--blind); }
-      .cov-group { margin-bottom: 16px; }
-      .cov-group-h { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-faint); margin: 0 0 8px; }
-      .cov-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 2px; }
-      .cov-row { display: flex; align-items: baseline; gap: 10px; padding: 6px 10px; border: 1px solid var(--edge); border-radius: 8px; background: var(--surface); }
-      .cov-row.emitted { border-color: var(--healthy-edge); }
-      .cov-row.in_note { border-color: var(--degraded-edge); }
-      .cov-row.blind { border-style: dashed; }
-      .cov-row .g { font-size: 11px; flex: none; }
-      .cov-row.emitted .g { color: var(--healthy); } .cov-row.in_note .g { color: var(--degraded); } .cov-row.blind .g { color: var(--blind); }
-      .cov-name { font-size: 12.5px; color: var(--ink-dim); }
-      .cov-note { font-size: 11px; color: var(--ink-faint); margin-left: auto; text-align: right; }
-
-      .blind-panel { display: flex; gap: 12px; align-items: flex-start; padding: 18px; border: 1px dashed var(--blind-edge); border-radius: 14px; background: var(--blind-soft); }
-      .blind-panel .g { font-size: 18px; color: var(--blind); }
-      .blind-panel p { margin: 0; font-size: 14px; color: var(--ink-dim); }
-      .blind-panel strong { color: var(--ink); }
-
-      .foot { margin-top: 8px; }
-      .foot p { font-size: 12px; color: var(--ink-faint); max-width: 86ch; }
-      .foot a { color: var(--ink-dim); }
-
-      @media (max-width: 720px) { .mech-grid { grid-template-columns: 1fr; } .cov-note { display: none; } .hero h1 { font-size: 44px; } }
-      @media (prefers-reduced-motion: reduce) { * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+      :root{color-scheme:dark;--surface:#0a0d0e;--raised:#16191b;--edge:#2a2f31;--ink:#f3f5f4;--dim:#c4ccca;--faint:#8b9492;--brand:#5fd3da;--ok:#8fa99b;--warn:#d8b06a;--font-d:"Instrument Serif",Georgia,serif;--font-s:"Inter",system-ui,sans-serif;--font-m:"JetBrains Mono",ui-monospace,Consolas,monospace}
+      *{box-sizing:border-box}html,body{height:100%}
+      body{margin:0;font:16px/1.55 var(--font-s);color:var(--ink);background:radial-gradient(120% 80% at 50% 120%,#5fd3da12 0,transparent 60%),var(--surface);background-attachment:fixed;-webkit-font-smoothing:antialiased}
+      a{color:inherit}.mono{font-family:var(--font-m);font-variant-numeric:tabular-nums}.display{font-family:var(--font-d);font-weight:400}.ac{font-family:var(--font-d);font-style:italic;color:var(--brand)}
+      .topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid var(--edge);position:sticky;top:0;z-index:10;background:#0a0d0ecc;backdrop-filter:blur(8px)}
+      .wordmark{font-family:var(--font-d);font-size:20px;text-decoration:none}.topnav{display:flex;gap:18px;font-size:14px}.topnav a{color:var(--faint);text-decoration:none}.topnav a:hover{color:var(--ink)}.topnav .here{color:var(--ink);border-bottom:2px solid var(--brand)}
+      main{max-width:920px;margin:0 auto;padding:40px 24px 90px}
+      .eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin:0 0 6px}
+      .hero h1{font-size:clamp(40px,7vw,64px);margin:0 0 10px;line-height:1.03}.lede{font-size:18px;color:var(--dim);max-width:60ch;margin:0}.lede strong{color:var(--ink);font-weight:500}
+      .summary{display:flex;flex-wrap:wrap;gap:10px;margin:28px 0}
+      .stat{flex:1 1 120px;border:1px solid var(--edge);border-radius:12px;padding:12px 14px;background:color-mix(in srgb,var(--raised) 55%,transparent);display:flex;flex-direction:column;gap:3px}
+      .stat .num{font-size:24px;font-weight:600}.stat .lab{font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:.05em}
+      .stat.blind{flex-basis:100%;border-style:dashed}.stat.blind .num{color:var(--faint)}
+      .meaning-note{display:flex;gap:12px;align-items:flex-start;margin:0 0 32px;padding:13px 15px;border:1px solid var(--edge);border-radius:13px;background:var(--raised)}
+      .meaning-note .g{color:var(--faint);font-size:16px}.meaning-note p{margin:0;font-size:13.5px;color:var(--dim)}.meaning-note strong{color:var(--ink)}
+      .sec{font-size:24px;margin:0 0 14px}
+      .episodes{display:grid;gap:10px}.loading{color:var(--faint);font-size:13px}
+      .ep{border:1px solid var(--edge);border-radius:13px;padding:14px 16px;background:color-mix(in srgb,var(--raised) 50%,transparent)}
+      .ep-top{display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+      .intent{font-size:15px;font-weight:500}.unc{font-size:10px;color:var(--warn);border:1px solid #d8b06a40;border-radius:6px;padding:1px 5px;margin-left:6px;font-weight:400}
+      .when{font-size:12px;color:var(--faint);white-space:nowrap}
+      .did{margin-top:8px;font-size:13px;color:var(--dim)}.did .k{color:var(--faint);font-size:11px;text-transform:uppercase;letter-spacing:.05em;margin-right:6px}.did .tc{color:var(--faint);font-size:11px;margin-left:6px}
+      .extra{margin-top:6px;font-size:12px;color:var(--faint)}
+      .ep-foot{margin-top:11px;padding-top:10px;border-top:1px solid var(--edge);display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-size:11px}
+      .proj{color:var(--faint)}.blindset{color:var(--faint);margin-left:auto}
+      .v{font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--edge)}.v.ok{color:var(--ok);border-color:#8fa99b40}.v.unk{color:var(--faint)}
+      .foot{margin-top:30px}.foot p{font-size:12px;color:var(--faint)}.foot a{color:var(--dim)}
+      @media(max-width:680px){.blindset{margin-left:0}}
     </style>
   </body>
 </html>

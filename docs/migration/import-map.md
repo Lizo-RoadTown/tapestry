@@ -40,6 +40,8 @@ Each row:
 | `the-loom/infra/migrations/002_init_projects.sql` | `tapestry/infra/migrations/002_init_projects.sql` | Lift (forklift) | Imported (Step 3, 2026-06-20) | byte-identical; `projects`/`repos`/`machines` |
 | `Make_Skills/core/skill_making/compiler.py` | `tapestry/engine/skill-compiler/python/skill_compiler/compiler.py` | **Refactor** | Imported (Step 4, 2026-06-21) | import paths rewritten to Tapestry layout; bodies unchanged; compile + resolution verified |
 | `Make_Skills/services/skill_making/` (9 modules + tests) | `tapestry/services/skill-making/python/skill_making/` | **Refactor** | Imported (Step 4, 2026-06-21) | imports rewritten; **`hmac_verify.py`+`models.py` byte-identical** (wire contract); sys.path bootstrap; **deploy shape TBD** |
+| `the-loom/loom-cli/` (`loom_cli/` + pyproject) | `tapestry/packages/cli/` | Lift | Imported (Step 5a, 2026-06-21) | byte-identical (`cmp`); stdlib-only; URL-env-driven; `loom_cli` resolves; not published yet |
+| starter repos (web-starter, project-starter, classroom-hub-starter, SDE_Extraction, ux-starter) | `tapestry/templates/{software,classroom,research,operations}-project/` | (Step 5b) Rewrite/curate | Pending | NOT a lift — curate template from full starter apps; per §6.5 Decision 6 |
 
 ## Template
 

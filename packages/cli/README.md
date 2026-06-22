@@ -1,15 +1,22 @@
 # `packages/cli/`
 
-**Status:** Slot. No code yet.
+**Status:** Populated — Step 5a (CLI lift), 2026-06-21. Code lifted; not yet published.
 
-## Purpose
+The `loom` CLI: scaffolds + registers new consuming projects (the cross-platform replacement for the old PowerShell `new-loom-project.ps1`).
 
-`tapestry init` CLI for spawning new projects from templates/.
+## What's here
 
-## Source
+Verbatim **Lift** (`cmp`-verified identical) of `the-loom/loom-cli/`:
+- `loom_cli/cli.py` — argparse entrypoint (`main`).
+- `loom_cli/init.py` — `init` command: creates `.env` (OTel propagation + `LOOM_PROJECT_ID`), registers the project, etc.
+- `loom_cli/__init__.py`, `__main__.py`, `pyproject.toml`.
 
-the-loom/scripts/new-loom-project.ps1 (manual scaffolder)
+Stdlib-only (no third-party deps); **URL-env-driven** (reads `LOOM_MEMORY_MCP_URL` / `LOOM_MEMORY_URL` / `LOOM_PROJECT_ID` — no hardcoded loom hostnames). `loom_cli` package name kept (rename deferred, like `loom_auth`).
 
-## When this slot populates
+## Migration status
 
-When the source has stabilized AND the operator approves migration. See [`../../docs/migration/README.md`](../../docs/migration/README.md).
+**Decision: Lift.** Verified: files byte-identical to source, compiles, `loom_cli.cli` resolves. Companion: Step 5b (templates assembly) — `templates/*` are assembled from the starter repos separately (curation, not a lift).
+
+## Provenance
+- the-loom: `loom-cli/` (the cross-platform scaffolder)
+- loom-memory: `tapestry_step3_prod_cutover_complete_2026_06_21` (migration state)

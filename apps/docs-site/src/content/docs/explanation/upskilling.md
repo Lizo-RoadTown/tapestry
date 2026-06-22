@@ -14,12 +14,12 @@ For the observation mechanism that surfaces candidates in the first place, see [
 ## The upskilling loop
 
 ```mermaid
-flowchart LR
-  A([Repeated work<br/>in sessions])
-  B([Observer surfaces<br/>candidate])
-  C([Operator evaluates<br/>against criteria])
-  D([Promoted into durable<br/>tool / subagent / skill / agent])
-  E([Available by name<br/>to every project])
+flowchart TB
+  A([Repeated work in sessions])
+  B([Observer surfaces candidate])
+  C([Operator evaluates against criteria])
+  D([Promoted into durable tool / subagent / skill / agent])
+  E([Available by name to every project])
   A --> B --> C --> D --> E
   E -.->|"used in future work"| A
 ```

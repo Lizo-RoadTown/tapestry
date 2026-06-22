@@ -1,0 +1,64 @@
+# Promtail config — tails ~/.claude/logs/hooks.jsonl from the host and
+# ships parsed entries to Loki for the dev-experience dashboard.
+#
+# The host's ~/.claude/logs/ is mounted into this container at
+# /var/log/claude/ (read-only). See docker-compose.yml for the volume
+# binding.
+#
+# Pattern source: Grafana Promtail docs
+# https://grafana.com/docs/loki/latest/send-data/promtail/configuration/
+#
+# Each line in hooks.jsonl looks like:
+#   {"ts":"2026-...","hook":"PreToolUse","phase":"end","scope_in":true,
+#    "action":"reminder_injected","note":"citation_reminder;target=...",
+#    "exit_code":0,"elapsed_ms":42}
+# This config parses it, promotes hook + phase + action to labels (for
+# fast filtering in Grafana), and keeps the rest in the structured log.
+
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+  log_level: warn
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  - job_name: claude-code-hooks
+    static_configs:
+      - targets: [localhost]
+        labels:
+          job: claude-code-hooks
+          source: hooks-jsonl
+          __path__: /var/log/claude/hooks.jsonl
+
+    pipeline_stages:
+      # 1. Parse the JSON line into structured fields.
+      - json:
+          expressions:
+            ts: ts
+            hook: hook
+            phase: phase
+            action: action
+            note: note
+            exit_code: exit_code
+            elapsed_ms: elapsed_ms
+            scope_in: scope_in
+
+      # 2. Promote hook + phase + action to labels for filtering.
+      #    Other fields stay in the log line for query-time use.
+      - labels:
+          hook:
+          phase:
+          action:
+
+      # 3. Use the JSON `ts` field as the entry timestamp (otherwise
+      #    Promtail uses ingest time, which lags).
+      - timestamp:
+          source: ts
+          format: RFC3339Nano
+          fallback_formats:
+            - RFC3339

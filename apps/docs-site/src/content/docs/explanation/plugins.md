@@ -11,13 +11,15 @@ For the file-by-file reference, see [Load-bearing files](/reference/load-bearing
 
 | Plugin | Marketplace | Job |
 |---|---|---|
-| `loom-discipline` | `lizo-loom` | The universal discipline stack: PROBE hooks, memory MCP wiring, auto-recall at session start, upskilling audit at stop. |
-| `liz-patterns` | `lizo-skills` | The canonical reusable agents, skills, and scripts (including the architecture-snapshot canonicals). |
-| `sde-extraction-guard` (and similar per-project guards) | `lizo-skills` | Project-specific guardrails that COMPLEMENT loom-discipline. Each project that needs its own guard has its own. |
+| `tapestry-discipline` | `tapestry` | The universal discipline stack: PROBE hooks, memory MCP wiring, auto-recall at session start, upskilling audit at stop. |
+| `tapestry-patterns` | `tapestry` | The canonical reusable agents, skills, and scripts (including the architecture-snapshot canonicals). |
+| Per-project guards (`sde-extraction-guard` etc.) | project-specific | Project-specific guardrails that complement `tapestry-discipline`. Each project that needs its own guard has its own. |
 
 You will likely enable all three for any non-trivial Tapestry-consuming project.
 
-## `loom-discipline@lizo-loom` — the discipline source
+The two `tapestry-*` plugins were consolidated into the tapestry monorepo 2026-06-22; the prior names + marketplaces (`loom-discipline@lizo-loom`, `liz-patterns@lizo-skills`) remain available during the transition window. New projects should use the `tapestry-*` names.
+
+## `tapestry-discipline@tapestry` — the discipline source
 
 **What it does:**
 - Declares the `loom-memory` MCP server in its own `plugin.json`. Enabling the plugin = wiring the MCP.
@@ -30,17 +32,19 @@ You will likely enable all three for any non-trivial Tapestry-consuming project.
 
 **What you'd lose without it:** every behavior listed above. The agent reverts to default Claude Code with no memory, no PROBE reminder, no boundary check, no upskilling audit.
 
-**Where it lives on disk:** `~/.claude/plugins/cache/lizo-loom/loom-discipline/<version>/`.
+**Where it lives on disk:** `~/.claude/plugins/cache/tapestry/tapestry-discipline/<version>/`.
 
-**Source repo:** [`Lizo-RoadTown/the-loom`](https://github.com/Lizo-RoadTown/the-loom) — the platform's beta repo, which doubles as the marketplace by housing the plugin under `adapters/claude-code/loom-discipline/`. (See [Names you'll see](/start/names-you-will-see/) for what "the-loom" is.)
+**Source repo:** [`Lizo-RoadTown/tapestry`](https://github.com/Lizo-RoadTown/tapestry) — the canonical home; the plugin lives at `integrations/claude-code/tapestry-discipline/` with the marketplace manifest at the repo root.
 
 **Install:**
 ```
-/plugin marketplace add Lizo-RoadTown/the-loom
-/plugin install loom-discipline@lizo-loom
+/plugin marketplace add Lizo-RoadTown/tapestry
+/plugin install tapestry-discipline@tapestry
 ```
 
-## `liz-patterns@lizo-skills` — the canonical patterns
+The prior `/plugin install loom-discipline@lizo-loom` (sourced from the-loom) still works during the transition window.
+
+## `tapestry-patterns@tapestry` — the canonical patterns
 
 **What it does:**
 - Hosts the reusable agents and skills (`documentation`, `deep-research-pattern`, `next-actions-planning`, `infrastructure-mapping`, `agentic-skill-design`, `proposal-authoring`, and others).
@@ -51,15 +55,17 @@ You will likely enable all three for any non-trivial Tapestry-consuming project.
 - The architecture-snapshot pipeline can't run (wrappers can't find the canonical → write an error → SessionStart hook proceeds without the snapshot).
 - Canonical patterns aren't invokable by name. You'd have to copy-paste skill prompts manually.
 
-**Where it lives on disk:** `~/.claude/plugins/cache/lizo-skills/liz-patterns/<version>/`.
+**Where it lives on disk:** `~/.claude/plugins/cache/tapestry/tapestry-patterns/<version>/`.
 
-**Source repo:** `Lizo-RoadTown/claude-skills-marketplace`.
+**Source repo:** `Lizo-RoadTown/tapestry` (formerly `claude-skills-marketplace`).
 
 **Install:**
 ```
-/plugin marketplace add Lizo-RoadTown/claude-skills-marketplace
-/plugin install liz-patterns@lizo-skills
+/plugin marketplace add Lizo-RoadTown/tapestry
+/plugin install tapestry-patterns@tapestry
 ```
+
+The prior `/plugin install liz-patterns@lizo-skills` (sourced from claude-skills-marketplace) still works during the transition window.
 
 ## Per-project guards (the `sde-extraction-guard` pattern)
 
@@ -157,7 +163,7 @@ To check for marketplace updates:
 This refreshes the marketplace metadata. Installed plugins are then ready to be re-installed at the new version:
 
 ```
-/plugin install loom-discipline@lizo-loom
+/plugin install tapestry-discipline@tapestry
 ```
 
 This downloads the new version into the cache as a new subdirectory. **Restart Claude Code** for the new hooks to bind.
@@ -184,10 +190,10 @@ If `~/.claude/plugins/cache/` is bloated with old versions, you can delete the o
 
 In priority order:
 
-1. Confirm `.claude/settings.json` enables the plugin (`"loom-discipline@lizo-loom": true`).
+1. Confirm `.claude/settings.json` enables the plugin (`"tapestry-discipline@tapestry": true`).
 2. Confirm you restarted Claude Code AFTER the settings change.
-3. Confirm the marketplace is registered (`/plugin marketplace list` shows `lizo-loom`).
-4. Confirm the plugin is in the cache (`ls ~/.claude/plugins/cache/lizo-loom/loom-discipline/`).
+3. Confirm the marketplace is registered (`/plugin marketplace list` shows `tapestry`).
+4. Confirm the plugin is in the cache (`ls ~/.claude/plugins/cache/tapestry/tapestry-discipline/`).
 5. Check the plugin's hook scripts in the cache directly — they should be executable and free of syntax errors.
 6. For the discipline plugin specifically, also confirm `LOOM_PROJECT_ID` is set in `.env` so the scope gate activates.
 
@@ -195,7 +201,7 @@ For deeper triage, see [Recover from common failures](/how-to/recover-from-commo
 
 ## When to build your own per-project plugin
 
-You DON'T need a custom plugin for most projects. `loom-discipline` + `liz-patterns` cover the general discipline + canonical patterns. Most consuming projects just enable those two and that's enough.
+You DON'T need a custom plugin for most projects. `tapestry-discipline` + `tapestry-patterns` cover the general discipline + canonical patterns. Most consuming projects just enable those two and that's enough.
 
 You DO need a custom plugin when:
 

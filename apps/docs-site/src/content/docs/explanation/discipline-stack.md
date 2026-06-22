@@ -174,8 +174,8 @@ A one-line JSON entry per plugin in your project's `.claude/settings.json`:
 ```json
 {
   "enabledPlugins": {
-    "loom-discipline@lizo-loom": true,
-    "liz-patterns@lizo-skills": true,
+    "tapestry-discipline@tapestry": true,
+    "tapestry-patterns@tapestry": true,
     "your-guard@lizo-skills": true
   }
 }

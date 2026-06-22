@@ -64,6 +64,18 @@ What the observer is **not** interested in:
 
 The observer sits at the *patterns* level of the [signal hierarchy](/explanation/signal-hierarchy/) — events flow through telemetry → signals → patterns before the observer touches them.
 
+## Derived intent
+
+The observer derives an intent hypothesis per coordination episode by combining signals (user prompts, agent responses, tool activity, memory activity, architecture changes, correction events, prior observer findings). Intent is not a telemetry attribute — see [Observer-derived intent](/explanation/observer-derived-intent/) for the full canon.
+
+Schema per hypothesis: `intent_summary`, `intent_category`, `confidence` (high/medium/low/unknown), `supporting_evidence`, `derivation_method`. Hypotheses may be revised; revisions are themselves observable signals.
+
+## Current implementation scope (honesty)
+
+Today's observer is a static shape-drift scanner. It does not yet observe runtime invocation patterns, telemetry events, cross-session signals, or derive intent hypotheses. The intent-derivation layer described above is the target shape; the gap between target and current is one of the open architectural questions.
+
+What is wired today: Path A transcript parser (counts skill invocations + parses upskilling reports per session); the self-observer Render cron (walks registered repos via GitHub API + applies signal rules + emits candidates). What is not yet wired: OTel telemetry consumption beyond `_observability.py` emission; cross-session pattern recognition; intent derivation; runtime invocation tracking. Absence is a first-class state — see [the observatory console](/explanation/the-observer/#how-the-observer-fits-the-recursive-loop) for how absence is surfaced.
+
 ## What the observer holds per tracked unit
 
 For each interface the observer tracks (per [user-agent interfaces](/start/user-agent-interface/#what-each-tracked-interface-carries)):

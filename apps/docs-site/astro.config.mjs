@@ -47,6 +47,7 @@ export default defineConfig({
           items: [
             { label: "The signal hierarchy", slug: "explanation/signal-hierarchy" },
             { label: "The observer", slug: "explanation/the-observer" },
+            { label: "Observer-derived intent", slug: "explanation/observer-derived-intent" },
             { label: "How the platform upskills itself", slug: "explanation/upskilling" },
             { label: "Sharing intelligence across projects", slug: "explanation/sharing-intelligence-across-projects" },
             { label: "The memory MCP", slug: "explanation/memory-mcp" },

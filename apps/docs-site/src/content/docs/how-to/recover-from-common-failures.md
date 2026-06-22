@@ -14,9 +14,9 @@ Before diagnosing, confirm what the agent CAN see:
 | Quick check | What it tells you |
 |---|---|
 | `/mcp` in Claude Code | Lists active MCP servers. If `loom-memory` is not there, the MCP isn't wired. |
-| Look at the top of your most recent message | If you don't see `[loom-discipline] Discipline check: PROBE files before asserting ...`, the UserPromptSubmit hook isn't firing. |
+| Look at the top of your most recent message | If you don't see `[tapestry-discipline] Discipline check: PROBE files before asserting ...`, the UserPromptSubmit hook isn't firing. |
 | Look at the very start of the conversation | If you don't see an auto-recall block of past memories, the SessionStart hook isn't firing. |
-| `/plugin list` | Shows enabled plugins for this project. If `loom-discipline@lizo-loom` is not there or not enabled, the plugin isn't running. |
+| `/plugin list` | Shows enabled plugins for this project. If `tapestry-discipline@tapestry` is not there or not enabled, the plugin isn't running. |
 | `cat .mcp.json` | Shows declared MCP servers in your project. |
 | `cat .claude/settings.json` | Shows enabled plugins for this project. |
 | `cat .env \| grep LOOM_PROJECT_ID` | Shows the project ID the hooks scope against. |
@@ -25,11 +25,11 @@ Before diagnosing, confirm what the agent CAN see:
 
 ### Symptom: The agent says "I don't have memory tools available"
 
-**Cause:** Neither the `loom-discipline` plugin nor your `.mcp.json` is wiring the `loom-memory` MCP server.
+**Cause:** Neither the `tapestry-discipline` plugin nor your `.mcp.json` is wiring the `loom-memory` MCP server.
 
 **Fix:**
 
-1. Verify the plugin is enabled in `.claude/settings.json` — should contain `"loom-discipline@lizo-loom": true`.
+1. Verify the plugin is enabled in `.claude/settings.json` — should contain `"tapestry-discipline@tapestry": true`.
 2. If not, add it. Then **fully restart Claude Code** in this repo.
 3. As belt-and-suspenders, add the MCP block to `.mcp.json` as described in [Set up a new project, Step 4](/how-to/set-up-a-new-project/).
 4. Restart Claude Code again to pick up the `.mcp.json` change.
@@ -54,7 +54,7 @@ Before diagnosing, confirm what the agent CAN see:
 
 **Fix:** Same as above. Plugin enabled in settings.json + LOOM_PROJECT_ID set + restart Claude Code.
 
-**How to confirm fixed:** Send any message. The top should show `[loom-discipline] Discipline check: PROBE files before asserting (cite file:line). Distinguish dev-tooling (...) from runtime (...). Save corrections as feedback memory immediately. CORE DIRECTIVE 1 ...`.
+**How to confirm fixed:** Send any message. The top should show `[tapestry-discipline] Discipline check: PROBE files before asserting (cite file:line). Distinguish dev-tooling (...) from runtime (...). Save corrections as feedback memory immediately. CORE DIRECTIVE 1 ...`.
 
 ### Symptom: The agent stops citing file:line and starts making up things
 
@@ -80,7 +80,7 @@ Before diagnosing, confirm what the agent CAN see:
 
 **Cause:** `scripts/architecture_snapshot.py` and/or `scripts/architecture_diff.py` are missing from your repo. The SessionStart hook reads from these and silently no-ops if they're absent.
 
-**Fix:** Add the thin wrapper scripts that dispatch to the canonical implementations in the `liz-patterns` plugin. See [the wrapper-pattern reference (consuming project PR)](https://github.com/Lizo-RoadTown/sde-extraction/commit/2325e67) for the canonical example. The wrappers are a few lines each.
+**Fix:** Add the thin wrapper scripts that dispatch to the canonical implementations in the `tapestry-patterns` plugin. See [the wrapper-pattern reference (consuming project PR)](https://github.com/Lizo-RoadTown/sde-extraction/commit/2325e67) for the canonical example. The wrappers are a few lines each.
 
 **How to confirm fixed:** Start a new session. The SessionStart context should include an architecture narrative (or "no structural changes" diff against the prior baseline).
 
@@ -113,19 +113,19 @@ Before diagnosing, confirm what the agent CAN see:
 
 **Fix:**
 
-1. Confirm marketplace registration: `/plugin marketplace list` — `lizo-loom` should appear.
-2. If not: `/plugin marketplace add Lizo-RoadTown/the-loom`.
-3. Force re-install the plugin: `/plugin remove loom-discipline@lizo-loom`, then `/plugin install loom-discipline@lizo-loom`.
+1. Confirm marketplace registration: `/plugin marketplace list` — `tapestry` should appear.
+2. If not: `/plugin marketplace add Lizo-RoadTown/tapestry`.
+3. Force re-install the plugin: `/plugin remove tapestry-discipline@tapestry`, then `/plugin install tapestry-discipline@tapestry`.
 4. Restart Claude Code again.
-5. As a last resort, check the plugin cache directly: `ls ~/.claude/plugins/cache/lizo-loom/loom-discipline/` — should show the latest version directory.
+5. As a last resort, check the plugin cache directly: `ls ~/.claude/plugins/cache/tapestry/tapestry-discipline/` — should show the latest version directory.
 
 ### Symptom: The architecture-snapshot scripts ARE present but the hook still doesn't run them
 
-**Cause:** Could be missing Python dependencies for the canonical scripts in `liz-patterns`, or `liz-patterns` not installed.
+**Cause:** Could be missing Python dependencies for the canonical scripts in `tapestry-patterns`, or `tapestry-patterns` not installed.
 
 **Fix:**
 
-1. Install the patterns plugin: `/plugin install liz-patterns@lizo-skills`.
+1. Install the patterns plugin: `/plugin install tapestry-patterns@tapestry`.
 2. Confirm the wrappers in your `scripts/` point at the canonical scripts in the patterns plugin cache.
 3. Try running the wrapper manually: `python scripts/architecture_snapshot.py` — should produce a JSON+MD snapshot in `docs/architecture-snapshots/`.
 

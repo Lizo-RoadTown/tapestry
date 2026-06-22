@@ -72,6 +72,10 @@ The transport is wired ([`the-loom/adapters/claude-code/loom-discipline/scripts/
 
 Current attributes per event: `hook_name`, `event`, `exit_code`, `elapsed_ms`, `action`, `note`. The `note` field carries unstructured strings (`out_of_scope`, `malformed_input`, etc.) that this contract is meant to replace with typed attributes.
 
+## What this contract does NOT include
+
+Intent. Intent is observer-derived, not telemetry-emitted — see [Observer-derived intent](/explanation/observer-derived-intent/). Adding intent attributes here would conflate the interpretation layer with the emission layer. The observer reads these typed attributes (plus memory, transcripts, diffs, prior findings) and produces an intent hypothesis as a separate output.
+
 ## Source of truth
 
 This page is the operator-facing surface of the contract. The internal architecture spec lives at [`docs/reference/coordination-telemetry-contract.md`](https://github.com/Lizo-RoadTown/tapestry/blob/main/docs/reference/coordination-telemetry-contract.md) in the repo root (Tapestry-agent owned). If the two diverge, the repo-root spec is canonical.

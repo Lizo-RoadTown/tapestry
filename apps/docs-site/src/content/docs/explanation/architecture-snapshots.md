@@ -46,7 +46,7 @@ your-project/scripts/architecture_snapshot.py  ← thin wrapper (~50 lines)
 your-project/scripts/architecture_diff.py       ← thin wrapper (~50 lines)
 ```
 
-Each wrapper looks up the canonical implementation in the `liz-patterns` plugin and dispatches to it with your repo root as an argument. The canonical bodies live at:
+Each wrapper looks up the canonical implementation in the `tapestry-patterns` plugin and dispatches to it with your repo root as an argument. The canonical bodies live at:
 
 ```
 ~/.claude/plugins/cache/lizo-skills/liz-patterns/<version>/scripts/architecture_snapshot.py
@@ -55,7 +55,7 @@ Each wrapper looks up the canonical implementation in the `liz-patterns` plugin 
 
 This is the Pillar 1 discipline (ONE pattern, ONE home) applied to the snapshot scripts: every project shares the same canonical implementation, so when the canonical evolves, every project gets the improvement on next pull. The per-project wrappers exist only so existing callers (the SessionStart hook, CI, manual `python scripts/architecture_snapshot.py` invocation) keep working — they're a routing layer, not a copy.
 
-If the canonical isn't found, the wrapper writes a clear error pointing you to install the patterns plugin: `/plugin install liz-patterns@lizo-skills`.
+If the canonical isn't found, the wrapper writes a clear error pointing you to install the patterns plugin: `/plugin install tapestry-patterns@tapestry`.
 
 ## When the snapshot fires
 
@@ -84,8 +84,8 @@ Two reasons:
 | `scripts/architecture_snapshot.py` | Detects absence, logs `snapshot_script_absent`, no-ops. | Loses snapshot + diff context. Proceeds normally otherwise. |
 | `scripts/architecture_diff.py` | Snapshot still runs; diff step is skipped. | Has the snapshot but no diff against prior baseline. |
 | `docs/architecture-snapshots/` directory | First post-deletion snapshot recreates the directory. Diff has nothing to compare against (treated as "first ever snapshot"). | Loses historical record. Going forward, the system rebuilds. |
-| The canonical scripts in the `liz-patterns` plugin cache | Wrapper falls through every fallback path and writes an error. | Hook logs the error and proceeds without snapshot context. |
-| The `liz-patterns` plugin uninstalled entirely | Wrapper can't find any canonical; errors. | Same as above. Install: `/plugin install liz-patterns@lizo-skills`. |
+| The canonical scripts in the `tapestry-patterns` plugin cache | Wrapper falls through every fallback path and writes an error. | Hook logs the error and proceeds without snapshot context. |
+| The `tapestry-patterns` plugin uninstalled entirely | Wrapper can't find any canonical; errors. | Same as above. Install: `/plugin install tapestry-patterns@tapestry`. |
 
 Each of these is a one-line silent loss. The agent doesn't crash. It just stops seeing the architecture.
 
@@ -97,7 +97,7 @@ The canonical pattern is documented in [a real consuming project's PR (commit `2
 
 First run produces the first snapshot. From there, every session adds another and diffs against the prior.
 
-If you don't have the canonical scripts available (`liz-patterns` plugin not installed): `/plugin install liz-patterns@lizo-skills`, then restart the project's Claude Code session.
+If you don't have the canonical scripts available (`tapestry-patterns` plugin not installed): `/plugin install tapestry-patterns@tapestry`, then restart the project's Claude Code session.
 
 ## How to verify it's working
 

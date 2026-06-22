@@ -9,7 +9,7 @@ You don't directly interact with it. But two scripts in your `scripts/` director
 
 ## What the diff is for
 
-The diff isn't an infrastructure-change report for its own sake. Architecture analysis is one of the **reinforcement mechanisms** Tapestry uses to maintain coordination quality. The diff's purpose is to surface structural changes that affect coordination — interfaces appearing or disappearing, memory attachment points moving, coordination pathways relocating, friction-prone shapes emerging.
+The diff isn't an infrastructure-change report for its own sake. Architecture analysis is one of the **reinforcement mechanisms** Tapestry uses to maintain coordination quality — alongside OTel telemetry (services emit OpenTelemetry → Grafana Cloud), memory, friction analysis, and the rest. The diff's purpose is to surface structural changes that affect coordination — interfaces appearing or disappearing, memory attachment points moving, coordination pathways relocating, friction-prone shapes emerging.
 
 When you read a snapshot diff, the questions to ask are coordination-shaped, not service-shaped:
 

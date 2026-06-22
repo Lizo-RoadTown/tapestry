@@ -21,7 +21,17 @@ flowchart TB
     PL -.applied.-> P
 ```
 
-**Sensors:** memory, telemetry, architecture snapshots, session transcripts, cross-project signals.
+## Where the signals come from
+
+| Sensor | Transport | What it reveals |
+|---|---|---|
+| **OTel telemetry** | Services + the discipline plugin emit OpenTelemetry via OTLP → Grafana Cloud (`OTEL_EXPORTER_OTLP_*` env vars) | What ran, what failed, latencies, correction events, tool usage |
+| **Architecture snapshots** | SessionStart hook + self-observer Render cron write to `docs/architecture-snapshots/` | Structural state of repos + diffs against prior snapshots |
+| **Session transcripts** | Stop hook parses JSONL transcripts in-session | Skill invocations, recurring patterns inside one session |
+| **Memory** | loom-memory MCP (`loom-agent-context.onrender.com`) | Operator corrections, decisions, project-state notes accumulated across sessions |
+| **Cross-project signals** | Same memory store queried across project tags | Patterns repeating across multiple projects in the fleet |
+
+OTel is the canonical telemetry transport. The architecture-snapshot pipeline and the OTel pipeline are complementary — snapshots give the structural view, telemetry gives the runtime view, and the observer reads both.
 
 ## What the observer watches for
 
@@ -167,7 +177,8 @@ A pattern that recurs in your project for three sessions becomes an `observed` c
 - **Not an LLM running over your code.** The Path A observer is a pure-Python script that parses transcripts. The self-observer cron uses signal rules, not classification. Neither model nor judgment is involved at this layer.
 - **Not real-time.** Path A fires at session-end. The self-observer fires every 6 hours. There's always lag between "the pattern happened" and "the candidate appears."
 - **Not the promoter.** The observer emits candidates. Whether a candidate becomes durable structure is a separate decision — currently operator-gated; eventually a Tapestry policy daemon. The observer's job ends at "this pattern is worth looking at."
-- **Not the architecture-snapshot pipeline.** The snapshot pipeline (see [Architecture snapshots](/explanation/architecture-snapshots/)) is structural — it records what exists. The observer is behavioral — it records what happens. They're complementary and both feed session/cross-session awareness, but they look at different surfaces.
+- **Not the architecture-snapshot pipeline.** The snapshot pipeline (see [Architecture snapshots](/explanation/architecture-snapshots/)) is one of the observer's inputs, not the observer itself. Snapshots give the structural view; OTel telemetry gives the runtime view; the observer reads both.
+- **Not the OTel pipeline.** Services emit OTel traces/logs to Grafana Cloud via OTLP. The observer queries that telemetry through telemetry-ingestion / project-observatory. Emission and observation are different roles.
 
 ## What fails if the observer is missing
 

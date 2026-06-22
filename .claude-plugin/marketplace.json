@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "tapestry",
+  "description": "Tapestry — the user/agent support and reinforcement system. Memory, telemetry, observability, architecture analysis, friction analysis, and upskilling as mechanisms that observe, strengthen, stabilize, and evolve coordination between operators and agents. This marketplace ships the Claude Code plugins that wire consuming projects into the platform.",
+  "owner": {
+    "name": "Liz Osborn",
+    "email": "lizocontactinfo@gmail.com"
+  },
+  "metadata": {
+    "pluginRoot": "./integrations/claude-code"
+  },
+  "plugins": [
+    {
+      "name": "tapestry-discipline",
+      "source": "./integrations/claude-code/tapestry-discipline",
+      "description": "Auto-injects PROBE-first behavior, file:line citation enforcement, dev-tooling-vs-runtime distinction, and friction-as-memory writing for Claude Code sessions in any Tapestry-consuming project. 4 hooks cover the session lifecycle (SessionStart auto-recall + architecture snapshot; UserPromptSubmit PROBE injection; PreToolUse write audit; Stop upskilling check + Path A observer). Registers the loom-memory MCP. Emits OTel telemetry per the coordination contract. Renamed from loom-discipline.",
+      "version": "0.1.15",
+      "author": { "name": "Liz Osborn" },
+      "license": "Apache-2.0",
+      "category": "discipline",
+      "tags": ["discipline", "hooks", "agent-behavior", "tapestry", "probe-first", "friction-as-memory", "observability", "otel", "coordination-reinforcement"],
+      "repository": "https://github.com/Lizo-RoadTown/tapestry"
+    },
+    {
+      "name": "tapestry-patterns",
+      "source": "./integrations/claude-code/tapestry-patterns",
+      "description": "Canonical patterns library — ONE home for the reusable agents, skills, and tools that ship with the platform. Available in every Claude Code session so the same pattern means the same thing wherever invoked. Includes drift-watcher, infrastructure-mapping, next-actions-planning, lessons-learned, agentic-skill-design, deep-research-pattern, documentation, and more. Renamed from liz-patterns.",
+      "version": "0.1.1",
+      "author": { "name": "Liz Osborn" },
+      "license": "Apache-2.0",
+      "category": "patterns-library",
+      "tags": ["patterns-library", "canonical-home", "tapestry", "agents", "skills", "tools", "recursive-skill-engine"],
+      "repository": "https://github.com/Lizo-RoadTown/tapestry"
+    }
+  ]
+}

@@ -22,7 +22,7 @@ What the dashboard shows per episode, and where each comes from (PROBE'd against
 | Field | Meaning | Source today | Needs |
 |---|---|---|---|
 | **context** | which coordination thread this belongs to | — | contract: `coordination_context_id` (not emitted) |
-| **intent** | what the operator was trying to do | only a coarse category in `note` (e.g. `build`) | **new capture** — a prompt summary / labeled intent |
+| **intent** | what the operator was trying to do | only a coarse category in `note` (e.g. `build`) | **observer-derived** from the prompt (see Intent capture) |
 | **agent actions** | what the agent did | `PreToolUse` `tool_name` (derivable) | structuring |
 | **friction** | where it snagged | stop-audit detects, transient | contract: `friction_present` / `friction_type` |
 | **corrections** | the operator had to correct the agent | stop-audit detects, transient | contract: `correction_present` |
@@ -44,6 +44,34 @@ What the dashboard shows per episode, and where each comes from (PROBE'd against
    - **strengthened** if: it produced a durable candidate, OR it resolved a prior friction, OR it was clean and memory was used.
    - **neutral** otherwise.
 
+## Intent capture (observer-owned)
+
+Intent is **derived by the observer**, not filled out by the operator. It is an interpretation, not a fact. Layered:
+
+```text
+raw prompt
+  ↓  observer reads it
+intent hypothesis (summary + type)
+  ↓
+confidence
+  ↓
+optional correction by user/agent
+```
+
+For each working episode, the observer reads the user prompt and derives intent. It stores:
+
+- `raw_prompt_ref` / `prompt_hash` — the raw prompt preserved as evidence
+- `intent_summary`
+- `intent_type`
+- `confidence`
+- `evidence` — excerpt or pointer
+- `derived_by = observer`
+- `correction_status`
+
+**Treat intent as interpretation.** If confidence is low, mark the episode `intent_uncertain` rather than pretending the system knows. The dashboard renders that as **"Intent unclear / needs review"** — not as a failure, and not as green. A manual label can exist as an **override**, never as the default capture path.
+
+The observer already reads the transcript and emits candidates ([`observer.py:24-38`](../../the-loom/adapters/claude-code/loom-discipline/scripts/observer.py)); intent-derivation is a new step on the same read → interpret → emit pattern (loom-agent).
+
 ## Rollup → coordination quality
 
 Over episodes, per context / project / fleet: correction frequency, friction recurrence, memory-miss rate, time-to-durable-structure. Health states: **healthy / degraded / blind / unknown** — blind ≠ healthy.
@@ -52,7 +80,7 @@ Over episodes, per context / project / fleet: correction frequency, friction rec
 
 The model is only as good as its inputs. Three gaps must close before a verdict means anything:
 
-1. **Intent capture** — what the operator wanted. The biggest gap; without it, episodes are anonymous.
+1. **Intent capture** — what the operator wanted. Approach decided (observer-derived, above); the observer step still needs building.
 2. **Memory instrumentation** — whether memory helped or failed. Absent today.
 3. **Friction/correction as structured fields** — detected but not logged.
 
@@ -60,7 +88,7 @@ Until these land, the dashboard shows episodes with mostly-blind verdicts — ho
 
 ## Open questions
 
-1. **Intent capture:** a prompt summary (privacy/size cost?), an operator-set intent label, or LLM-derived from the turn? This is the load-bearing one.
+1. ~~Intent capture~~ — **RESOLVED (operator, 2026-06-22): observer-derived** from the prompt, with evidence + confidence + correction override. See [Intent capture](#intent-capture-observer-owned).
 2. **Episode boundary:** per-prompt cycle (recommended), or a larger intent-spanning context as the atomic unit?
 3. **Where the interpretation layer runs:** a job that reads the telemetry store and writes episode rows, or computed on read at query time.
 

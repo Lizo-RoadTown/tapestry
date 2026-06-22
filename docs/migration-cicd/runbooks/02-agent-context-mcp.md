@@ -5,7 +5,7 @@
 **Source path:** `services/agent-context/`
 **Destination:** `tapestry/services/agent-context/`
 **Decision:** [x] Lift  (verbatim; schema forklift per [ADR-0003](../../adr/0003-shared-postgres-schema-source-of-truth.md))
-**Status:** **parity-verified** (2026-06-20) — staging deployed (`tapestry-agent-context-staging`, srv-d8rfng37uimc73f5c7gg) + full smoke GREEN. Next gate is `parity-verified → prod-rolling` = operator authorization + the the-loom blueprint handover. Production stays gated until the operator says go.
+**Status:** **prod-deployed (CUTOVER COMPLETE)** 2026-06-21 — the live `loom-agent-context` is now re-sourced to the tapestry repo (same name/URL/loom-postgres/keys; consumers unchanged). Verified GREEN against the live URL (health, read-known-record, recall, write→read, MCP handshake; real data intact). the-loom blueprint released via the-loom PR #31 (merge to make permanent). Now in the monitoring window. See `tapestry_step2_prod_cutover_complete_2026_06_21`.
 **ADR:** [ADR-0002](../../adr/0002-cutover-continuous-sync.md) (cutover), [ADR-0003](../../adr/0003-shared-postgres-schema-source-of-truth.md) (schema source-of-truth)
 
 > **⚠️ CORE DIRECTIVE 1 — highest blast radius in the system.** This service hosts the loom-memory MCP that EVERY session in EVERY repo depends on. A bad cutover breaks all agents everywhere. This runbook's whole design goal is to make the change a **near-no-op for consumers** and **instantly reversible**.

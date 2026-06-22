@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "loom-sdk"
+version = "0.1.0"
+description = "Shared runtime primitives for Tapestry services (tenant_conn, BYO secrets, future model registry + observability)"
+requires-python = ">=3.10"
+dependencies = [
+    "loom-auth>=0.1.0",
+    "psycopg[binary,pool]>=3.2",
+]
+
+# Shape-for-lift: this package mirrors the eventual tapestry/packages/sdk/
+# Python destination. First inhabitants (PR-3, audit §1.2, 2026-06-22):
+# - loom_sdk.db        — tenant_conn + shared pool helper
+# - loom_sdk.secrets   — pgcrypto BYO-API-key storage
+# Future inhabitants (audit §2.2):
+# - loom_sdk.providers — multi-provider LangChain resolver
+# - loom_sdk.tools     — read-only Postgres SQL tool for the agent
+# - loom_sdk.observability — telemetry helpers
+
+[tool.setuptools.packages.find]
+where = ["python"]
+include = ["loom_sdk*"]

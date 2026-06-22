@@ -3,6 +3,7 @@
 **Status:** Open — needs operator decisions on UI home, cross-project scoping, and observatory-service migration timing (see Open questions).
 **Authors:** Liz, agent-assisted (Tapestry-agent), with an outside agent's reframe
 **Date:** 2026-06-22
+**Governed by:** [Canon: User-Agent Interface Observatory](../canon/user-agent-interface-observatory.md). The primary object is the **user-agent interface**; projects are containers; the layers below are **per-interface signal dimensions**, not per-project panels.
 
 ## Problem
 
@@ -16,15 +17,29 @@ There is also already a tapestry concept for this: `services/project-observatory
 
 The dashboard is not "Grafana but for agents." It is **a surface for watching agency become structure** — project morphology over time: how each connected project is forming, drifting, learning, breaking, and stabilizing. Grafana-style runtime telemetry is one input among several; the deeper content is the shape of each project and the loop that turns repeated behavior into durable structure (observe → candidate → policy decision → compiled skill).
 
+Per the governing canon, the deeper content is more specific than "project shape": the primary object is the **user-agent interface** — a recurring coordination surface where the operator expresses intent, an agent acts, project structure constrains it, memory is used/missed/corrected, friction appears, and repeated patterns may become durable structure. A project contains many such interfaces; the observer tracks project shape *because* shape determines where interfaces are and how they change. The dashboard therefore organizes everything below **around interfaces**, with projects as their containers.
+
 The honest constraint, which the UI must encode rather than paper over: **most of the runtime signal does not exist yet.** The observer today is a static shape-drift scanner — *"the observer reliably catches frontmatter+description shape drift. It does not observe runtime invocation patterns, telemetry events, cross-session signals, or session-end upskilling reports"* ([docs/proposals/2026-06-18-runtime-observation-deferred-to-tapestry.md:38](2026-06-18-runtime-observation-deferred-to-tapestry.md)). `services/project-observatory/` is a ~24-line stub ([same doc:216](2026-06-18-runtime-observation-deferred-to-tapestry.md)). So every layer must be labeled **available now**, **planned signal**, or **missing instrumentation**.
 
-## Decision: evolve `apps/web-dashboard/` into the Project Observatory console — a layered, cross-project surface backed by `services/project-observatory/`
+## Decision: evolve `apps/web-dashboard/` into the Project Observatory console — interfaces as first-class objects, projects as containers
 
-The dashboard becomes a multi-project console answering: (1) is this project wired correctly? (2) what changed recently? (3) what are the agents doing? (4) what is the observer seeing? (5) what friction keeps recurring? (6) what is ready to become durable structure? (7) what is missing, stale, broken, or drifting?
+The dashboard becomes a cross-project console whose first-class object is the **user-agent interface**. Its model is the canon hierarchy:
 
-Each question is a **layer**. Each layer is backed by a concrete tapestry data source and carries an honest availability tag.
+```text
+Operator
+  ↓
+User-Agent Interfaces        (the first-class objects)
+  ↓
+Projects                     (containers of interfaces)
+  ↓
+Architecture / Runtime / Memory / Observer / Friction / Upskilling   (signal dimensions per interface)
+```
 
-### Layer → data source → availability
+For each interface, the console tracks: purpose · agent role · operator expectation · architecture context · memory dependencies · runtime signals · friction signals · correction history · candidate durable structure ([canon: Required UI Model](../canon/user-agent-interface-observatory.md)). It answers, per interface and rolled up per project: is it wired correctly? what changed? what are agents doing? what is the observer seeing? what friction recurs? what is ready to become durable structure? what is missing/stale/broken/drifting?
+
+The 7 layers below are **signal dimensions attached to interfaces**, not standalone per-project panels. Each is backed by a concrete tapestry data source and carries an honest availability tag. The hard new problem the canon introduces — **how an interface is identified/derived**, since interfaces are not directly instrumented today — is P1 below and Open question 5.
+
+### Signal dimension → data source → availability (attached per interface)
 
 | Layer | Shows | Data source | Availability |
 |---|---|---|---|
@@ -52,25 +67,40 @@ A single availability enum the UI renders per layer, so absence is a first-class
 ```typescript
 type SignalAvailability = "available" | "planned" | "missing";
 
-type ObservatoryLayer = {
-  key: "fleet" | "shape" | "telemetry" | "memory" | "friction"
-     | "observer" | "upskilling" | "policy";
+// The first-class object (canon). Interfaces are derived, not yet instrumented.
+type UserAgentInterface = {
+  id: string;
+  projectId: string;          // its container
+  purpose: string;
+  agentRole: string;
+  operatorExpectation: string;
+  architectureContext: string[];   // shape elements that define this surface
+  signals: Record<SignalDimensionKey, SignalSlot>;   // the dimensions below
+  status: "active" | "emerging" | "changed" | "degraded" | "stable";
+};
+
+type SignalDimensionKey =
+  | "shape" | "runtime" | "memory" | "friction"
+  | "observer" | "upskilling" | "policy";
+
+type SignalSlot = {
   availability: SignalAvailability;
   source: string;            // e.g. "project-registry:/projects"
   emptyReason?: string;      // shown when availability !== "available"
 };
 ```
 
-Cross-project scoping rides the existing self-host/RLS pattern: every backend call resolves a `project_id` (from `project-registry`) and a `tenant_id` (self-host → `SELF_HOST_TENANT_ID`); the console fans out per project rather than assuming one.
+Cross-project scoping rides the existing self-host/RLS pattern: every backend call resolves a `project_id` (from `project-registry`) and a `tenant_id` (self-host → `SELF_HOST_TENANT_ID`). The console fans out per project, and within each project per interface, rather than assuming one of either.
 
 ## Implementation phases
 
 | Phase | Scope | Output | Blocks |
 |---|---|---|---|
-| **P1: Fleet + shape (available-now spine)** | Fleet overview from `project-registry`; per-project shape from architecture-snapshots; the availability-tag framework | A real multi-project console showing wiring + shape, honest "missing" tags elsewhere | All later layers (establishes the layer/availability shell) |
-| **P2: Generalize observer/upskilling/policy to N projects** | Lift the existing candidates/decisions loop from one tenant to per-project | Observer + Upskilling + Policy layers, cross-project | — |
-| **P3: Memory + friction layers** | Memory writes/recalls + staleness; aggregate `feedback`/`lesson` memos into a friction view | Memory + Friction layers | Needs a friction-classification pass over agent-context |
-| **P4: Runtime telemetry** | Wire `telemetry-ingestion`/`project-observatory` once the runtime-observer exists | Runtime-telemetry layer (real, not iframe-only) | **Blocked on** runtime-observer build (deferred per ADR-0001 / runtime-observation proposal) |
+| **P1: Interface model + first derivation** | Define what a user-agent interface is operationally; derive a first-pass interface set per project from architecture shape (snapshots) × agent roles (CLAUDE.md / adapters) × `project-registry`; the per-interface availability shell | The first-class object exists; projects render as containers of derived interfaces with honest "missing" signal tags | All later phases (everything hangs off interfaces) |
+| **P2: Fleet + shape, organized by interface** | Fleet overview from `project-registry`; per-project shape from architecture-snapshots; attach shape signals to interfaces | A real cross-project console showing interfaces, wiring, and shape | — |
+| **P3: Observer / upskilling / policy per interface** | Generalize the lifted candidates/decisions loop from one tenant to per-project, and attribute candidates to the interface that produced them | Observer + Upskilling + Policy dimensions, per interface | Step 7 (`architecture-registry` + `policy` migrated) |
+| **P4: Memory + friction per interface** | Memory writes/recalls + staleness; aggregate `feedback`/`lesson` memos into per-interface friction + correction history | Memory + Friction dimensions | Needs a friction-classification pass over agent-context |
+| **P5: Runtime telemetry per interface** | Wire `telemetry-ingestion`/`project-observatory` once the runtime-observer exists; attribute runtime signals to interfaces | Runtime dimension (real, not iframe-only) | **Blocked on** runtime-observer build (deferred per ADR-0001 / runtime-observation proposal; loom-agent's lane) |
 
 ## Two-mode notes
 
@@ -84,14 +114,16 @@ Cross-project scoping rides the existing self-host/RLS pattern: every backend ca
 1. **UI home:** evolve `apps/web-dashboard/` in place, move it to `apps/admin-console/` (also a slot), or stand up a new app? Recommendation: evolve `apps/web-dashboard/` (the loop code is already there) and retire/repoint the README framing.
 2. **Cross-project scoping model:** confirm "console fans out per `project_id` from `project-registry`, each call self-host-RLS-scoped" as the mechanism — or is there a preferred aggregation service (the `project-observatory` service itself) that should own the fan-out server-side?
 3. **`services/project-observatory/` migration timing:** it's the runtime-observer home and a stub. Does P4 wait for the runtime-observer to be built (currently deferred), or does the observatory service migrate first as the aggregation API even before runtime signals exist?
-4. **Friction layer source:** aggregate `feedback`/`lesson` memories from `agent-context` as the friction signal (P3), or wait for dedicated friction instrumentation?
+4. **Friction layer source:** aggregate `feedback`/`lesson` memories from `agent-context` as the friction signal (P4), or wait for dedicated friction instrumentation?
+5. **Interface derivation (the canon's hard new question):** how is a user-agent interface identified? Options: (a) derive heuristically from architecture shape × agent roles × project areas (cheap, approximate, available now); (b) declare interfaces explicitly in each project's `.project-intelligence/` (precise, manual); (c) infer from runtime/session signals once they exist (accurate, blocked on instrumentation). Recommendation: start with (a) in P1 and let (b)/(c) refine it.
 
 ## What this implies for the next action
 
-P1 is the only phase that needs no new instrumentation: a multi-project shell over `project-registry` + architecture-snapshots with the availability-tag framework, honestly marking the rest "planned"/"missing." That is the smallest build that turns the lifted single-project console into the Project Observatory, and it is the right first PR — but it should wait on the operator's answer to Open question 1 (UI home) and on Step 7 (`architecture-registry` + `policy` migration), since the observer/policy layers read those services.
+P1 (interface model + first derivation) is the pivot: it needs no new instrumentation — it derives a first-pass interface set from data that already exists (architecture snapshots, `project-registry`, project `CLAUDE.md`/adapters) and renders projects as containers of interfaces with honest "missing" tags on the signal dimensions. That is the smallest build that makes the canon real in the UI. It should wait on the operator's answers to Open question 1 (UI home) and 5 (derivation approach), and the observer/policy dimensions (P3) wait on Step 7 (`architecture-registry` + `policy` migration).
 
 ## Sources
 
+- [`docs/canon/user-agent-interface-observatory.md`](../canon/user-agent-interface-observatory.md) — **the governing canon** (user-agent interface = primary object)
 - [`apps/web-dashboard/`](../../apps/web-dashboard/) — the lifted Step 6 console (page.tsx, candidates/page.tsx, dashboard/page.tsx)
 - [`services/project-observatory/README.md`](../../services/project-observatory/README.md) — the named concept + live source
 - [`docs/adr/0001-observer-topology.md`](../adr/0001-observer-topology.md) — self-observer (static shape-drift) vs runtime-observer (→ project-observatory) vs decomposer vs policy

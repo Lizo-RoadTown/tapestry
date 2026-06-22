@@ -106,38 +106,42 @@ The platform's value compounds the longer you use it, but only if the reinforcem
 
 The five concrete pieces of the discipline stack you wire into your project — plus the platform-side pieces hosted for you — are how the above mechanisms actually exist:
 
+Two diagrams: first, what's wired where; second, how each piece reaches the agent in your session.
+
 ```mermaid
-flowchart LR
-  subgraph PROJECT["Your project repo"]
-    direction TB
-    MCP[".mcp.json<br/>declares MCP servers"]
-    SETTINGS[".claude/settings.json<br/>enables plugins"]
+flowchart TB
+  subgraph PROJECT["Your project repo (5 files)"]
+    SETTINGS[".claude/settings.json"]
+    MCP[".mcp.json"]
     ENV[".env<br/>LOOM_PROJECT_ID"]
-    PI[".project-intelligence/<br/>per-project agent config"]
-    SNAP["scripts/architecture_*.py<br/>+ docs/architecture-snapshots/"]
+    PI[".project-intelligence/"]
+    SNAP["scripts/architecture_*.py"]
   end
 
-  subgraph PLATFORM["Tapestry platform"]
-    direction TB
+  subgraph PLATFORM["Tapestry platform (hosted)"]
     PLUGIN1["loom-discipline plugin"]
     PLUGIN2["liz-patterns plugin"]
-    PLUGIN3["per-project guard plugin<br/>(optional)"]
-    MEMORY["loom-memory MCP server<br/>(hosted)"]
+    PLUGIN3["per-project guard<br/>(optional)"]
+    MEMORY["loom-memory MCP"]
   end
 
-  AGENT(["Agent session"])
+  SETTINGS -->|enables| PLUGIN1
+  SETTINGS -->|enables| PLUGIN2
+  SETTINGS -->|enables| PLUGIN3
+  MCP -->|wires| MEMORY
+  ENV -->|scopes hooks| PLUGIN1
+  PLUGIN1 -->|reads| MEMORY
+  PLUGIN2 -->|hosts scripts| SNAP
+```
 
-  MCP -->|"wires"| MEMORY
-  SETTINGS -->|"enables"| PLUGIN1
-  SETTINGS -->|"enables"| PLUGIN2
-  SETTINGS -->|"enables"| PLUGIN3
-  PLUGIN1 -->|"declares"| MEMORY
-  PLUGIN2 -->|"hosts canonical scripts"| SNAP
-  ENV -->|"scopes hooks +<br/>tags memory writes"| PLUGIN1
-  PLUGIN1 -->|"4 hooks"| AGENT
-  PLUGIN3 -->|"project-specific hooks"| AGENT
-  PI -->|"per-project agent profile"| AGENT
-  SNAP -->|"snapshot pipeline at SessionStart"| AGENT
+```mermaid
+flowchart TB
+  PLUGIN1["loom-discipline"] -->|4 hooks| AGENT
+  PLUGIN3["per-project guard"] -->|project hooks| AGENT
+  MEMORY["loom-memory MCP"] -->|recall on SessionStart| AGENT
+  PI[".project-intelligence/"] -->|agent profile| AGENT
+  SNAP["scripts/architecture_*.py"] -->|snapshot on SessionStart| AGENT
+  AGENT(["Agent session"])
 ```
 
 For the file-by-file reference, see [Load-bearing files](/reference/load-bearing-files/). To set up a project, see [Set up a new project](/how-to/set-up-a-new-project/). For diagnosis when something breaks, see [Recover from common failures](/how-to/recover-from-common-failures/).

@@ -33,6 +33,8 @@ flowchart TB
 
 OTel is the canonical telemetry transport. The architecture-snapshot pipeline and the OTel pipeline are complementary — snapshots give the structural view, telemetry gives the runtime view, and the observer reads both.
 
+The OTel events must carry the [coordination contract](/reference/otel-coordination-contract/) — typed attributes (`tapestry.coordination_context_id`, `tapestry.friction_present`, `tapestry.observer_*`, etc.) the observer reads as coordination signals. Free-text `note` strings don't count; the contract is what makes telemetry interpretable.
+
 ## What the observer watches for
 
 Interface lifecycle states (one input):

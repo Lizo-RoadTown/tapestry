@@ -66,6 +66,7 @@ export default defineConfig({
           label: "Reference",
           items: [
             { label: "Load-bearing files", slug: "reference/load-bearing-files" },
+            { label: "OTel coordination contract", slug: "reference/otel-coordination-contract" },
           ],
         },
       ],

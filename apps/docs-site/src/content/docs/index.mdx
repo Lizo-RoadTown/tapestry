@@ -1,12 +1,12 @@
 ---
 title: Tapestry
-description: A system for observing how work evolves and deciding what should become durable structure. Projects have a shape; the shape changes over time; Tapestry watches those changes and crystallizes them into reusable skills, agents, and architecture.
+description: A platform for observing the evolving coordination layer between operators and agents, and deciding what part of that coordination should become durable structure. The primary object is the user-agent interface. Projects, memory, telemetry, and architecture are evidence.
 template: splash
 hero:
-  tagline: A project has a shape. The shape changes over time. Tapestry observes those changes and decides what should become durable structure. Memory, observability, and upskilling are different faces of that one loop — not separate products.
+  tagline: A user-agent interface is a recurring coordination surface where operator intent, agent behavior, project structure, memory, and corrections meet. Tapestry observes those interfaces as they evolve and decides which patterns of coordination should become durable structure. Memory, observability, and upskilling are different faces of that one loop — not separate products.
   actions:
-    - text: Start with project shape
-      link: /start/project-shape/
+    - text: Start with the user-agent interface
+      link: /start/user-agent-interface/
       icon: right-arrow
     - text: What Tapestry is not
       link: /start/what-tapestry-is-not/
@@ -25,28 +25,39 @@ These docs reference a few transitional names from the platform's beta period �
 
 ## The one sentence
 
-**Tapestry is a system for observing how work evolves and deciding what should become durable structure.**
+**Tapestry observes the evolving coordination layer between operators and agents, and decides what part of that coordination should become durable structure.**
 
-If you remember nothing else from these docs, remember that sentence. Everything else is one face of it.
+The shorter version, focused on the loop: *observing how work evolves and deciding what should become durable structure.*
+
+If you remember nothing else from these docs, remember those two sentences. Everything else is one face of them.
+
+## The primary object: the user-agent interface
+
+A **user-agent interface** is a recurring coordination surface where operator intent, agent behavior, project structure, memory, and correction activity meet. Interfaces are the *primary object* Tapestry observes. Projects, architecture, memory, telemetry, and friction are evidence about how interfaces are evolving.
+
+The durable structure being built is **not the project itself**. The durable structure being built is the **evolving coordination layer between the operator and the agents**.
+
+Do not search-and-replace "project" with "interface" in your head. Projects are still important. Architecture is still important. Telemetry is still important. The change is that those things become *context* for understanding interfaces, rather than being treated as the primary object of observation.
 
 ## Five things that all turn out to be the same thing
 
 You will see Tapestry described as each of these. All five are true:
 
-1. A memory system (the agent's understanding of project shape persists across sessions)
-2. An observability system (you can ask what's happening in any project right now)
-3. An upskilling system (recurring work becomes reusable skills, agents, tools)
-4. A project portfolio system (the same loop applied across many projects compounds)
-5. A human/agent coordination system (humans correct agents inside that loop)
+1. A memory system (the substrate where interfaces accumulate state across sessions)
+2. An observability system (telemetry exposing how interfaces are being exercised)
+3. An upskilling system (what happens when an interface stabilizes enough to earn durable structure)
+4. A project portfolio system (the same observation loop applied across many projects)
+5. A human/agent coordination system (the work happening inside the interfaces)
 
-They feel like different products because they target different surfaces. They aren't different products. They are five faces of *observe shape, decide what becomes structure*.
+They feel like different products because they target different surfaces. They aren't different products. They are five faces of *observe interfaces, decide what coordination becomes structure*.
 
 If you ever feel lost in the docs, ask yourself: *which face of the loop is this describing?* That usually resolves the confusion.
 
-The two pages that ground every other page on this site:
+The three pages that ground every other page on this site:
 
-- **[Project shape](/start/project-shape/)** — the unifying concept. A project has observable structure beyond just its code; that structure changes over time; Tapestry exists to watch those changes.
-- **[What Tapestry is not](/start/what-tapestry-is-not/)** — anchoring against the false analogies (LangSmith, Grafana, AgentOps, Memory MCP, Knowledge Graph) readers reach for first.
+- **[User-agent interface](/start/user-agent-interface/)** — the primary object. The recurring coordination surface the platform observes.
+- **[Project shape](/start/project-shape/)** — the substrate interfaces live on. A project has observable structure beyond just its code; that structure changes; shape change is evidence of interface change.
+- **[What Tapestry is not](/start/what-tapestry-is-not/)** — anchoring against the false analogies (LangSmith, Grafana, AgentOps, Memory MCP, Knowledge Graph, project observability) readers reach for first.
 
 ## Why projects plug in
 
@@ -68,14 +79,15 @@ You do not need to know every internal mechanic. You need to know which files ar
 
 In order:
 
-1. **[Project shape](/start/project-shape/)** — the unifying concept
-2. **[What Tapestry is not](/start/what-tapestry-is-not/)** — anchoring against false frames
-3. **[The signal hierarchy](/explanation/signal-hierarchy/)** — Events → Signals → Patterns → Candidates → Skills → Structure
-4. **[The observer](/explanation/the-observer/)** — the central character of the loop
-5. **[How the platform upskills itself](/explanation/upskilling/)** — the loop from shape change to durable structure
-6. **[Sharing intelligence across projects](/explanation/sharing-intelligence-across-projects/)** — the loop applied across the fleet
-7. **[The memory MCP](/explanation/memory-mcp/)** — the substrate the observer reads/writes
-8. **[The plugins](/explanation/plugins/)** + **[The discipline stack](/explanation/discipline-stack/)** + **[Architecture snapshots](/explanation/architecture-snapshots/)** — the concrete moving parts
+1. **[User-agent interface](/start/user-agent-interface/)** — the primary object of observation
+2. **[Project shape](/start/project-shape/)** — the substrate interfaces live on
+3. **[What Tapestry is not](/start/what-tapestry-is-not/)** — anchoring against false frames
+4. **[The signal hierarchy](/explanation/signal-hierarchy/)** — Events → Signals → Patterns → Candidates → Skills → Structure
+5. **[The observer](/explanation/the-observer/)** — the central character of the loop; tracks interface lifecycle
+6. **[How the platform upskills itself](/explanation/upskilling/)** — the loop from interface stabilization to durable structure
+7. **[Sharing intelligence across projects](/explanation/sharing-intelligence-across-projects/)** — the loop applied across the fleet
+8. **[The memory MCP](/explanation/memory-mcp/)** — the substrate where interfaces accumulate state
+9. **[The plugins](/explanation/plugins/)** + **[The discipline stack](/explanation/discipline-stack/)** + **[Architecture snapshots](/explanation/architecture-snapshots/)** — the concrete moving parts; architecture diffs reveal interface change
 
 Read in that order and the system snaps into focus. Read in any other order and you may end up mapping it onto something it isn't.
 

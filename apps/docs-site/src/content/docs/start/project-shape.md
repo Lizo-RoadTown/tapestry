@@ -1,9 +1,9 @@
 ---
 title: Project shape
-description: The unifying concept underneath every other Tapestry idea. A project has a shape — observable structure that exists independent of any single file — and that shape changes over time.
+description: The substrate that user-agent interfaces live on. A project has a shape — observable structure that exists independent of any single file — and that shape changes over time. Shape change is one of the strongest evidence sources for how user-agent interfaces are evolving.
 ---
 
-The single concept underneath every other idea in Tapestry. Read this before anything else.
+The substrate on which user-agent interfaces live. Read [user-agent interface](/start/user-agent-interface/) first — that's the primary object of observation. This page is the substrate that primary object exists on.
 
 ## Definition
 
@@ -50,7 +50,9 @@ Every Tapestry-detectable event is some signal about one of these four motions.
 
 ## Why this concept is load-bearing
 
-Once you have *project shape* as a primitive, every other Tapestry concept describes one face of it:
+Project shape is the **substrate** layer in Tapestry's architectural hierarchy. The primary object of observation is the [user-agent interface](/start/user-agent-interface/); interfaces live inside projects; projects have shape. Shape change is one of the strongest evidence sources for *interface change*.
+
+Once you have *project shape* as a primitive — sitting beneath user-agent interface and above all the lower-level Tapestry concepts — every other Tapestry concept describes one face of it:
 
 - **Memory** is the agent's accumulated understanding of the shape. The substrate the observer reads from and writes to.
 - **Observability** is the API for asking what the current shape is and what it's doing right now.
@@ -65,21 +67,22 @@ If you read a Tapestry doc and find yourself confused about what level it's on, 
 
 ## The questions Tapestry exists to answer
 
-State questions ("what is the project right now?") are secondary. Tapestry is built around trajectory questions:
+State questions ("what is the project right now?") are secondary. Tapestry is built around trajectory questions — all of them ultimately about *interfaces*, with shape as the evidence:
 
-- How is this project's shape changing?
-- What's drifting?
-- What's stabilizing?
-- What pattern is forming that hasn't been named yet?
-- What recurring friction wants to become a skill?
-- What's about to need new structure?
-- Which projects in the fleet have similar shape — and can share intelligence?
+- How is this project's shape changing — and which user-agent interfaces is that change affecting?
+- What's drifting — and which interface is becoming misaligned with operator intent?
+- What's stabilizing — and which interface is about to earn durable structure?
+- What pattern is forming that hasn't been named yet — at which coordination surface?
+- What recurring friction wants to become a skill — and which interface generates that friction?
+- What's about to need new structure — to support which interface?
+- Which projects in the fleet have similar shape — and therefore expose similar interfaces that can share intelligence?
 
 If you find yourself building or documenting something that doesn't help answer one of those questions, it's probably orthogonal to Tapestry's actual purpose.
 
 ## Related
 
+- [User-agent interface](/start/user-agent-interface/) — the primary object; shape is the substrate it lives on
 - [What Tapestry is not](/start/what-tapestry-is-not/) — anchoring against false analogies (LangSmith, Grafana, AgentOps)
-- [The observer](/explanation/the-observer/) — the component that watches shape change
+- [The observer](/explanation/the-observer/) — the component that watches shape change as evidence of interface change
 - [How the platform upskills itself](/explanation/upskilling/) — the feedback loop from shape change to durable structure
 - [Sharing intelligence across projects](/explanation/sharing-intelligence-across-projects/) — shape signals compounding across the fleet

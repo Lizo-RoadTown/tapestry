@@ -5,7 +5,7 @@
 **Source paths:** `core/skill_making/compiler.py` + `services/skill_making/`
 **Destinations:** `engine/skill-compiler/python/skill_compiler/` + `services/skill-making/python/skill_making/`
 **Decision:** [x] **Refactor** (lifted + import paths rewritten — the FIRST non-verbatim step)
-**Status:** proposed — code refactored + verified (compile + import resolution green); **no deploy**. Deploy shape is an open item (below).
+**Status:** **migration-complete (code-lift) 2026-06-21** — code refactored + verified (compile + import resolution green; bridge contract byte-identical). **NO prod cutover owed:** operator confirmed `make-skills-api` was a host for a DIFFERENT app and does NOT migrate (`feedback_make_skills_api_is_host_for_other_app_not_a_migration_target_2026_06_21`). The lifted engine logic is canonical Tapestry; it deploys fresh/standalone when the product needs it (the "deploy shape" section below is superseded — there is nothing to re-source/cut over).
 **ADR:** [ADR-0003](../../adr/0003-shared-postgres-schema-source-of-truth.md) (schema source-of-truth)
 
 ## Why Refactor (not Lift)

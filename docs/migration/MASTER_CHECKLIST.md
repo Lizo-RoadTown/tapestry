@@ -113,6 +113,16 @@ Per `tapestry/docs/proposals/2026-06-13-v1-scope-and-roadmap.md` §5 (sequenced 
 - [ ] **Step 7a** — telemetry-ingestion + project-observatory lift
 - [ ] **Step 8** — discipline plugins migrate to `tapestry/integrations/claude-code/`
 
+### Q2c. Author Tapestry-specific top-level prose docs
+
+Per extended-migration-audit §2.11 (PR-9, 2026-06-22): Make_Skills' top-level `ARCHITECTURE.md`, `CONTRIBUTING.md`, `AGENTS.md` were lifted to `docs/_archive/make-skills-*.md` as provenance reference. Tapestry needs its own authored top-level versions:
+
+- [ ] `tapestry/ARCHITECTURE.md` — top-level engine + service-fleet architecture (companion to `docs/architecture/UMBRELLA.md`)
+- [ ] `tapestry/CONTRIBUTING.md` — Tapestry-specific contribution norms (paths, branch conventions, CI)
+- [ ] `tapestry/AGENTS.md` — cross-IDE agent persona for the Tapestry repo
+
+`CHANGELOG.md` intentionally deferred (Tapestry starts fresh per §6 Q6 decision).
+
 ### Q3. Loop-closure auto-write
 
 Per MANIFESTO Part 4.7 — engine compile output → plugin file → git commit → push. Currently manual. Future scope.

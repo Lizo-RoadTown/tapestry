@@ -72,8 +72,13 @@ The transport is wired ([`the-loom/adapters/claude-code/loom-discipline/scripts/
 
 Current attributes per event: `hook_name`, `event`, `exit_code`, `elapsed_ms`, `action`, `note`. The `note` field carries unstructured strings (`out_of_scope`, `malformed_input`, etc.) that this contract is meant to replace with typed attributes.
 
+## Source of truth
+
+This page is the operator-facing surface of the contract. The internal architecture spec lives at [`docs/reference/coordination-telemetry-contract.md`](https://github.com/Lizo-RoadTown/tapestry/blob/main/docs/reference/coordination-telemetry-contract.md) in the repo root (Tapestry-agent owned). If the two diverge, the repo-root spec is canonical.
+
 ## Related
 
 - [Load-bearing files — OTel env vars](/reference/load-bearing-files/#otel-otel-telemetry)
 - [The observer](/explanation/the-observer/) — consumes OTel telemetry as one of its sensors
 - [Architecture snapshots](/explanation/architecture-snapshots/) — one of several mechanisms; snapshot/diff IDs land in the contract via `tapestry.architecture_snapshot_id` / `tapestry.diff_report_id`
+- [Observatory console](/observatory) — the operator-facing view that will read these typed attributes once instrumented

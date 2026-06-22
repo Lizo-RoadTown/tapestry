@@ -1,0 +1,9 @@
+# Provisional — finalized when the Step-4 deploy shape is decided (see runbook 04).
+# Deps the lifted bridge + compiler import. fastapi only if served as a standalone wrapper.
+fastapi>=0.115
+uvicorn[standard]>=0.32
+psycopg[binary]>=3.2
+psycopg-pool>=3.2
+pydantic>=2
+httpx>=0.27
+langchain-core>=0.3

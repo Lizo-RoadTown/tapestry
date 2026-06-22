@@ -1,9 +1,15 @@
 ---
-title: User-agent interface
-description: The primary object Tapestry observes. A recurring coordination surface where operator intent, agent behavior, project structure, memory, and correction activity meet. Projects contain interfaces; interfaces are what change shape; the durable structure being built is the coordination layer between operator and agents.
+title: User-agent interfaces
+description: A recurring coordination surface where operator intent, agent behavior, project structure, memory, and correction activity meet. Interfaces occur inside projects and workflows. Tapestry observes them as one of several signals about coordination health.
 ---
 
-The primary object of observation. Read this before [project shape](/start/project-shape/) and [what Tapestry is not](/start/what-tapestry-is-not/) — those pages make more sense once this primitive is in place.
+A user-agent interface is one observable manifestation of the coordination Tapestry reinforces. Interfaces occur inside projects and workflows; Tapestry observes them alongside other signals when tracking coordination health.
+
+## Where interfaces sit in the picture
+
+Tapestry is a user/agent support and reinforcement system. Its concern is the coordination between operator and agents. Memory, telemetry, observability, architecture analysis, friction analysis, and upskilling are mechanisms it uses to reinforce that coordination.
+
+When an interface degrades, coordination is breaking down at that surface. When an interface stabilizes, coordination has settled into a pattern that may deserve durable structure. Tapestry watches interfaces because their state is informative about coordination quality.
 
 ## Definition
 
@@ -17,87 +23,56 @@ Some examples to make this concrete:
 - The interface that emerges when a new dashboard surface starts being used and your corrections shape what it shows
 - The interface that degrades when an MCP server starts dropping requests and the agent's behavior shifts in response
 
-Interfaces are not endpoints. They're not screens. They're not single conversations. They're the *recurring patterns of coordination* that exist between you and the agents working on your behalf — patterns that have purpose, history, expectations, and friction.
+Interfaces are recurring patterns of coordination — patterns with purpose, history, expectations, and friction. They exist inside projects independently of any platform that watches them.
 
-## Why this is the primary object
+## What the observer looks at when it watches interfaces
 
-You will see Tapestry described as project observability, project telemetry, memory infrastructure, agent telemetry, or admin tooling. All of those are *components*. None of them is the thing being observed.
+The observer tracks interface state as one input to its broader picture of coordination health. The five lifecycle states it distinguishes:
 
-The thing being observed is the user-agent interface. Projects contain interfaces. Architecture is evidence about interfaces. Memory attaches to interfaces. Telemetry exposes how interfaces are exercised. Friction signals reveal where interfaces are misaligned with operator intent. Corrections are how interfaces stabilize over time.
-
-If the platform optimizes for "observe projects" it produces a portfolio dashboard with no behavioral teeth. If the platform optimizes for "observe telemetry" it produces Grafana. If the platform optimizes for "observe memory" it produces a memory MCP. If the platform optimizes for "observe interfaces" it produces something that actually understands how work between operator and agents is changing — which is what's needed for the recursive upskilling loop to land in the right place.
-
-## The architectural hierarchy
-
-```mermaid
-flowchart TB
-    UAI["User-agent interface<br/>recurring coordination surface"]
-    PC["Project context<br/>where the interface lives"]
-    T["Telemetry<br/>evidence about the interface"]
-    O["Observer<br/>interprets telemetry as<br/>interface evolution"]
-    CS["Candidate structure<br/>interface stabilization<br/>that earned durable form"]
-    UAI --> PC --> T --> O --> CS
-    CS -.shapes.-> UAI
-```
-
-Read top-down: the interface is what exists; the project is its container; telemetry is the evidence trail; the observer interprets that trail as interface change; candidate structure is what earns durability when an interface stabilizes. Then the loop closes: durable structure shapes the next generation of interfaces.
-
-## Interface lifecycle
-
-Every interface is in one of these states at any time:
-
-| State | Meaning | What the observer surfaces |
+| State | Meaning | Signal to coordination health |
 |---|---|---|
-| **Active** | Interface is in regular use; behavior is predictable | Health signals; routine telemetry; stable correction history |
-| **Emerging** | Interface is forming; coordination patterns are taking shape but not yet predictable | Novelty signals; new correction patterns; expanding agent participation |
-| **Changing** | Interface is in flux; participants, expectations, or memory attachments are shifting | Drift signals; correction-rate changes; memory thrash |
-| **Degraded** | Interface is failing intermittently; coordination is breaking down | Failure signals; recurring corrections that aren't sticking; agent confusion across handoffs |
-| **Stabilized** | Interface has converged on a coherent form; corrections have effectively stopped | Pattern → candidate → durable structure pipeline; reusable skill emergence |
+| **Active** | Interface is in regular use; behavior is predictable | Coordination working as expected |
+| **Emerging** | Interface is forming; coordination patterns are taking shape but not yet predictable | New coordination surface forming; operator and agents are still calibrating |
+| **Changing** | Interface is in flux; participants, expectations, or memory attachments are shifting | Coordination is adapting — may be intentional, may be drift |
+| **Degraded** | Interface is failing intermittently; coordination is breaking down | Coordination quality dropping; reinforcement needed |
+| **Stabilized** | Interface has converged on a coherent form; corrections have effectively stopped | Coordination has settled; pattern may deserve durable structure |
 
-The observer's primary job is to know which lifecycle state each interface is in, and to detect transitions between states early.
+Interface lifecycle is one of several inputs the observer uses. Memory health, telemetry signals, architecture diffs, friction patterns, and correction recurrence are other inputs.
 
-## What each interface carries
+## What each tracked interface carries
 
-For each tracked interface, the observer holds:
+For each interface the observer tracks, it holds:
 
-- **Purpose** — what coordination this surface exists to support
-- **Participating agents** — which agents (and the operator) take part
+- **Purpose** — what coordination this surface supports
+- **Participating agents** — which agents and operator take part
 - **Operator expectations** — what "working" looks like from the operator's view
 - **Memory dependencies** — which memory entries the interface relies on
 - **Architecture dependencies** — which platform/repo structure supports it
 - **Runtime signals** — telemetry exposing how the interface is being exercised
 - **Friction signals** — where the interface is misaligned with intent
 - **Correction history** — what the operator has corrected and when
-- **Candidate durable structures** — what could become a reusable skill / agent / tool / pattern if this interface stabilizes
+- **Candidate durable structures** — what could earn promotion if the interface stabilizes
 
-## How this changes other Tapestry concepts
+Today's observer implementation tracks a subset of this (skills invoked, recurring patterns from the upskilling report, cross-repo signal-rule output). The full set is the target shape.
 
-Project shape, the observer, architecture diffs, the dashboard, telemetry, memory — none of them go away. Their *role* changes:
+## How interfaces relate to the rest of the picture
 
-| Concept | Old framing | New framing |
-|---|---|---|
-| **Project** | The thing being observed | A container of interfaces; context for interface analysis |
-| **Project shape** | The observable structure that changes over time | The substrate that interfaces live on; shape change is evidence of interface change |
-| **Architecture** | Diagrams of services + repos | Evidence about where interfaces live and how they coordinate |
-| **Memory** | Storage layer for the agent's knowledge | Substrate where interfaces accumulate state |
-| **Runtime telemetry** | What ran and what failed | Evidence about how interfaces are being exercised |
-| **Friction** | Recurring operator corrections | The clearest signal of interface misalignment |
-| **Observer** | Component that watches project change | Component that watches interface evolution |
-| **Architecture diff** | What changed in the codebase | What changed about which interfaces exist, where, and how |
-| **Dashboard** | UI for project telemetry | UI for understanding interface state and trajectory |
-
-Do not search-and-replace "project" with "interface" anywhere. Projects are still important. Architecture is still important. Telemetry is still important. The change is that those things become **context** for understanding interfaces, rather than being treated as the primary object.
-
-## The canonical principle
-
-> **Tapestry observes project shape because project shape affects user-agent interfaces. The durable structure being built is not the project itself. The durable structure being built is the evolving coordination layer between the operator and the agents.**
-
-That sentence is what every other doc on this site is one face of.
+| Concept | Relationship |
+|---|---|
+| **Tapestry** | The support/reinforcement system; acts on interfaces from outside them |
+| **User/agent coordination** | The focal phenomenon; interfaces are one observable manifestation of it |
+| **Projects** | Environments where coordination occurs; expose different interfaces under different conditions |
+| **Project shape** | The structural conditions a project creates for coordination; affects which interfaces emerge and how they behave |
+| **Memory** | A reinforcement mechanism; also where interface state accumulates |
+| **Telemetry** | A reinforcement mechanism; surfaces signals about how interfaces are being exercised |
+| **Observer** | The component that watches interface lifecycle alongside other coordination signals |
+| **Architecture diffs** | Often reveal interface change; more broadly reveal structural changes affecting coordination |
+| **Upskilling** | What happens when a stabilized interface earns durable structure |
 
 ## Related
 
-- [Project shape](/start/project-shape/) — the substrate interfaces live on
-- [What Tapestry is not](/start/what-tapestry-is-not/) — anchoring against false frames; especially "Tapestry is not project observability"
-- [The observer](/explanation/the-observer/) — the component that watches interface evolution
-- [The signal hierarchy](/explanation/signal-hierarchy/) — the levels of evidence the observer interprets as interface change
-- [How the platform upskills itself](/explanation/upskilling/) — what happens when an interface stabilizes enough to earn durable structure
+- [Canonical statement](/) — Tapestry as a user/agent support and reinforcement system
+- [Project shape](/start/project-shape/) — environments where coordination occurs
+- [What Tapestry is not](/start/what-tapestry-is-not/) — anchoring against "Tapestry is an interface observatory" and other false frames
+- [The observer](/explanation/the-observer/) — the component that watches interface lifecycle as one of many coordination signals
+- [The signal hierarchy](/explanation/signal-hierarchy/) — the levels of evidence the observer interprets

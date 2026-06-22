@@ -9,21 +9,19 @@ You don't directly interact with it. But two scripts in your `scripts/` director
 
 ## What the diff is for
 
-The diff isn't an infrastructure-change report for its own sake. Its real purpose is to **reveal user-agent interface change** — when an interface appears, disappears, moves, splits, or merges, the structural diff is usually the first place the change becomes visible.
+The diff isn't an infrastructure-change report for its own sake. Architecture analysis is one of the **reinforcement mechanisms** Tapestry uses to maintain coordination quality. The diff's purpose is to surface structural changes that affect coordination — interfaces appearing or disappearing, memory attachment points moving, coordination pathways relocating, friction-prone shapes emerging.
 
-When you read a snapshot diff, the questions to ask are interface-shaped, not service-shaped:
+When you read a snapshot diff, the questions to ask are coordination-shaped, not service-shaped:
 
 - What interfaces appeared in this diff? (A new service usually means a new coordination surface the operator and agent will need to learn.)
-- What interfaces disappeared? (A removed service usually means an interface the operator was depending on is gone.)
+- What interfaces disappeared? (A removed service usually means a coordination surface the operator was depending on is gone.)
 - What interfaces moved? (Code moving between packages often means a coordination surface relocated — agent's mental model may now be wrong.)
-- What interfaces split or merged? (A package becoming two packages, or two becoming one, almost always reshapes which agent talks to which.)
-- What memory attachment points changed? (Memory tagged to a path that no longer exists loses its discoverability — the interface that memory served becomes orphaned.)
+- What interfaces split or merged? (A package becoming two packages, or two becoming one, almost always reshapes which agent coordinates with which.)
+- What memory attachment points changed? (Memory tagged to a path that no longer exists loses discoverability — the coordination that memory was supporting becomes orphaned.)
 - What friction patterns became visible? (Some kinds of drift only show up structurally — a duplicate showing up in two places is a friction signal even before the operator notices it.)
-- What coordination pathways changed? (Bridge endpoints, MCP servers, webhooks — these are all interface surfaces, and the diff is where their movement is detected.)
+- What coordination pathways changed? (Bridge endpoints, MCP servers, webhooks — these are coordination surfaces, and the diff is where their movement is detected.)
 
-The architecture-analyst narrative (`<timestamp>-narrative.md`) reads the diff and tries to answer these questions in prose. The diff itself is the raw evidence; the narrative is the interface-shaped interpretation.
-
-See [user-agent interface](/start/user-agent-interface/) for what the underlying object is and why this framing matters.
+The architecture-analyst narrative (`<timestamp>-narrative.md`) reads the diff and answers these questions in prose. The diff is raw evidence; the narrative is the coordination-shaped interpretation.
 
 ## What it produces
 

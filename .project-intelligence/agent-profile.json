@@ -1,0 +1,6 @@
+{
+  "configured_agents": [
+    {"kind": "claude-code", "version": "unknown", "capabilities": ["hooks", "mcp", "skills", "plugins"]}
+  ],
+  "generated_by": "manual_dogfood_bootstrap_2026_06_21"
+}

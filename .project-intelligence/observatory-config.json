@@ -1,0 +1,6 @@
+{
+  "telemetry_destinations": [
+    {"kind": "grafana-cloud-otlp", "configured_via": "OTEL_EXPORTER_OTLP_* env vars in .env"}
+  ],
+  "sampling_rules": "default-all"
+}

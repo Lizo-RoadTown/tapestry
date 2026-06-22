@@ -6,3 +6,10 @@ __pycache__/
 .env.local
 *.env
 !.env.example
+
+# Per-machine Claude Code state
+.claude/logs/
+.claude/settings.local.json
+
+# MCP config — may contain API tokens; per-machine, not committed
+.mcp.json

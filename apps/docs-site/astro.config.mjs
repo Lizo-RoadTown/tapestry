@@ -30,6 +30,7 @@ export default defineConfig({
           label: "Start here",
           items: [
             { label: "Overview", slug: "index" },
+            { label: "Names you'll see in these docs", slug: "start/names-you-will-see" },
             { label: "What keeps a project on track", slug: "start/what-stays-on-track" },
           ],
         },
@@ -37,6 +38,8 @@ export default defineConfig({
           label: "How it works",
           items: [
             { label: "The discipline stack (orientation)", slug: "explanation/discipline-stack" },
+            { label: "Sharing intelligence across projects", slug: "explanation/sharing-intelligence-across-projects" },
+            { label: "How the platform upskills itself", slug: "explanation/upskilling" },
             { label: "The plugins", slug: "explanation/plugins" },
             { label: "The memory MCP", slug: "explanation/memory-mcp" },
             { label: "The observer", slug: "explanation/the-observer" },

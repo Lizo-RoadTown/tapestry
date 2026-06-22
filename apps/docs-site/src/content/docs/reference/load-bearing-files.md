@@ -127,7 +127,7 @@ LOOM_PROJECT_ID=your-project-id
 
 **Gitignore status:** committed (they're code).
 
-**Reference:** SDE_Extraction PR #1 (commit `2325e67`) for the wrapper pattern.
+**Reference:** [the wrapper-pattern PR in a real consuming project](https://github.com/Lizo-RoadTown/sde-extraction/commit/2325e67) (commit `2325e67`).
 
 ### `.project-intelligence/<project-id>/workflow-candidates/`
 
@@ -261,7 +261,7 @@ OTEL_SERVICE_NAME=loom-discipline
 
 ### `lizo-loom`
 
-**Source:** `https://github.com/Lizo-RoadTown/the-loom` (the `the-loom` repo IS the marketplace, by housing the plugin under `adapters/claude-code/loom-discipline/`).
+**Source:** [`https://github.com/Lizo-RoadTown/the-loom`](https://github.com/Lizo-RoadTown/the-loom) — the platform's beta repo doubles as the marketplace for this plugin, housing it under `adapters/claude-code/loom-discipline/`. (See [Names you'll see](/start/names-you-will-see/) for what "the-loom" is.)
 
 **Contents:** the `loom-discipline` plugin.
 

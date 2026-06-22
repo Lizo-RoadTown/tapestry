@@ -32,7 +32,7 @@ You will likely enable all three for any non-trivial Tapestry-consuming project.
 
 **Where it lives on disk:** `~/.claude/plugins/cache/lizo-loom/loom-discipline/<version>/`.
 
-**Source repo:** `Lizo-RoadTown/the-loom` (the `the-loom` repo IS the marketplace by housing the plugin under `adapters/claude-code/loom-discipline/`).
+**Source repo:** [`Lizo-RoadTown/the-loom`](https://github.com/Lizo-RoadTown/the-loom) — the platform's beta repo, which doubles as the marketplace by housing the plugin under `adapters/claude-code/loom-discipline/`. (See [Names you'll see](/start/names-you-will-see/) for what "the-loom" is.)
 
 **Install:**
 ```
@@ -69,7 +69,7 @@ You will likely enable all three for any non-trivial Tapestry-consuming project.
 
 **Important: they COMPLEMENT `loom-discipline`, they don't replace it.** The `sde-extraction-guard` plugin's own `plugin.json` description says it explicitly. Both plugins should be enabled simultaneously.
 
-**Where the guard plugin lives:** in the project's own repo (e.g., `SDE_Extraction/plugins/sde-extraction-guard/`), AND cached at `~/.claude/plugins/cache/lizo-skills/sde-extraction-guard/`.
+**Where the guard plugin lives:** in the project's own repo at `plugins/<your-guard-name>/`, AND cached at `~/.claude/plugins/cache/<marketplace>/<your-guard-name>/`. The worked example to copy from is [`sde-extraction-guard`](https://github.com/Lizo-RoadTown/sde-extraction/tree/main/plugins/sde-extraction-guard) — a project-specific guard plugin built for a real research project that consumes the platform.
 
 **Source pattern:** see `Lizo-RoadTown/sde-extraction` for the canonical example. If your project needs its own guard, model it on this pattern — own `.claude-plugin/plugin.json`, own `hooks/hooks.json`, own hook scripts (Node, Python, or shell), optionally own skill files.
 
@@ -199,11 +199,11 @@ You DON'T need a custom plugin for most projects. `loom-discipline` + `liz-patte
 
 You DO need a custom plugin when:
 
-- Your project has a recurring drift class that the general discipline doesn't catch (the `sde-extraction-guard` framing-clarification gate exists because the SDE_Extraction project kept hitting a Dagster-incident-class drift where a "layer" became a separate deployed system).
+- Your project has a recurring drift class that the general discipline doesn't catch. The canonical example: the `sde-extraction-guard` framing-clarification gate exists because one project kept hitting a specific drift where the operator asked for a "layer in the existing app" and the agent built a whole separate deployed system instead. The guard injects a per-turn gate that forces the agent to restate what kind of artifact it's building before scaffolding anything.
 - Your project has a project-specific invariant check that runs on every edit to a particular surface (schema integrity, contract conformance, lint that the general discipline doesn't enforce).
 - Your project bundles a methodology skill that's specific enough to belong with the project, not in the universal `liz-patterns`.
 
-The pattern: bundle a project's own `plugins/<name>/` directory in the repo, register it as a local marketplace via `.claude-plugin/marketplace.json`, and enable alongside `loom-discipline` in `.claude/settings.json`. See `SDE_Extraction/plugins/sde-extraction-guard/` for the worked example.
+The pattern: bundle a project's own `plugins/<name>/` directory in the repo, register it as a local marketplace via `.claude-plugin/marketplace.json`, and enable alongside `loom-discipline` in `.claude/settings.json`. Worked example to copy: [`sde-extraction-guard` in a real consuming project](https://github.com/Lizo-RoadTown/sde-extraction/tree/main/plugins/sde-extraction-guard).
 
 ## Related
 

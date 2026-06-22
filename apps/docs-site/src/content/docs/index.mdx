@@ -1,9 +1,9 @@
 ---
-title: What keeps your project on track
-description: Tapestry is the platform Liz's projects plug into. This site explains the wiring that keeps a consuming project working when something small goes wrong.
+title: A platform for spreading intelligence across your projects
+description: Tapestry is the platform that lets AI agents working in different projects share memory, surface patterns, and coordinate decisions. This site explains the wiring that makes that work — and how to keep it working when something small goes missing.
 template: splash
 hero:
-  tagline: When you create a project that plugs into the Tapestry platform, a small stack of plugins, MCP servers, hooks, and config files keeps the agent on track. This site explains every load-bearing piece so nothing breaks silently if you move, delete, or forget about it.
+  tagline: When you plug a project into Tapestry, the agent working in it shares memory and learnings with agents working in every other project on the platform. Decisions made in one project surface in another's context. Corrections you give once stick across sessions and propagate to sibling projects. Patterns that recur across multiple projects get surfaced as candidates for codification. This site explains the wiring that makes that work.
   actions:
     - text: What keeps a project on track
       link: /start/what-stays-on-track/
@@ -19,24 +19,44 @@ hero:
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
 
+:::note[First-time reader?]
+These docs reference a few transitional names from the platform's beta period — `the-loom`, `Make_Skills`, `SDE_Extraction`, plugin marketplaces called `lizo-loom` and `lizo-skills`. **If any name feels unfamiliar, see [Names you'll see in these docs](/start/names-you-will-see/) first.** It's a one-page glossary that explains every name in plain terms.
+:::
+
+## Why projects plug into Tapestry
+
+The headline value: **intelligence spreads across repositories.** Every Tapestry-consuming project shares one memory store, one cross-agent communication channel, one pattern-recognition layer. Three concrete things flow:
+
+- **Memory persists across sessions and across projects** — a correction you give in one project becomes a binding rule the agent applies next session, and a sibling project's agent sees it too.
+- **Agents update each other directly** — a memo written in one project's session is in the next session's auto-recall context for a sibling project, before the operator even types a message.
+- **Patterns and skills spread** — repeated behavior the observer notices in one project becomes a candidate; recurring across multiple projects, it becomes a stronger candidate for promotion into a reusable skill every project can invoke by name.
+
+This compounding cross-project intelligence is what makes the platform worth wiring into. The rest of this site is the operator-facing detail on the wiring itself.
+
+See [Sharing intelligence across projects](/explanation/sharing-intelligence-across-projects/) for how the mechanism works, and [How the platform upskills itself](/explanation/upskilling/) for how repeated work becomes durable structure (tools, subagents, skills, agents) over time.
+
 ## Who this is for
 
-You are creating a project that plugs into the Tapestry platform — for example, the way SDE_Extraction plugs in. You want the agent working in your project to behave like the agent working in `the-loom` or `Make_Skills`: it checks memory at the start of a task, follows PROBE discipline, knows what's a runtime concern vs a dev-tooling concern, and writes friction to memory the moment you correct it.
+You are setting up a project that plugs into the Tapestry platform. You want the AI agent working in your project to start each session with the platform's accumulated context, follow PROBE discipline (cite sources rather than guess), distinguish runtime concerns from dev tooling, and write friction to memory the moment you correct it.
 
 You do not need to know every internal mechanic. You need to know which files are load-bearing, what each one does, and how to recover when one of them goes missing.
 
 ## What this site explains
 
-- The stack of plugins, MCP wiring, hooks, and configuration files that make the agent in your project behave like the agents in Liz's other projects.
+- The stack of plugins, MCP wiring, hooks, and configuration files that make the agent in your project behave consistently across sessions.
 - Why each piece exists. (If you don't know what something does, you will eventually delete or move it. Knowing why prevents that.)
 - How to set up a new project so the stack is wired correctly from day one.
 - How to recover when the agent starts drifting — usually because something small went missing.
 
-## What this site does NOT cover
+## What this site covers — and what lives elsewhere
 
-- What Tapestry IS conceptually. That lives in the [MANIFESTO](https://github.com/Lizo-RoadTown/tapestry/blob/main/MANIFESTO.md) and the [architecture umbrella](https://github.com/Lizo-RoadTown/tapestry/blob/main/docs/architecture/UMBRELLA.md).
-- How Tapestry is built. That lives in the migration docs and ADRs inside the repo.
-- API references for the platform services. Those come later when the services migrate from `the-loom` into Tapestry.
+This site focuses on the operator-facing piece: **what keeps a consuming project on track when it plugs into the platform.** Wiring, hooks, configuration, recovery from common failures, reference of load-bearing files.
+
+Companion material lives in dedicated places:
+
+- **Architecture and design philosophy** — the [MANIFESTO](https://github.com/Lizo-RoadTown/tapestry/blob/main/MANIFESTO.md) and the [architecture umbrella doc](https://github.com/Lizo-RoadTown/tapestry/blob/main/docs/architecture/UMBRELLA.md).
+- **Engineering plan and migration** — the migration docs and ADRs in the repo.
+- **API references for the platform services** — coming as services stabilize their public contracts.
 
 ## Find what you need
 

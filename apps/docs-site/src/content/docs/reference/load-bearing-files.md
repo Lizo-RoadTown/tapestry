@@ -189,7 +189,7 @@ LOOM_PROJECT_ID=your-project-id
 
 **Why it exists:** Pillar 1 of the MANIFESTO — "one pattern, one home, available everywhere via reference." Skills live in the plugin, not duplicated in every repo.
 
-**If missing:** consuming projects can still wrap their own architecture-snapshot scripts but lose access to the canonical agents and skills via the `liz-patterns:` namespace.
+**If missing:** consuming projects can still wrap their own architecture-snapshot scripts but lose access to the canonical agents and skills via the `tapestry-patterns:` namespace.
 
 **Install:** `/plugin marketplace add Lizo-RoadTown/tapestry`, then `/plugin install tapestry-patterns@tapestry`. (The prior `liz-patterns@lizo-skills` sourced from `Lizo-RoadTown/claude-skills-marketplace` still works during the transition.)
 
@@ -259,21 +259,22 @@ OTEL_SERVICE_NAME=loom-discipline
 
 ## Marketplaces
 
-### `lizo-loom`
+### `tapestry` (canonical)
 
-**Source:** [`https://github.com/Lizo-RoadTown/the-loom`](https://github.com/Lizo-RoadTown/the-loom) — the platform's beta repo doubles as the marketplace for this plugin, housing it under `adapters/claude-code/loom-discipline/`. (See [Names you'll see](/start/names-you-will-see/) for what "the-loom" is.)
+**Source:** [`https://github.com/Lizo-RoadTown/tapestry`](https://github.com/Lizo-RoadTown/tapestry). The marketplace manifest lives at the repo root in `.claude-plugin/marketplace.json`; plugins live under `integrations/claude-code/`.
 
-**Contents:** the `tapestry-discipline` plugin.
+**Contents:** the `tapestry-discipline` plugin and the `tapestry-patterns` plugin.
 
-**Add to Claude Code:** `/plugin marketplace add Lizo-RoadTown/the-loom`.
+**Add to Claude Code:** `/plugin marketplace add Lizo-RoadTown/tapestry`.
 
-### `lizo-skills`
+### Transitional marketplaces
 
-**Source:** `https://github.com/Lizo-RoadTown/claude-skills-marketplace`.
+Two prior marketplaces remain available during the cutover window — the plugins they host were renamed + relocated into the `tapestry` marketplace on 2026-06-22 (PR #42).
 
-**Contents:** the `tapestry-patterns` plugin and per-project guard plugins (e.g., `sde-extraction-guard`).
+- `lizo-loom` — sourced from [`https://github.com/Lizo-RoadTown/the-loom`](https://github.com/Lizo-RoadTown/the-loom) — formerly hosted `loom-discipline` (now `tapestry-discipline`)
+- `lizo-skills` — sourced from `https://github.com/Lizo-RoadTown/claude-skills-marketplace` — formerly hosted `liz-patterns` (now `tapestry-patterns`) plus per-project guard plugins like `sde-extraction-guard`
 
-**Add to Claude Code:** `/plugin marketplace add Lizo-RoadTown/claude-skills-marketplace`.
+Existing projects with these marketplaces registered keep working. New projects should add the `tapestry` marketplace.
 
 ## File-existence audit at session start
 
@@ -290,7 +291,7 @@ test -f scripts/architecture_snapshot.py && echo "OK: snapshot script" || echo "
 echo "=== LOOM_PROJECT_ID ==="
 grep LOOM_PROJECT_ID .env 2>/dev/null || echo "MISSING: LOOM_PROJECT_ID in .env"
 echo "=== Enabled plugins ==="
-cat .claude/settings.json 2>/dev/null | grep -i "loom-discipline" || echo "MISSING: loom-discipline in settings.json"
+cat .claude/settings.json 2>/dev/null | grep -iE "tapestry-discipline|loom-discipline" || echo "MISSING: tapestry-discipline (or transitional loom-discipline) in settings.json"
 ```
 
 If any line shows MISSING, see [Recover from common failures](/how-to/recover-from-common-failures/) for the fix.

@@ -14,7 +14,7 @@ Before diagnosing, confirm what the agent CAN see:
 | Quick check | What it tells you |
 |---|---|
 | `/mcp` in Claude Code | Lists active MCP servers. If `loom-memory` is not there, the MCP isn't wired. |
-| Look at the top of your most recent message | If you don't see `[tapestry-discipline] Discipline check: PROBE files before asserting ...`, the UserPromptSubmit hook isn't firing. |
+| Look at the top of your most recent message | If you don't see `[loom-discipline] Discipline check: PROBE files before asserting ...`, the UserPromptSubmit hook isn't firing. |
 | Look at the very start of the conversation | If you don't see an auto-recall block of past memories, the SessionStart hook isn't firing. |
 | `/plugin list` | Shows enabled plugins for this project. If `tapestry-discipline@tapestry` is not there or not enabled, the plugin isn't running. |
 | `cat .mcp.json` | Shows declared MCP servers in your project. |
@@ -54,7 +54,7 @@ Before diagnosing, confirm what the agent CAN see:
 
 **Fix:** Same as above. Plugin enabled in settings.json + LOOM_PROJECT_ID set + restart Claude Code.
 
-**How to confirm fixed:** Send any message. The top should show `[tapestry-discipline] Discipline check: PROBE files before asserting (cite file:line). Distinguish dev-tooling (...) from runtime (...). Save corrections as feedback memory immediately. CORE DIRECTIVE 1 ...`.
+**How to confirm fixed:** Send any message. The top should show `[loom-discipline] Discipline check: PROBE files before asserting (cite file:line). Distinguish dev-tooling (...) from runtime (...). Save corrections as feedback memory immediately. CORE DIRECTIVE 1 ...`.
 
 ### Symptom: The agent stops citing file:line and starts making up things
 

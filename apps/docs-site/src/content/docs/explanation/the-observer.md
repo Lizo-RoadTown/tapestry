@@ -134,7 +134,7 @@ The Path A observer watches what HAPPENS in sessions. The self-observer cron wat
 
 ## Path A: the local session observer
 
-**Where it lives:** in the `loom-discipline` plugin at `adapters/claude-code/loom-discipline/scripts/observer.py`. It runs as part of the plugin's Stop-hook pipeline — same hook that fires the upskilling audit.
+**Where it lives:** in the `tapestry-discipline` plugin at `integrations/claude-code/tapestry-discipline/scripts/observer.py`. It runs as part of the plugin's Stop-hook pipeline — same hook that fires the upskilling audit.
 
 **What it does:**
 
@@ -242,7 +242,7 @@ None of those exist yet. The current observer is the foundation; future work add
 - [What Tapestry is not](/start/what-tapestry-is-not/) — why "observability system" is a misleading frame for Tapestry
 - [The signal hierarchy](/explanation/signal-hierarchy/) — the levels of telemetry the observer consumes
 - [The discipline stack](/explanation/discipline-stack/) — the recursive loop where the observer pathway joins the memory pathway
-- [Plugins](/explanation/plugins/) — `loom-discipline` is what hosts the Path A observer in its Stop hook
+- [Plugins](/explanation/plugins/) — `tapestry-discipline` is what hosts the Path A observer in its Stop hook
 - [Memory MCP](/explanation/memory-mcp/) — one of the observer's sensors; substrate for project-shape state
 - [Architecture snapshots](/explanation/architecture-snapshots/) — the structural-snapshot sensor complementing the observer's behavioral sensors
 - [Load-bearing files](/reference/load-bearing-files/) — file-by-file reference of observer components

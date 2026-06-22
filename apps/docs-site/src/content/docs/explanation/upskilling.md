@@ -47,7 +47,7 @@ The four artifact types in the table above correspond to four distinct things in
 
 **Subagent.** A specialist invoked by the main agent for one bounded task. Has its own persona (system prompt), its own tool access, often its own loaded skills. Returns a structured result. Example: a `documentation-reviewer` subagent that takes a draft + style guide and returns a critique. Each invocation is one LLM session within the larger conversation.
 
-**Skill.** A markdown file (`SKILL.md`) at a known location. The main agent reads it when applicable and applies its methodology. No persona, no tool access of its own — it's read by the same agent doing the work. Example: `liz-patterns:documentation` (the skill that informs how docs get written across all projects).
+**Skill.** A markdown file (`SKILL.md`) at a known location. The main agent reads it when applicable and applies its methodology. No persona, no tool access of its own — it's read by the same agent doing the work. Example: `tapestry-patterns:documentation` (the skill that informs how docs get written across all projects).
 
 **Agent.** A standalone agent file (`<name>.md`) registered in the platform's agents directory. Like a subagent but at a higher level — owns an ongoing responsibility across calls, not just one bounded task. Often deployed as a long-running process. Example: the `self-observer` cron is registered as an agent even though it's a deployed service; the role definition is the agent file, the implementation is the service.
 

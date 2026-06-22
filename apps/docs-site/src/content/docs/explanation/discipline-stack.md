@@ -64,7 +64,7 @@ The mechanisms, paired with the specific weak bond each one reinforces, are in t
 |---|---|---|
 | **Memory loss across sessions** | The user said something important last session; the agent doesn't have it next session; correction is lost or has to be re-said. | The **loom-memory MCP** + the SessionStart auto-recall hook. Persistent cross-session memory; top-N relevant memories injected at conversation start. → [Memory MCP](/explanation/memory-mcp/) |
 | **Drift from the user's framing** | The user asks for a "layer" and the agent builds a separate deployed system. The user's load-bearing words get re-interpreted into the agent's default ontology. | **Per-project guard plugins** with framing-clarification gates that force the agent to restate the request in the user's words before building. The `sde-extraction-guard` UserPromptSubmit hook is the canonical example. → [Plugins](/explanation/plugins/) |
-| **Silent assumptions about the codebase** | The agent cites facts about the code that come from training-data defaults, not from the actual files. The user trusts the citation; the citation is wrong. | The **PROBE-discipline reminder** injected at the top of every user message by the `loom-discipline` UserPromptSubmit hook. "Cite file:line. Don't assert without grep/read." → [Plugins](/explanation/plugins/) |
+| **Silent assumptions about the codebase** | The agent cites facts about the code that come from training-data defaults, not from the actual files. The user trusts the citation; the citation is wrong. | The **PROBE-discipline reminder** injected at the top of every user message by the `tapestry-discipline` UserPromptSubmit hook. "Cite file:line. Don't assert without grep/read." → [Plugins](/explanation/plugins/) |
 | **Forgotten corrections** | The user corrects the agent at minute 10 of a session; by minute 40, the agent has drifted back to the original behavior; by next session, the correction is gone entirely. | The **friction-as-memory rule** — every correction MUST be saved as a `feedback` memory immediately, at the moment of correction, not deferred. The discipline reminder reinforces it; the memory itself preserves it across sessions. → [Memory MCP](/explanation/memory-mcp/) |
 | **Architectural blindness** | The agent has no idea what's deployed, what changed since last session, what services exist, what depends on what. Every conversation starts from zero structural awareness. | The **architecture-snapshot pipeline** at SessionStart. Produces a structural snapshot + diff against prior baseline + narrative summary, injected as session context. → [Architecture snapshots](/explanation/architecture-snapshots/) |
 | **Repeated mistakes across sessions** | The same pattern recurs — same misunderstanding, same wrong architectural choice, same forgotten rule. Each session starts cold so the patterns don't accumulate into learning. | The **upskilling audit** (Stop hook, CORE DIRECTIVE 2). When a session crosses a substantive-work threshold without producing an upskilling report, it surfaces loudly. The audit RAISES the pattern; the observer PERSISTS it (see next row). → [Plugins](/explanation/plugins/) |
@@ -119,8 +119,8 @@ flowchart TB
   end
 
   subgraph PLATFORM["Tapestry platform (hosted)"]
-    PLUGIN1["loom-discipline plugin"]
-    PLUGIN2["liz-patterns plugin"]
+    PLUGIN1["tapestry-discipline plugin"]
+    PLUGIN2["tapestry-patterns plugin"]
     PLUGIN3["per-project guard<br/>(optional)"]
     MEMORY["loom-memory MCP"]
   end
@@ -136,7 +136,7 @@ flowchart TB
 
 ```mermaid
 flowchart TB
-  PLUGIN1["loom-discipline"] -->|4 hooks| AGENT
+  PLUGIN1["tapestry-discipline"] -->|4 hooks| AGENT
   PLUGIN3["per-project guard"] -->|project hooks| AGENT
   MEMORY["loom-memory MCP"] -->|recall on SessionStart| AGENT
   PI[".project-intelligence/"] -->|agent profile| AGENT
@@ -153,8 +153,8 @@ The diagram above shows how the pieces interconnect. The five summaries below sa
 ### 1. The plugins → [Read more](/explanation/plugins/)
 
 Three plugins typically active per project:
-- **`loom-discipline`** — the universal discipline source (PROBE hooks, MCP wiring, auto-recall, upskilling audit)
-- **`liz-patterns`** — the canonical reusable agents, skills, and scripts
+- **`tapestry-discipline`** — the universal discipline source (PROBE hooks, MCP wiring, auto-recall, upskilling audit)
+- **`tapestry-patterns`** — the canonical reusable agents, skills, and scripts
 - A **per-project guard plugin** (optional) — project-specific guardrails like `sde-extraction-guard`'s framing-clarification gate
 
 They compose, they don't replace. All three are designed to coexist.
@@ -165,7 +165,7 @@ They compose, they don't replace. All three are designed to coexist.
 
 ### 3. The architecture-snapshot automation → [Read more](/explanation/architecture-snapshots/)
 
-At session start, the `loom-discipline` plugin runs `scripts/architecture_snapshot.py` (a thin wrapper dispatching to the canonical script in `liz-patterns`) to produce a structural snapshot of your repo, diffs it against the prior baseline, and injects the result as session context. The agent starts each conversation with a current map of what's deployed and what changed since last session. The whole pipeline is invisible until it goes missing — which is why it gets its own page.
+At session start, the `tapestry-discipline` plugin runs `scripts/architecture_snapshot.py` (a thin wrapper dispatching to the canonical script in `tapestry-patterns`) to produce a structural snapshot of your repo, diffs it against the prior baseline, and injects the result as session context. The agent starts each conversation with a current map of what's deployed and what changed since last session. The whole pipeline is invisible until it goes missing — which is why it gets its own page.
 
 ### 4. The plugin enable in `.claude/settings.json`
 
@@ -195,11 +195,11 @@ Two project-rooted pieces that scope the discipline to YOUR project:
 | If this is missing or wrong | The agent loses |
 |---|---|
 | `.mcp.json` not declaring `loom-memory` AND plugin not enabled | All memory tools. The agent has no way to call `memory_recall` or `memory_write`. |
-| `loom-discipline` plugin not enabled | All four hooks. No auto-recall at session start, no PROBE reminder per turn, no PreToolUse check, no Stop audit. |
+| `tapestry-discipline` plugin not enabled | All four hooks. No auto-recall at session start, no PROBE reminder per turn, no PreToolUse check, no Stop audit. |
 | Plugin enabled but `LOOM_PROJECT_ID` unset | Hooks may no-op because the scope gate finds nothing to activate against. |
 | `LOOM_PROJECT_ID` drifted (different value than expected) | Memory writes tag the "wrong" project; the agent recalls memories that don't match its operating context. |
 | `.project-intelligence/` deleted or moved | The agent loses per-project specialization — it doesn't know what role it plays in this repo. |
-| `liz-patterns` plugin missing | Architecture-snapshot wrappers can't find canonicals; snapshots stop being generated; canonical skills aren't invokable by name. |
+| `tapestry-patterns` plugin missing | Architecture-snapshot wrappers can't find canonicals; snapshots stop being generated; canonical skills aren't invokable by name. |
 | `scripts/architecture_snapshot.py` deleted | Snapshot pipeline silently no-ops at session start. Architecture awareness across sessions disappears. |
 | `docs/architecture-snapshots/` deleted | Historical baseline lost; next snapshot is "first ever" with empty diff. Recovery is automatic on next session, but the historical record is gone. |
 
@@ -211,7 +211,7 @@ Use the [Set up a new project](/how-to/set-up-a-new-project/) checklist for a fr
 
 ## Why this site exists
 
-In June 2026, a consuming project's agent had been running without the `loom-discipline` plugin enabled and without the memory MCP wired in its `.mcp.json` for about three weeks before anyone noticed. The project's `CLAUDE.md` told the agent to use the memory tools, but the tools were never actually available in the session. The agent silently did what it could — reading the `CLAUDE.md`, accepting the framing, and never confirming the tools actually existed.
+In June 2026, a consuming project's agent had been running without the `tapestry-discipline` plugin enabled and without the memory MCP wired in its `.mcp.json` for about three weeks before anyone noticed. The project's `CLAUDE.md` told the agent to use the memory tools, but the tools were never actually available in the session. The agent silently did what it could — reading the `CLAUDE.md`, accepting the framing, and never confirming the tools actually existed.
 
 The fix was three lines of JSON. The reason it wasn't caught for three weeks is that absence is invisible: the agent had no negative-space awareness, the operator had no checklist to run, and nothing in the system loudly said "this is broken."
 

@@ -73,8 +73,8 @@ flowchart TB
   end
 
   subgraph PLATFORM["Tapestry platform (hosted)"]
-    PLUGIN1["loom-discipline plugin"]
-    PLUGIN2["liz-patterns plugin"]
+    PLUGIN1["tapestry-discipline plugin"]
+    PLUGIN2["tapestry-patterns plugin"]
     PLUGIN3["per-project guard<br/>(optional)"]
     MEMORY["loom-memory MCP"]
   end
@@ -92,7 +92,7 @@ Then how each piece reaches the agent in your session:
 
 ```mermaid
 flowchart TB
-  PLUGIN1["loom-discipline"] -->|4 hooks| AGENT
+  PLUGIN1["tapestry-discipline"] -->|4 hooks| AGENT
   PLUGIN3["per-project guard"] -->|project hooks| AGENT
   MEMORY["loom-memory MCP"] -->|recall on SessionStart| AGENT
   PI[".project-intelligence/"] -->|agent profile| AGENT
@@ -103,14 +103,14 @@ flowchart TB
 The five concrete pieces in your repo:
 
 1. **`.mcp.json`** declares the loom-memory MCP server.
-2. **`.claude/settings.json`** enables the loom-discipline plugin (and any per-project guards).
+2. **`.claude/settings.json`** enables the tapestry-discipline plugin (and any per-project guards).
 3. **`.env`** holds `LOOM_PROJECT_ID` — the scope gate for hook activation and the tag applied to every memory write.
 4. **`.project-intelligence/<project-id>/`** holds the per-project agent profile (role, observatory config).
-5. **`scripts/architecture_*.py`** are thin wrappers that dispatch to the canonical snapshot scripts in the `liz-patterns` plugin.
+5. **`scripts/architecture_*.py`** are thin wrappers that dispatch to the canonical snapshot scripts in the `tapestry-patterns` plugin.
 
 The two platform-side pieces (hosted, not in your repo):
 
-- **The `loom-discipline` plugin** — installed once per machine; enabled per project; provides the four lifecycle hooks (SessionStart, UserPromptSubmit, PreToolUse, Stop).
+- **The `tapestry-discipline` plugin** — installed once per machine; enabled per project; provides the four lifecycle hooks (SessionStart, UserPromptSubmit, PreToolUse, Stop).
 - **The `loom-memory` MCP server** — hosted at `loom-agent-context.onrender.com/mcp/memory/`; shared across every Tapestry-consuming project, scoped per-project via `project_tags`.
 
 ## What the agent loses if a piece goes missing
@@ -138,7 +138,7 @@ For the file-by-file reference: [Load-bearing files](/reference/load-bearing-fil
 
 ## Why this site exists
 
-In June 2026, a consuming project's agent had been running without the `loom-discipline` plugin enabled and without the memory MCP wired in its `.mcp.json` for about three weeks before anyone noticed. The project's `CLAUDE.md` told the agent to use the memory tools, but the tools were never actually available in the session. The agent silently did what it could — reading the `CLAUDE.md`, accepting the framing, and never confirming the tools actually existed.
+In June 2026, a consuming project's agent had been running without the `tapestry-discipline` plugin enabled and without the memory MCP wired in its `.mcp.json` for about three weeks before anyone noticed. The project's `CLAUDE.md` told the agent to use the memory tools, but the tools were never actually available in the session. The agent silently did what it could — reading the `CLAUDE.md`, accepting the framing, and never confirming the tools actually existed.
 
 The fix was three lines of JSON. The reason it wasn't caught for three weeks is that absence is invisible: the agent had no negative-space awareness, the operator had no checklist to run, and nothing in the system loudly said "this is broken."
 

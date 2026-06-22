@@ -138,7 +138,7 @@ You should expect to see the agent loudly surface MCP unavailability rather than
 ## Related
 
 - [The discipline stack](/explanation/discipline-stack/) — how the MCP fits with the plugins, the observer, and the recursive miscommunication-becomes-architecture loop
-- [The plugins](/explanation/plugins/) — `loom-discipline` is what wires the MCP into your project
+- [The plugins](/explanation/plugins/) — `tapestry-discipline` is what wires the MCP into your project
 - [The observer](/explanation/the-observer/) — how patterns in your session activity become candidates that compound across sessions
 - [Set up a new project](/how-to/set-up-a-new-project/) — get the MCP wired into a new repo
 - [Recover from common failures](/how-to/recover-from-common-failures/) — when the agent stops checking memory

@@ -1,131 +1,99 @@
 ---
 /**
- * The Observatory — the coordination-reinforcement console.
+ * The Observatory — the coordination-support view over OTEL telemetry.
  *
- * Lives inside the docs site (same Astro project / deploy / domain), at /observatory.
- * Governed by docs/canon/user-agent-coordination-reinforcement.md:
- *   Tapestry is a user/agent support and reinforcement system. The primary object is
- *   OPERATOR-AGENT COORDINATION. Memory, telemetry, observability, architecture,
- *   friction/correction, upskilling, and policy are REINFORCEMENT MECHANISMS. Projects
- *   are environments where coordination occurs; interfaces/surfaces are one manifestation.
- *   The view anchors on coordination_context, not on interface identity.
+ * Inside the docs site (same Astro project / deploy / domain), at /observatory.
+ * Canon: docs/canon/user-agent-coordination-reinforcement.md.
+ * Contract: docs-site reference/otel-coordination-contract.md.
  *
- * Honesty rule (canon): each mechanism states its availability — available / planned /
- * missing. Absence is a marked state with a glyph + label (not color alone), never a blank.
+ * Reads OTEL-backed telemetry; it is not Grafana. Grafana is the substrate;
+ * this is the coordination-support layer over it.
  *
- * Style: SDE_Extraction design system (warm near-black; Instrument Serif / Inter /
- * JetBrains Mono; "absent" first-class), translated to plain CSS (Starlight, no Tailwind).
+ * State rule (binding): healthy / degraded / blind / unknown. Blind means the
+ * signal is not instrumented yet — never "nothing is wrong." Missing signal is
+ * never shown as healthy.
+ *
+ * Today the coordination contract is not emitted yet, so coordination health is
+ * mostly blind. What IS real is instrumentation coverage: which contract
+ * attributes the hooks emit now (PROBE'd from _observability.py + hooks.jsonl).
  */
 
-type Avail = "available" | "planned" | "missing";
-const AVAIL_GLYPH: Record<Avail, string> = { available: "●", planned: "◐", missing: "○" };
-const AVAIL_LABEL: Record<Avail, string> = {
-  available: "available now",
-  planned: "planned",
-  missing: "not yet instrumented",
+type State = "healthy" | "degraded" | "blind" | "unknown";
+const STATE_GLYPH: Record<State, string> = { healthy: "●", degraded: "◐", blind: "⊘", unknown: "○" };
+const STATE_LABEL: Record<State, string> = {
+  healthy: "healthy",
+  degraded: "degraded",
+  blind: "blind — signal not instrumented yet",
+  unknown: "unknown — no reading yet",
 };
 
-// The reinforcement mechanisms (canon). The object they reinforce is coordination.
-const MECHANISMS: { key: string; label: string; reinforces: string; avail: Avail }[] = [
-  { key: "memory", label: "Memory", reinforces: "what was learned persists and is recalled at the right moment", avail: "available" },
-  { key: "architecture", label: "Architecture analysis", reinforces: "shape changes that alter how coordination happens are caught", avail: "available" },
-  { key: "policy", label: "Policy & audit", reinforces: "decisions about what becomes durable are recorded and replayable", avail: "available" },
-  { key: "observability", label: "Observability", reinforces: "the observer surfaces where coordination drifts or stabilizes", avail: "planned" },
-  { key: "upskilling", label: "Upskilling", reinforces: "repeated coordination becomes a durable skill", avail: "planned" },
-  { key: "telemetry", label: "Telemetry", reinforces: "every action is attributable to coordination quality, not just execution", avail: "planned" },
-  { key: "friction", label: "Friction & correction", reinforces: "recurring misunderstandings and corrections are made legible", avail: "missing" },
-  { key: "runtime", label: "Runtime analysis", reinforces: "invocation, tool, and session behavior describe coordination health", avail: "missing" },
-];
+// Instrumentation coverage = the one real reading today. PROBE'd:
+//   _observability.py:154+ pushes OTLP/HTTP to Grafana Cloud; hooks.jsonl mirrors.
+//   Today's events carry hook/tool/project/session + a free-text `note`.
+type Cov = "emitted" | "in_note" | "blind";
+const COV_GLYPH: Record<Cov, string> = { emitted: "●", in_note: "◐", blind: "⊘" };
+const COV_LABEL: Record<Cov, string> = {
+  emitted: "emitted as a typed field",
+  in_note: "present, but as free-text in note",
+  blind: "not emitted",
+};
 
-// Coordination contexts — anchored on coordination_context_id (NOT interface_id).
-// A context is an instance of operator-agent coordination inside a project environment;
-// a surface (interface/workflow) is one manifestation attached to it. Derived/illustrative.
-const CONTEXTS: {
-  id: string;
-  project: string; // environment
-  surface: string; // one manifestation
-  agents: string;
-  intent: string;
-  status: "active" | "emerging" | "stable";
-  // which mechanisms currently reinforce THIS context, and at what availability
-  reinforced: { key: string; avail: Avail }[];
-}[] = [
+const COVERAGE: { group: string; attrs: { name: string; cov: Cov; note?: string }[] }[] = [
   {
-    id: "ctx_tapestry_migration",
-    project: "tapestry",
-    surface: "migration choreography",
-    agents: "Tapestry-agent",
-    intent: "migrate a piece safely, one step at a time",
-    status: "active",
-    reinforced: [
-      { key: "memory", avail: "available" },
-      { key: "architecture", avail: "available" },
-      { key: "policy", avail: "available" },
-      { key: "observability", avail: "planned" },
-      { key: "friction", avail: "missing" },
+    group: "Anchor",
+    attrs: [{ name: "tapestry.coordination_context_id", cov: "blind", note: "events anchor on session_id + project_id today" }],
+  },
+  {
+    group: "Required context",
+    attrs: [
+      { name: "tapestry.project_id", cov: "emitted" },
+      { name: "tapestry.session_id", cov: "emitted" },
+      { name: "tapestry.agent_id", cov: "blind" },
+      { name: "tapestry.agent_role", cov: "blind" },
+      { name: "tapestry.surface_id / workflow_surface", cov: "blind" },
+      { name: "tapestry.surface_type", cov: "blind" },
     ],
   },
   {
-    id: "ctx_loom_promotion",
-    project: "the-loom",
-    surface: "promotion review",
-    agents: "operator + policy service",
-    intent: "decide what repeated behavior becomes durable structure",
-    status: "stable",
-    reinforced: [
-      { key: "policy", avail: "available" },
-      { key: "upskilling", avail: "available" },
-      { key: "observability", avail: "available" },
-      { key: "telemetry", avail: "planned" },
-    ],
-  },
-  {
-    id: "ctx_sde_curation",
-    project: "SDE_Extraction",
-    surface: "extraction curation",
-    agents: "extraction agent",
-    intent: "extract a model the operator can validate and stand behind",
-    status: "active",
-    reinforced: [
-      { key: "memory", avail: "available" },
-      { key: "architecture", avail: "available" },
-      { key: "friction", avail: "planned" },
-      { key: "runtime", avail: "missing" },
+    group: "Mechanism attributes",
+    attrs: [
+      { name: "tapestry.hook_name", cov: "emitted" },
+      { name: "tapestry.tool_name", cov: "emitted", note: "PreToolUse" },
+      { name: "tapestry.architecture_snapshot_id", cov: "in_note", note: "snapshot filename in note" },
+      { name: "tapestry.diff_report_id", cov: "in_note", note: "diff filename in note" },
+      { name: "tapestry.observer_ran", cov: "in_note" },
+      { name: "tapestry.observer_detected_count", cov: "in_note" },
+      { name: "tapestry.observer_created_count", cov: "in_note" },
+      { name: "tapestry.observer_updated_count", cov: "in_note" },
+      { name: "tapestry.friction_present", cov: "in_note", note: "stop-audit detects; transient warning" },
+      { name: "tapestry.friction_type", cov: "blind" },
+      { name: "tapestry.correction_present", cov: "in_note", note: "stop-audit detects; transient warning" },
+      { name: "tapestry.memory_read_count", cov: "blind" },
+      { name: "tapestry.memory_write_count", cov: "blind" },
+      { name: "tapestry.memory_miss", cov: "blind" },
+      { name: "tapestry.upskill_candidate_present", cov: "in_note", note: "observer counts" },
     ],
   },
 ];
 
-// The telemetry contract Tapestry-agent owns (the UI consumes it). Anchored on
-// coordination_context_id; every significant event answers: did this strengthen,
-// weaken, or reveal something about coordination?
-const TELEMETRY_ATTRS = [
-  "tapestry.coordination_context_id",
-  "tapestry.project_id",
-  "tapestry.surface_id",
-  "tapestry.surface_type",
-  "tapestry.agent_id",
-  "tapestry.agent_role",
-  "tapestry.user_intent_id",
-  "tapestry.memory_read_count",
-  "tapestry.memory_write_count",
-  "tapestry.memory_miss",
-  "tapestry.correction_present",
-  "tapestry.friction_type",
-  "tapestry.upskill_candidate",
-  "tapestry.architecture_context_hash",
-  "tapestry.diff_report_id",
+const covCount = (c: Cov) => COVERAGE.flatMap((g) => g.attrs).filter((a) => a.cov === c).length;
+const totalAttrs = COVERAGE.flatMap((g) => g.attrs).length;
+
+// Coordination health, today. Honest: the contract is not emitted, so per-mechanism
+// coordination quality is blind. The structure is shown; the readings are not faked.
+const MECHANISMS: { label: string; state: State; why: string }[] = [
+  { label: "Memory", state: "blind", why: "read/write/miss counts not emitted yet" },
+  { label: "Architecture", state: "unknown", why: "snapshots produced; not yet read as a coordination signal" },
+  { label: "Policy & audit", state: "unknown", why: "decisions recorded; not yet attributed to coordination" },
+  { label: "Friction / correction", state: "blind", why: "detected as transient warnings; no typed signal" },
+  { label: "Observability", state: "blind", why: "observer counts in note; not coordination-attributed" },
+  { label: "Upskilling", state: "blind", why: "candidate counts in note; not attributed" },
+  { label: "Telemetry", state: "degraded", why: "transport live; coordination shape not emitted" },
+  { label: "Runtime", state: "blind", why: "invocation/session signals not coordination-anchored" },
 ];
 
-const MECH_LABEL: Record<string, string> = Object.fromEntries(MECHANISMS.map((m) => [m.key, m.label]));
-
-const CANON_URL =
-  "https://github.com/Lizo-RoadTown/tapestry/blob/main/docs/canon/user-agent-coordination-reinforcement.md";
-
-// roll-up per context: how many reinforcing mechanisms are available now
-function contextRollup(c: (typeof CONTEXTS)[number]) {
-  const avl = c.reinforced.filter((r) => r.avail === "available").length;
-  return { avl, tot: c.reinforced.length };
-}
+const CANON_URL = "https://github.com/Lizo-RoadTown/tapestry/blob/main/docs/canon/user-agent-coordination-reinforcement.md";
+const CONTRACT_URL = "/reference/otel-coordination-contract/";
 ---
 
 <!doctype html>
@@ -134,16 +102,10 @@ function contextRollup(c: (typeof CONTEXTS)[number]) {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>The Observatory — Tapestry</title>
-    <meta
-      name="description"
-      content="The coordination-reinforcement console: operator-agent coordination, and the mechanisms — memory, telemetry, observability, architecture, friction, upskilling, policy — that strengthen it over time."
-    />
+    <meta name="description" content="The coordination-support view over OTEL telemetry: how healthy operator-agent coordination is across projects, and which signals are instrumented yet." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   </head>
   <body>
     <header class="topbar">
@@ -156,128 +118,96 @@ function contextRollup(c: (typeof CONTEXTS)[number]) {
 
     <main>
       <section class="hero">
-        <p class="eyebrow mono">user/agent support &amp; reinforcement</p>
+        <p class="eyebrow mono">coordination-support view · over OTEL telemetry</p>
         <h1 class="display">The <span class="display-accent">Observatory</span></h1>
         <p class="lede">
-          Tapestry strengthens, stabilizes, and evolves <strong>coordination between the operator and
-          its agents</strong>. This console watches that coordination — and the mechanisms reinforcing it.
-        </p>
-        <p class="canon-note">
-          Governed by the canon
-          <a href={CANON_URL}>User-Agent Coordination Reinforcement</a>: coordination is the object;
-          memory, telemetry, observability, architecture, friction, upskilling, and policy are the
-          mechanisms. Projects are environments; surfaces are one manifestation.
+          How healthy is coordination between you and your agents — across projects — and which signals are
+          instrumented enough to tell. OTEL carries the signal; this reads it as coordination quality.
         </p>
       </section>
 
-      <section class="honesty" role="note">
-        <span class="glyph mono missing" aria-hidden="true">○</span>
-        <p>
-          Most coordination signal is <strong>not instrumented yet</strong>. Each mechanism below states
-          whether it is available now, planned, or not yet instrumented — shown by glyph and label, not
-          color alone. Absence is a marked state, never a blank. Nothing here is fabricated.
-        </p>
+      <!-- the state vocabulary, stated once, up front -->
+      <section class="states" aria-label="state legend">
+        <span class="st healthy"><span class="g mono">●</span> healthy</span>
+        <span class="st degraded"><span class="g mono">◐</span> degraded</span>
+        <span class="st blind"><span class="g mono">⊘</span> blind</span>
+        <span class="st unknown"><span class="g mono">○</span> unknown</span>
+        <p class="states-note"><strong>Blind ≠ healthy.</strong> Blind means the signal isn't instrumented yet. Missing signal is never shown as healthy.</p>
       </section>
 
-      <!-- THE OBJECT + THE MECHANISMS -->
-      <section aria-labelledby="mech-h">
+      <!-- L0: coordination health today (honest: mostly blind) -->
+      <section aria-labelledby="health-h">
         <div class="section-head">
-          <h2 id="mech-h" class="display">Reinforcement mechanisms</h2>
-          <p class="hint">The means by which coordination is strengthened. None alone defines the system.</p>
+          <h2 id="health-h" class="display">Coordination health</h2>
+          <p class="hint">Per reinforcement mechanism, across the fleet. The contract isn't emitted yet, so most readings are blind — the structure is shown, the readings are not faked.</p>
         </div>
         <ul class="mech-grid">
-          {
-            MECHANISMS.map((m) => (
-              <li class={`mech ${m.avail}`}>
-                <div class="mech-top">
-                  <span class="mech-name">{m.label}</span>
-                  <span class={`avail ${m.avail}`} title={AVAIL_LABEL[m.avail]}>
-                    <span class="glyph mono" aria-hidden="true">{AVAIL_GLYPH[m.avail]}</span>
-                    {AVAIL_LABEL[m.avail]}
-                  </span>
-                </div>
-                <p class="mech-reinforces">{m.reinforces}</p>
-              </li>
-            ))
-          }
+          {MECHANISMS.map((m) => (
+            <li class={`mech ${m.state}`}>
+              <div class="mech-top">
+                <span class="mech-name">{m.label}</span>
+                <span class={`state-pill ${m.state}`} title={STATE_LABEL[m.state]}>
+                  <span class="g mono" aria-hidden="true">{STATE_GLYPH[m.state]}</span>{m.state}
+                </span>
+              </div>
+              <p class="mech-why">{m.why}</p>
+            </li>
+          ))}
         </ul>
       </section>
 
-      <!-- THE INSTANCES: coordination contexts -->
+      <!-- the one real reading today: instrumentation coverage -->
+      <section aria-labelledby="cov-h">
+        <div class="section-head">
+          <h2 id="cov-h" class="display">Instrumentation coverage</h2>
+          <p class="hint">
+            What the hooks emit today (PROBE'd from <code>_observability.py</code> + <code>hooks.jsonl</code>) against the
+            <a href={CONTRACT_URL}>coordination contract</a>. This is real: <strong>{covCount("emitted")} emitted</strong> ·
+            <strong>{covCount("in_note")} in note</strong> · <strong>{covCount("blind")} blind</strong> of {totalAttrs}.
+          </p>
+        </div>
+        <div class="cov-legend">
+          <span class="cov emitted"><span class="g mono">●</span> {COV_LABEL.emitted}</span>
+          <span class="cov in_note"><span class="g mono">◐</span> {COV_LABEL.in_note}</span>
+          <span class="cov blind"><span class="g mono">⊘</span> {COV_LABEL.blind}</span>
+        </div>
+        {COVERAGE.map((grp) => (
+          <div class="cov-group">
+            <h3 class="cov-group-h">{grp.group}</h3>
+            <ul class="cov-list">
+              {grp.attrs.map((a) => (
+                <li class={`cov-row ${a.cov}`}>
+                  <span class="g mono" aria-hidden="true" title={COV_LABEL[a.cov]}>{COV_GLYPH[a.cov]}</span>
+                  <span class="cov-name mono">{a.name}</span>
+                  {a.note && <span class="cov-note">{a.note}</span>}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </section>
+
+      <!-- L2 structure: coordination contexts (blind until the anchor is emitted) -->
       <section aria-labelledby="ctx-h">
         <div class="section-head">
           <h2 id="ctx-h" class="display">Coordination contexts</h2>
-          <p class="hint">
-            Instances of operator-agent coordination, each anchored on a
-            <code>coordination_context_id</code>. The project is the environment; the surface is one
-            manifestation. Mechanisms attach here.
-          </p>
+          <p class="hint">Each instance of coordination, anchored on <code>coordination_context_id</code>, drills down to its events. The anchor isn't emitted yet, so this is blind.</p>
         </div>
-
-        <div class="ctx-list">
-          {
-            CONTEXTS.map((c) => {
-              const r = contextRollup(c);
-              return (
-                <article class="ctx">
-                  <div class="ctx-head">
-                    <div>
-                      <span class={`status status-${c.status}`}>{c.status}</span>
-                      <h3 class="ctx-surface">{c.surface}</h3>
-                    </div>
-                    <span class="rollup mono" title="reinforcing mechanisms available now">
-                      {r.avl}/{r.tot} reinforcing
-                    </span>
-                  </div>
-                  <p class="ctx-id mono">{c.id}</p>
-                  <dl class="ctx-meta">
-                    <div><dt>environment</dt><dd class="mono">{c.project}</dd></div>
-                    <div><dt>agents</dt><dd>{c.agents}</dd></div>
-                    <div><dt>intent</dt><dd>{c.intent}</dd></div>
-                  </dl>
-                  <div class="ctx-mechs">
-                    {c.reinforced.map((rf) => (
-                      <span class={`mech-chip ${rf.avail}`} title={`${MECH_LABEL[rf.key]} — ${AVAIL_LABEL[rf.avail]}`}>
-                        <span class="glyph mono" aria-hidden="true">{AVAIL_GLYPH[rf.avail]}</span>
-                        {MECH_LABEL[rf.key]}
-                      </span>
-                    ))}
-                  </div>
-                </article>
-              );
-            })
-          }
-        </div>
-      </section>
-
-      <!-- THE INSTRUMENTATION: the telemetry contract -->
-      <section aria-labelledby="tel-h">
-        <div class="section-head">
-          <h2 id="tel-h" class="display">Telemetry contract</h2>
-          <p class="hint">
-            What feeds this view. Telemetry is not <code>project → service → trace → span</code>; it is
-            anchored on coordination context and answers: did this action strengthen, weaken, or reveal
-            something about coordination? Owned by Tapestry (the UI consumes it); the transport is loom's.
+        <div class="blind-panel">
+          <span class="g mono" aria-hidden="true">⊘</span>
+          <p>
+            <strong>Blind.</strong> No coordination contexts yet — <code>tapestry.coordination_context_id</code> is not emitted.
+            Once the hooks carry the anchor, contexts appear here (fleet → project → context → event), each with its
+            coordination-quality state.
           </p>
-        </div>
-        <div class="tel">
-          <p class="tel-anchor mono">
-            anchor: <span class="hl">tapestry.coordination_context_id</span>
-          </p>
-          <ul class="tel-attrs">
-            {TELEMETRY_ATTRS.filter((a) => a !== "tapestry.coordination_context_id").map((a) => (
-              <li class="mono">{a}</li>
-            ))}
-          </ul>
         </div>
       </section>
 
       <footer class="foot">
         <p class="mono">
-          Contexts shown are <strong>derived</strong> (first-pass, illustrative) from project environments
-          + agent roles — not a live readout. Per-context instrumentation is the open build (proposal:
-          coordination-reinforcement console, P1). Canon:
-          <a href={CANON_URL}>user-agent-coordination-reinforcement</a>.
+          Canon: <a href={CANON_URL}>user-agent-coordination-reinforcement</a> · Contract:
+          <a href={CONTRACT_URL}>otel-coordination-contract</a>. Coordination quality is correction frequency,
+          friction recurrence, memory-miss rate, and time-to-durable-structure — not request rate or latency.
         </p>
       </footer>
     </main>
@@ -285,146 +215,98 @@ function contextRollup(c: (typeof CONTEXTS)[number]) {
     <style is:global>
       :root {
         color-scheme: dark;
-        --surface: #0a0d0e;
-        --surface-raised: #16191b;
-        --edge: #2a2f31;
-        --ink: #f3f5f4;
-        --ink-dim: #c4ccca;
-        --ink-faint: #8b9492;
+        --surface: #0a0d0e; --surface-raised: #16191b; --edge: #2a2f31;
+        --ink: #f3f5f4; --ink-dim: #c4ccca; --ink-faint: #8b9492;
         --font-display: "Instrument Serif", Georgia, serif;
         --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
         --font-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
         --brand: #5fd3da;
-        --available: #8fa99b;
-        --available-soft: #8fa99b14;
-        --available-edge: #8fa99b40;
-        --planned: #d8b06a;
-        --planned-soft: #d8b06a16;
-        --planned-edge: #d8b06a40;
-        --missing: #8b9492;
-        --missing-soft: #2a2f3155;
+        --healthy: #8fa99b; --healthy-soft: #8fa99b14; --healthy-edge: #8fa99b40;
+        --degraded: #d8b06a; --degraded-soft: #d8b06a16; --degraded-edge: #d8b06a40;
+        --blind: #b98a8a; --blind-soft: #b98a8a14; --blind-edge: #b98a8a3a;
+        --unknown: #8b9492; --unknown-soft: #2a2f3155;
       }
       * { box-sizing: border-box; }
       html, body { height: 100%; }
       body {
-        margin: 0;
-        background:
-          radial-gradient(120% 80% at 50% 120%, #5fd3da12 0%, transparent 60%),
-          var(--surface);
+        margin: 0; font-size: 16px; line-height: 1.55; color: var(--ink);
+        font-family: var(--font-sans); -webkit-font-smoothing: antialiased;
+        background: radial-gradient(120% 80% at 50% 120%, #5fd3da12 0%, transparent 60%), var(--surface);
         background-attachment: fixed;
-        color: var(--ink);
-        font-family: var(--font-sans);
-        -webkit-font-smoothing: antialiased;
-        font-size: 16px;
-        line-height: 1.55;
       }
       a { color: inherit; }
       .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
       .display { font-family: var(--font-display); font-weight: 400; letter-spacing: 0.01em; }
       .display-accent { font-family: var(--font-display); font-style: italic; color: var(--brand); }
 
-      .topbar {
-        display: flex; align-items: center; justify-content: space-between;
-        padding: 16px 24px; border-bottom: 1px solid var(--edge);
-        position: sticky; top: 0; z-index: 10;
-        background: #0a0d0ecc; backdrop-filter: blur(8px);
-      }
+      .topbar { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; border-bottom: 1px solid var(--edge); position: sticky; top: 0; z-index: 10; background: #0a0d0ecc; backdrop-filter: blur(8px); }
       .wordmark { font-family: var(--font-display); font-size: 20px; text-decoration: none; }
       .topnav { display: flex; gap: 18px; font-size: 14px; }
       .topnav a { color: var(--ink-faint); text-decoration: none; padding: 4px 2px; }
       .topnav a:hover { color: var(--ink); }
       .topnav a.here { color: var(--ink); border-bottom: 2px solid var(--brand); }
 
-      main { max-width: 1000px; margin: 0 auto; padding: 48px 24px 96px; }
+      main { max-width: 1000px; margin: 0 auto; padding: 44px 24px 96px; }
+      section { margin-bottom: 48px; }
+      .hero { margin-bottom: 24px; }
+      .eyebrow { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faint); margin: 0 0 6px; }
+      .hero h1 { font-size: clamp(44px, 7vw, 70px); margin: 0 0 12px; line-height: 1.03; }
+      .lede { font-size: 18px; color: var(--ink-dim); max-width: 66ch; margin: 0; }
 
-      .hero { margin-bottom: 8px; }
-      .eyebrow { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); margin: 0 0 6px; }
-      .hero h1 { font-size: clamp(44px, 7vw, 72px); margin: 0 0 14px; line-height: 1.02; }
-      .lede { font-size: 19px; color: var(--ink-dim); max-width: 64ch; margin: 0 0 12px; }
-      .lede strong { color: var(--ink); font-weight: 500; }
-      .canon-note { font-size: 13px; color: var(--ink-faint); max-width: 70ch; margin: 0; }
-      .canon-note a, .lede a { color: var(--brand); text-decoration: none; }
-      .canon-note a:hover, .foot a:hover { text-decoration: underline; }
+      .states { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 14px 16px; border: 1px solid var(--edge); border-radius: 14px; background: var(--surface-raised); }
+      .st { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
+      .st .g { font-size: 12px; }
+      .st.healthy { color: var(--healthy); } .st.degraded { color: var(--degraded); }
+      .st.blind { color: var(--blind); } .st.unknown { color: var(--ink-faint); }
+      .states-note { flex-basis: 100%; margin: 4px 0 0; font-size: 13px; color: var(--ink-dim); }
+      .states-note strong { color: var(--ink); }
 
-      .honesty {
-        display: flex; gap: 12px; align-items: flex-start;
-        margin: 32px 0 44px; padding: 14px 16px;
-        border: 1px solid var(--edge); border-radius: 14px; background: var(--surface-raised);
-      }
-      .honesty .glyph { font-size: 18px; line-height: 1.4; color: var(--ink-faint); }
-      .honesty p { margin: 0; font-size: 14px; color: var(--ink-dim); }
-
-      .section-head { margin: 0 0 18px; }
+      .section-head { margin: 0 0 16px; }
       .section-head h2 { font-size: 28px; margin: 0; }
-      .hint { font-size: 14px; color: var(--ink-faint); margin: 4px 0 0; max-width: 76ch; }
-      code { font-family: var(--font-mono); font-size: 0.88em; color: var(--ink-dim); background: var(--missing-soft); padding: 1px 5px; border-radius: 5px; }
+      .hint { font-size: 14px; color: var(--ink-faint); margin: 5px 0 0; max-width: 78ch; }
+      .hint a { color: var(--brand); text-decoration: none; } .hint a:hover { text-decoration: underline; }
+      .hint strong { color: var(--ink-dim); }
+      code { font-family: var(--font-mono); font-size: 0.86em; color: var(--ink-dim); background: var(--unknown-soft); padding: 1px 5px; border-radius: 5px; }
 
-      section { margin-bottom: 52px; }
-
-      /* mechanisms grid */
       .mech-grid { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; grid-template-columns: repeat(2, 1fr); }
-      .mech {
-        border: 1px solid var(--edge); border-radius: 14px; padding: 16px;
-        background: color-mix(in srgb, var(--surface-raised) 55%, transparent);
-        border-left-width: 3px;
-      }
-      .mech.available { border-left-color: var(--available-edge); }
-      .mech.planned { border-left-color: var(--planned-edge); }
-      .mech.missing { border-left-color: var(--edge); }
+      .mech { border: 1px solid var(--edge); border-left-width: 3px; border-radius: 14px; padding: 14px 16px; background: color-mix(in srgb, var(--surface-raised) 55%, transparent); }
+      .mech.healthy { border-left-color: var(--healthy-edge); }
+      .mech.degraded { border-left-color: var(--degraded-edge); }
+      .mech.blind { border-left-color: var(--blind-edge); }
+      .mech.unknown { border-left-color: var(--edge); }
       .mech-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
       .mech-name { font-size: 16px; font-weight: 600; }
-      .mech-reinforces { font-size: 13px; color: var(--ink-dim); margin: 8px 0 0; }
+      .mech-why { font-size: 13px; color: var(--ink-dim); margin: 7px 0 0; }
+      .state-pill { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; white-space: nowrap; }
+      .state-pill.healthy { color: var(--healthy); } .state-pill.degraded { color: var(--degraded); }
+      .state-pill.blind { color: var(--blind); } .state-pill.unknown { color: var(--ink-faint); }
 
-      .avail { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; white-space: nowrap; }
-      .avail .glyph { font-size: 11px; }
-      .avail.available { color: var(--available); }
-      .avail.planned { color: var(--planned); }
-      .avail.missing { color: var(--ink-faint); }
+      .cov-legend { display: flex; flex-wrap: wrap; gap: 14px; margin: 0 0 16px; font-size: 12px; }
+      .cov { display: inline-flex; align-items: center; gap: 6px; }
+      .cov.emitted { color: var(--healthy); } .cov.in_note { color: var(--degraded); } .cov.blind { color: var(--blind); }
+      .cov-group { margin-bottom: 16px; }
+      .cov-group-h { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-faint); margin: 0 0 8px; }
+      .cov-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 2px; }
+      .cov-row { display: flex; align-items: baseline; gap: 10px; padding: 6px 10px; border: 1px solid var(--edge); border-radius: 8px; background: var(--surface); }
+      .cov-row.emitted { border-color: var(--healthy-edge); }
+      .cov-row.in_note { border-color: var(--degraded-edge); }
+      .cov-row.blind { border-style: dashed; }
+      .cov-row .g { font-size: 11px; flex: none; }
+      .cov-row.emitted .g { color: var(--healthy); } .cov-row.in_note .g { color: var(--degraded); } .cov-row.blind .g { color: var(--blind); }
+      .cov-name { font-size: 12.5px; color: var(--ink-dim); }
+      .cov-note { font-size: 11px; color: var(--ink-faint); margin-left: auto; text-align: right; }
 
-      /* contexts */
-      .ctx-list { display: grid; gap: 14px; }
-      .ctx {
-        border: 1px solid var(--edge); border-radius: 18px; padding: 20px;
-        background: color-mix(in srgb, var(--surface-raised) 60%, transparent);
-      }
-      .ctx-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-      .ctx-surface { font-size: 18px; margin: 6px 0 0; }
-      .status { font-size: 10px; text-transform: uppercase; letter-spacing: 0.07em; padding: 2px 7px; border-radius: 999px; border: 1px solid var(--edge); color: var(--ink-faint); }
-      .status-active { color: var(--available); border-color: var(--available-edge); }
-      .status-emerging { color: var(--brand); border-color: #5fd3da40; }
-      .status-stable { color: var(--ink-dim); }
-      .rollup { font-size: 12px; color: var(--ink-dim); white-space: nowrap; }
-      .ctx-id { font-size: 12px; color: var(--ink-faint); margin: 8px 0 12px; }
-
-      .ctx-meta { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 0 0 14px; }
-      .ctx-meta dt { font-size: 10px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-faint); margin: 0 0 2px; }
-      .ctx-meta dd { margin: 0; font-size: 13px; color: var(--ink-dim); }
-
-      .ctx-mechs { display: flex; flex-wrap: wrap; gap: 6px; padding-top: 12px; border-top: 1px solid var(--edge); }
-      .mech-chip { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; padding: 3px 9px; border-radius: 8px; border: 1px solid var(--edge); }
-      .mech-chip .glyph { font-size: 10px; }
-      .mech-chip.available { color: var(--available); border-color: var(--available-edge); background: var(--available-soft); }
-      .mech-chip.planned { color: var(--planned); border-color: var(--planned-edge); background: var(--planned-soft); }
-      .mech-chip.missing { color: var(--ink-faint); border-style: dashed; }
-
-      /* telemetry */
-      .tel { border: 1px solid var(--edge); border-radius: 16px; padding: 18px 20px; background: var(--surface); }
-      .tel-anchor { font-size: 13px; color: var(--ink-dim); margin: 0 0 14px; }
-      .tel-anchor .hl { color: var(--brand); }
-      .tel-attrs { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px 18px; }
-      .tel-attrs li { font-size: 12px; color: var(--ink-faint); padding: 2px 0; border-bottom: 1px solid #2a2f3133; }
+      .blind-panel { display: flex; gap: 12px; align-items: flex-start; padding: 18px; border: 1px dashed var(--blind-edge); border-radius: 14px; background: var(--blind-soft); }
+      .blind-panel .g { font-size: 18px; color: var(--blind); }
+      .blind-panel p { margin: 0; font-size: 14px; color: var(--ink-dim); }
+      .blind-panel strong { color: var(--ink); }
 
       .foot { margin-top: 8px; }
-      .foot p { font-size: 12px; color: var(--ink-faint); max-width: 84ch; }
+      .foot p { font-size: 12px; color: var(--ink-faint); max-width: 86ch; }
       .foot a { color: var(--ink-dim); }
 
-      @media (max-width: 720px) {
-        .mech-grid, .ctx-meta, .tel-attrs { grid-template-columns: 1fr; }
-        .hero h1 { font-size: 44px; }
-      }
-      @media (prefers-reduced-motion: reduce) {
-        * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
-      }
+      @media (max-width: 720px) { .mech-grid { grid-template-columns: 1fr; } .cov-note { display: none; } .hero h1 { font-size: 44px; } }
+      @media (prefers-reduced-motion: reduce) { * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
     </style>
   </body>
 </html>

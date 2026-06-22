@@ -1,19 +1,19 @@
 ---
-title: A platform for spreading intelligence across your projects
-description: Tapestry is the platform that lets AI agents working in different projects share memory, surface patterns, and coordinate decisions. This site explains the wiring that makes that work — and how to keep it working when something small goes missing.
+title: Tapestry
+description: A system for observing how work evolves and deciding what should become durable structure. Projects have a shape; the shape changes over time; Tapestry watches those changes and crystallizes them into reusable skills, agents, and architecture.
 template: splash
 hero:
-  tagline: When you plug a project into Tapestry, the agent working in it shares memory and learnings with agents working in every other project on the platform. Decisions made in one project surface in another's context. Corrections you give once stick across sessions and propagate to sibling projects. Patterns that recur across multiple projects get surfaced as candidates for codification. This site explains the wiring that makes that work.
+  tagline: A project has a shape. The shape changes over time. Tapestry observes those changes and decides what should become durable structure. Memory, observability, and upskilling are different faces of that one loop — not separate products.
   actions:
-    - text: What keeps a project on track
-      link: /start/what-stays-on-track/
+    - text: Start with project shape
+      link: /start/project-shape/
       icon: right-arrow
+    - text: What Tapestry is not
+      link: /start/what-tapestry-is-not/
+      variant: secondary
     - text: Set up a new project
       link: /how-to/set-up-a-new-project/
       icon: external
-      variant: secondary
-    - text: Recover from a failure
-      link: /how-to/recover-from-common-failures/
       variant: minimal
 ---
 
@@ -23,17 +23,40 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
 These docs reference a few transitional names from the platform's beta period — `the-loom`, `Make_Skills`, `SDE_Extraction`, plugin marketplaces called `lizo-loom` and `lizo-skills`. **If any name feels unfamiliar, see [Names you'll see in these docs](/start/names-you-will-see/) first.** It's a one-page glossary that explains every name in plain terms.
 :::
 
-## Why projects plug into Tapestry
+## The one sentence
 
-The headline value: **intelligence spreads across repositories.** Every Tapestry-consuming project shares one memory store, one cross-agent communication channel, one pattern-recognition layer. Three concrete things flow:
+**Tapestry is a system for observing how work evolves and deciding what should become durable structure.**
+
+If you remember nothing else from these docs, remember that sentence. Everything else is one face of it.
+
+## Five things that all turn out to be the same thing
+
+You will see Tapestry described as each of these. All five are true:
+
+1. A memory system (the agent's understanding of project shape persists across sessions)
+2. An observability system (you can ask what's happening in any project right now)
+3. An upskilling system (recurring work becomes reusable skills, agents, tools)
+4. A project portfolio system (the same loop applied across many projects compounds)
+5. A human/agent coordination system (humans correct agents inside that loop)
+
+They feel like different products because they target different surfaces. They aren't different products. They are five faces of *observe shape, decide what becomes structure*.
+
+If you ever feel lost in the docs, ask yourself: *which face of the loop is this describing?* That usually resolves the confusion.
+
+The two pages that ground every other page on this site:
+
+- **[Project shape](/start/project-shape/)** — the unifying concept. A project has observable structure beyond just its code; that structure changes over time; Tapestry exists to watch those changes.
+- **[What Tapestry is not](/start/what-tapestry-is-not/)** — anchoring against the false analogies (LangSmith, Grafana, AgentOps, Memory MCP, Knowledge Graph) readers reach for first.
+
+## Why projects plug in
+
+**Intelligence spreads across repositories.** Every Tapestry-consuming project shares one memory store, one cross-agent communication channel, one pattern-recognition layer. Three concrete things flow:
 
 - **Memory persists across sessions and across projects** — a correction you give in one project becomes a binding rule the agent applies next session, and a sibling project's agent sees it too.
 - **Agents update each other directly** — a memo written in one project's session is in the next session's auto-recall context for a sibling project, before the operator even types a message.
 - **Patterns and skills spread** — repeated behavior the observer notices in one project becomes a candidate; recurring across multiple projects, it becomes a stronger candidate for promotion into a reusable skill every project can invoke by name.
 
-This compounding cross-project intelligence is what makes the platform worth wiring into. The rest of this site is the operator-facing detail on the wiring itself.
-
-See [Sharing intelligence across projects](/explanation/sharing-intelligence-across-projects/) for how the mechanism works, and [How the platform upskills itself](/explanation/upskilling/) for how repeated work becomes durable structure (tools, subagents, skills, agents) over time.
+This is the loop applied across many projects rather than one. See [Sharing intelligence across projects](/explanation/sharing-intelligence-across-projects/) for how the mechanism works, and [How the platform upskills itself](/explanation/upskilling/) for how repeated work becomes durable structure (tools, subagents, skills, agents) over time.
 
 ## Who this is for
 
@@ -41,12 +64,20 @@ You are setting up a project that plugs into the Tapestry platform. You want the
 
 You do not need to know every internal mechanic. You need to know which files are load-bearing, what each one does, and how to recover when one of them goes missing.
 
-## What this site explains
+## Recommended reading order
 
-- The stack of plugins, MCP wiring, hooks, and configuration files that make the agent in your project behave consistently across sessions.
-- Why each piece exists. (If you don't know what something does, you will eventually delete or move it. Knowing why prevents that.)
-- How to set up a new project so the stack is wired correctly from day one.
-- How to recover when the agent starts drifting — usually because something small went missing.
+In order:
+
+1. **[Project shape](/start/project-shape/)** — the unifying concept
+2. **[What Tapestry is not](/start/what-tapestry-is-not/)** — anchoring against false frames
+3. **[The signal hierarchy](/explanation/signal-hierarchy/)** — Events → Signals → Patterns → Candidates → Skills → Structure
+4. **[The observer](/explanation/the-observer/)** — the central character of the loop
+5. **[How the platform upskills itself](/explanation/upskilling/)** — the loop from shape change to durable structure
+6. **[Sharing intelligence across projects](/explanation/sharing-intelligence-across-projects/)** — the loop applied across the fleet
+7. **[The memory MCP](/explanation/memory-mcp/)** — the substrate the observer reads/writes
+8. **[The plugins](/explanation/plugins/)** + **[The discipline stack](/explanation/discipline-stack/)** + **[Architecture snapshots](/explanation/architecture-snapshots/)** — the concrete moving parts
+
+Read in that order and the system snaps into focus. Read in any other order and you may end up mapping it onto something it isn't.
 
 ## What this site covers — and what lives elsewhere
 
@@ -61,8 +92,8 @@ Companion material lives in dedicated places:
 ## Find what you need
 
 <CardGrid>
-  <Card title="Why your agent stays on track" icon="information">
-    The discipline stack — what each piece is and why removing one breaks the whole project.
+  <Card title="The unifying frame" icon="open-book">
+    Project shape + what Tapestry is not. Start here if you've heard mixed messages about what this thing is.
   </Card>
   <Card title="Set up a new project" icon="rocket">
     Concrete steps to wire a new project so it gets the same discipline as the existing ones.

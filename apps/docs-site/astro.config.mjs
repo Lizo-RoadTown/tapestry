@@ -25,11 +25,17 @@ export default defineConfig({
         },
       ],
       // Explicit sidebar. The full v1 scope is visible.
+      // Ordering reflects the recommended reading sequence: unifying frame
+      // (project shape + what Tapestry is not) before the loop's mechanics
+      // (signal hierarchy + the observer) before specifics (plugins, memory,
+      // discipline stack, architecture snapshots).
       sidebar: [
         {
           label: "Start here",
           items: [
             { label: "Overview", slug: "index" },
+            { label: "Project shape", slug: "start/project-shape" },
+            { label: "What Tapestry is not", slug: "start/what-tapestry-is-not" },
             { label: "Names you'll see in these docs", slug: "start/names-you-will-see" },
             { label: "What keeps a project on track", slug: "start/what-stays-on-track" },
           ],
@@ -37,12 +43,13 @@ export default defineConfig({
         {
           label: "How it works",
           items: [
-            { label: "The discipline stack (orientation)", slug: "explanation/discipline-stack" },
-            { label: "Sharing intelligence across projects", slug: "explanation/sharing-intelligence-across-projects" },
-            { label: "How the platform upskills itself", slug: "explanation/upskilling" },
-            { label: "The plugins", slug: "explanation/plugins" },
-            { label: "The memory MCP", slug: "explanation/memory-mcp" },
+            { label: "The signal hierarchy", slug: "explanation/signal-hierarchy" },
             { label: "The observer", slug: "explanation/the-observer" },
+            { label: "How the platform upskills itself", slug: "explanation/upskilling" },
+            { label: "Sharing intelligence across projects", slug: "explanation/sharing-intelligence-across-projects" },
+            { label: "The memory MCP", slug: "explanation/memory-mcp" },
+            { label: "The plugins", slug: "explanation/plugins" },
+            { label: "The discipline stack (orientation)", slug: "explanation/discipline-stack" },
             { label: "Architecture snapshots", slug: "explanation/architecture-snapshots" },
           ],
         },

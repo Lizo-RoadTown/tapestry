@@ -1,0 +1,406 @@
+---
+/**
+ * The Observatory — the User-Agent Interface console.
+ *
+ * Lives inside the docs site (same Astro project / deploy / domain), at /observatory.
+ * Governed by docs/canon/user-agent-interface-observatory.md: the first-class object
+ * is the user-agent interface; projects are containers; the signal dimensions attach
+ * per interface, each carrying an honest availability tag.
+ *
+ * Style: translated from the SDE_Extraction dashboard design system (warm near-black,
+ * Instrument Serif / Inter / JetBrains Mono, semantic tokens where ABSENT is a
+ * first-class marked state). No Tailwind here (Starlight site) — tokens are plain CSS.
+ *
+ * Honesty rule (canon + UX contract): present "fills"; absent is a marked state, never a
+ * blank. Most interface signal is not instrumented yet — this view says so per signal,
+ * it does not fabricate.
+ */
+
+type Avail = "available" | "planned" | "missing";
+
+const SIGNALS = [
+  "shape",
+  "observer",
+  "upskilling",
+  "policy",
+  "memory",
+  "friction",
+  "runtime",
+] as const;
+type SignalKey = (typeof SIGNALS)[number];
+
+const SIGNAL_LABEL: Record<SignalKey, string> = {
+  shape: "Architecture / shape",
+  observer: "Observer findings",
+  upskilling: "Upskilling candidates",
+  policy: "Policy / audit",
+  memory: "Memory",
+  friction: "Friction",
+  runtime: "Runtime",
+};
+
+// Grounded default availability for today's platform (see canon + ADR-0001 +
+// runtime-observation-deferred). These are platform-wide truths, not per-interface
+// guesses, so the same defaults apply until per-interface instrumentation exists.
+const DEFAULT_AVAIL: Record<SignalKey, Avail> = {
+  shape: "available", // architecture snapshots/diffs exist per repo
+  memory: "available", // agent-context MCP: writes + recalls are live
+  policy: "planned", // policy/audit services exist; per-interface attribution does not
+  observer: "planned", // self-observer = static shape-drift only; not per-interface
+  upskilling: "planned", // candidate→decision loop exists for one tenant; not attributed
+  friction: "missing", // feedback/lesson memos exist but are not aggregated/attributed
+  runtime: "missing", // runtime invocation/session signals are not instrumented
+};
+
+type Interface = {
+  name: string;
+  purpose: string;
+  agentRole: string;
+  status: "active" | "emerging" | "stable" | "degraded";
+  // per-signal overrides; otherwise DEFAULT_AVAIL applies
+  signals?: Partial<Record<SignalKey, Avail>>;
+};
+
+type Project = {
+  id: string;
+  kind: string;
+  blurb: string;
+  interfaces: Interface[];
+};
+
+// First-pass, DERIVED interface set (illustrative). Interfaces are not yet
+// instrumented; these are derived from each project's shape + agent roles to make
+// the model concrete. Labeled as derived throughout — not a live readout.
+const FLEET: Project[] = [
+  {
+    id: "tapestry",
+    kind: "platform monorepo",
+    blurb: "The canonical system-of-record. Migration choreography + the platform's own coordination surfaces.",
+    interfaces: [
+      {
+        name: "Migration choreography",
+        purpose: "Operator directs each migration step; the agent lifts/refactors a piece and opens a PR.",
+        agentRole: "Tapestry-agent",
+        status: "active",
+        signals: { policy: "available", upskilling: "planned" },
+      },
+      {
+        name: "Cross-agent memory coordination",
+        purpose: "Operator + multiple agents stay in sync through loom-memory; drift is caught early.",
+        agentRole: "Tapestry-agent · loom-agent",
+        status: "active",
+        signals: { memory: "available", friction: "planned" },
+      },
+    ],
+  },
+  {
+    id: "the-loom",
+    kind: "platform prototype (legacy source)",
+    blurb: "Services, observer, registry, policy, dashboard. Migrating into Tapestry piece by piece.",
+    interfaces: [
+      {
+        name: "Promotion review",
+        purpose: "Operator promotes/holds/rejects observer candidates; the decision is filed and applied.",
+        agentRole: "operator + policy service",
+        status: "stable",
+        signals: { observer: "available", upskilling: "available", policy: "available" },
+      },
+    ],
+  },
+  {
+    id: "Make_Skills",
+    kind: "engine prototype (legacy source)",
+    blurb: "Skill compiler + bridge. Engine logic migrated to Tapestry (Step 4).",
+    interfaces: [
+      {
+        name: "Skill compilation",
+        purpose: "Repeated behavior is compiled into a durable skill; operator gates promotion.",
+        agentRole: "engine + operator",
+        status: "stable",
+        signals: { upskilling: "available", policy: "available" },
+      },
+    ],
+  },
+  {
+    id: "SDE_Extraction",
+    kind: "research consuming project",
+    blurb: "Literature → structured SDE models. The Agent Drafts / Human validated integrity boundary.",
+    interfaces: [
+      {
+        name: "Extraction curation",
+        purpose: "Agent extracts a model from a paper; operator validates and promotes drafts to Human validated.",
+        agentRole: "extraction agent",
+        status: "active",
+        signals: { friction: "planned", shape: "available" },
+      },
+      {
+        name: "Research synthesis",
+        purpose: "Operator asks for synthesis across sources; agent runs the deep-research pattern.",
+        agentRole: "research agent",
+        status: "emerging",
+      },
+    ],
+  },
+];
+
+function avail(p: Project, i: Interface, s: SignalKey): Avail {
+  return i.signals?.[s] ?? DEFAULT_AVAIL[s];
+}
+
+const STATE_LABEL: Record<Avail, string> = {
+  available: "available now",
+  planned: "planned signal",
+  missing: "missing instrumentation",
+};
+
+// roll-up: how many signal dimensions are available for a project's interfaces
+function rollup(p: Project) {
+  let avl = 0,
+    tot = 0;
+  for (const i of p.interfaces)
+    for (const s of SIGNALS) {
+      tot++;
+      if (avail(p, i, s) === "available") avl++;
+    }
+  return { avl, tot };
+}
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>The Observatory — Tapestry</title>
+    <meta
+      name="description"
+      content="The User-Agent Interface console: for every connected project, the interfaces where operator and agents meet — and what signal is available, planned, or missing."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="wordmark" href="/">Tapestry</a>
+      <nav class="topnav">
+        <a href="/">Docs</a>
+        <a class="here" href="/observatory">Observatory</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <h1 class="display">The <span class="display-accent">Observatory</span></h1>
+        <p class="lede">
+          For every connected project, the <strong>user-agent interfaces</strong> — the recurring
+          surfaces where the operator expresses intent and an agent acts — and what the platform can
+          currently see at each one.
+        </p>
+        <p class="canon-note">
+          Governed by the canon
+          <a href="https://github.com/Lizo-RoadTown/tapestry/blob/main/docs/canon/user-agent-interface-observatory.md"
+            >User-Agent Interface Observatory</a
+          >: the interface is the first-class object; projects are containers; the signal dimensions
+          attach per interface.
+        </p>
+      </section>
+
+      <section class="honesty">
+        <span class="dot missing"></span>
+        <p>
+          Most interface signal is <strong>not instrumented yet</strong>. This console shows the model
+          and, per signal, whether it is available now, planned, or missing — it does not fabricate a
+          reading. Absence is shown as a marked state, never as a blank.
+        </p>
+      </section>
+
+      <section class="legend">
+        <span class="chip available"><span class="dot available"></span>available now</span>
+        <span class="chip planned"><span class="dot planned"></span>planned signal</span>
+        <span class="chip missing"><span class="dot missing"></span>missing instrumentation</span>
+      </section>
+
+      <section class="fleet">
+        {
+          FLEET.map((p) => {
+            const r = rollup(p);
+            return (
+              <article class="project">
+                <div class="project-head">
+                  <div>
+                    <h2 class="mono project-id">{p.id}</h2>
+                    <span class="kind">{p.kind}</span>
+                  </div>
+                  <span class="rollup mono" title="signal dimensions available across this project's interfaces">
+                    {r.avl}/{r.tot} signals available
+                  </span>
+                </div>
+                <p class="blurb">{p.blurb}</p>
+
+                <div class="interfaces">
+                  {p.interfaces.map((i) => (
+                    <div class="iface">
+                      <div class="iface-head">
+                        <span class={`status status-${i.status}`}>{i.status}</span>
+                        <h3 class="iface-name">{i.name}</h3>
+                      </div>
+                      <p class="iface-purpose">{i.purpose}</p>
+                      <p class="iface-role mono">agent: {i.agentRole}</p>
+                      <div class="signals">
+                        {SIGNALS.map((s) => {
+                          const a = avail(p, i, s);
+                          return (
+                            <span class={`sig ${a}`} title={STATE_LABEL[a]}>
+                              <span class={`dot ${a}`} />
+                              {SIGNAL_LABEL[s]}
+                            </span>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </article>
+            );
+          })
+        }
+      </section>
+
+      <footer class="foot">
+        <p class="mono">
+          Interfaces shown are <strong>derived</strong> (first-pass, illustrative) from project shape +
+          agent roles — not a live readout. Per-interface instrumentation is the open build (proposal:
+          Project Observatory console, P1).
+        </p>
+      </footer>
+    </main>
+
+    <style is:global>
+      /* --- SDE_Extraction design tokens (warm near-black; absent is first-class) --- */
+      :root {
+        color-scheme: dark;
+        --surface: #0a0d0e;
+        --surface-raised: #16191b;
+        --edge: #2a2f31;
+        --ink: #f3f5f4;
+        --ink-dim: #c4ccca;
+        --ink-faint: #8b9492;
+        --font-display: "Instrument Serif", Georgia, serif;
+        --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+        --font-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+        --brand: #5fd3da;
+        /* availability = the three honest states, mapped to SDE semantics */
+        --available: #8fa99b; /* present / sage */
+        --available-soft: #8fa99b12;
+        --available-edge: #8fa99b33;
+        --planned: #d8b06a; /* attention / amber */
+        --planned-soft: #d8b06a1a;
+        --planned-edge: #d8b06a40;
+        --missing: #c4ccca; /* absent / neutral marked */
+        --missing-soft: #2a2f3166;
+      }
+      * { box-sizing: border-box; }
+      html, body { height: 100%; }
+      body {
+        margin: 0;
+        background:
+          radial-gradient(120% 80% at 50% 120%, #5fd3da12 0%, transparent 60%),
+          var(--surface);
+        background-attachment: fixed;
+        color: var(--ink);
+        font-family: var(--font-sans);
+        -webkit-font-smoothing: antialiased;
+        font-size: 15px;
+        line-height: 1.5;
+      }
+      a { color: inherit; }
+      .mono { font-family: var(--font-mono); }
+      .display { font-family: var(--font-display); font-weight: 400; letter-spacing: 0.01em; }
+      .display-accent { font-family: var(--font-display); font-style: italic; color: var(--brand); }
+
+      .topbar {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 16px 24px; border-bottom: 1px solid var(--edge);
+        position: sticky; top: 0; z-index: 10;
+        background: #0a0d0ecc; backdrop-filter: blur(8px);
+      }
+      .wordmark { font-family: var(--font-display); font-size: 20px; text-decoration: none; }
+      .topnav { display: flex; gap: 18px; font-size: 14px; }
+      .topnav a { color: var(--ink-faint); text-decoration: none; }
+      .topnav a:hover { color: var(--ink); }
+      .topnav a.here { color: var(--ink); }
+
+      main { max-width: 1080px; margin: 0 auto; padding: 40px 24px 80px; }
+      .hero h1 { font-size: clamp(40px, 6vw, 64px); margin: 0 0 12px; line-height: 1.05; }
+      .lede { font-size: 18px; color: var(--ink-dim); max-width: 70ch; margin: 0 0 10px; }
+      .canon-note { font-size: 13px; color: var(--ink-faint); max-width: 70ch; }
+      .canon-note a, .lede a { color: var(--brand); text-decoration: none; }
+      .canon-note a:hover { text-decoration: underline; }
+
+      .honesty {
+        display: flex; gap: 12px; align-items: flex-start;
+        margin: 28px 0; padding: 14px 16px;
+        border: 1px solid var(--edge); border-radius: 14px; background: var(--surface-raised);
+      }
+      .honesty p { margin: 0; font-size: 14px; color: var(--ink-dim); }
+
+      .legend { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; }
+      .chip {
+        display: inline-flex; align-items: center; gap: 7px;
+        padding: 4px 10px; border-radius: 999px; font-size: 12px; border: 1px solid var(--edge);
+      }
+      .chip.available { color: var(--available); border-color: var(--available-edge); background: var(--available-soft); }
+      .chip.planned { color: var(--planned); border-color: var(--planned-edge); background: var(--planned-soft); }
+      .chip.missing { color: var(--ink-faint); background: var(--missing-soft); }
+
+      .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex: none; }
+      .dot.available { background: var(--available); }
+      .dot.planned { background: var(--planned); }
+      .dot.missing { background: var(--missing); opacity: 0.5; }
+
+      .fleet { display: grid; gap: 18px; }
+      .project {
+        border: 1px solid var(--edge); border-radius: 18px; padding: 20px;
+        background: color-mix(in srgb, var(--surface-raised) 60%, transparent);
+      }
+      .project-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+      .project-id { font-size: 18px; margin: 0; }
+      .kind { font-size: 12px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.06em; }
+      .rollup { font-size: 12px; color: var(--ink-dim); }
+      .blurb { color: var(--ink-dim); font-size: 14px; margin: 8px 0 16px; max-width: 80ch; }
+
+      .interfaces { display: grid; gap: 12px; }
+      .iface {
+        border: 1px solid var(--edge); border-radius: 14px; padding: 14px 16px;
+        background: var(--surface);
+      }
+      .iface-head { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+      .iface-name { font-size: 15px; margin: 0; font-weight: 600; }
+      .status {
+        font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em;
+        padding: 2px 7px; border-radius: 999px; border: 1px solid var(--edge); color: var(--ink-faint);
+      }
+      .status-active { color: var(--available); border-color: var(--available-edge); }
+      .status-emerging { color: var(--brand); border-color: #5fd3da40; }
+      .status-degraded { color: var(--planned); border-color: var(--planned-edge); }
+      .iface-purpose { font-size: 13px; color: var(--ink-dim); margin: 4px 0; }
+      .iface-role { font-size: 12px; color: var(--ink-faint); margin: 0 0 10px; }
+
+      .signals { display: flex; flex-wrap: wrap; gap: 6px; }
+      .sig {
+        display: inline-flex; align-items: center; gap: 6px;
+        font-size: 11px; padding: 3px 8px; border-radius: 8px; border: 1px solid var(--edge);
+      }
+      .sig.available { color: var(--available); border-color: var(--available-edge); background: var(--available-soft); }
+      .sig.planned { color: var(--planned); border-color: var(--planned-edge); background: var(--planned-soft); }
+      .sig.missing { color: var(--ink-faint); border-style: dashed; background: transparent; }
+
+      .foot { margin-top: 28px; }
+      .foot p { font-size: 12px; color: var(--ink-faint); max-width: 80ch; }
+    </style>
+  </body>
+</html>

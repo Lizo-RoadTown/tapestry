@@ -41,7 +41,8 @@ Each row:
 | `Make_Skills/core/skill_making/compiler.py` | `tapestry/engine/skill-compiler/python/skill_compiler/compiler.py` | **Refactor** | Imported (Step 4, 2026-06-21) | import paths rewritten to Tapestry layout; bodies unchanged; compile + resolution verified |
 | `Make_Skills/services/skill_making/` (9 modules + tests) | `tapestry/services/skill-making/python/skill_making/` | **Refactor** | Imported (Step 4, 2026-06-21) | imports rewritten; **`hmac_verify.py`+`models.py` byte-identical** (wire contract); sys.path bootstrap; **deploy shape TBD** |
 | `the-loom/loom-cli/` (`loom_cli/` + pyproject) | `tapestry/packages/cli/` | Lift | Imported (Step 5a, 2026-06-21) | byte-identical (`cmp`); stdlib-only; URL-env-driven; `loom_cli` resolves; not published yet |
-| starter repos (web-starter, project-starter, classroom-hub-starter, SDE_Extraction, ux-starter) | `tapestry/templates/{software,classroom,research,operations}-project/` | (Step 5b) Rewrite/curate | Pending | NOT a lift — curate template from full starter apps; per §6.5 Decision 6 |
+| `project-starter/templates/_common/` + `ui-app/` | `tapestry/templates/software-project/` | (Step 5b) Assemble (lift slices) | Imported (Step 5b, 2026-06-21) | self-contained scaffold; `_common` base + `ui-app` overlay; placeholder-driven (`{{…}}`); `.mcp.json` wires loom-memory at same URL |
+| `classroom-hub-starter` / `SDE_Extraction` / (operations: no source yet) | `tapestry/templates/{classroom,research,operations}-project/` | (Step 5b) Assemble/curate | Pending | **TAXONOMY FORK:** project-starter splits by app-type (ui/agent); Tapestry by domain. classroom←classroom-hub-starter, research←SDE_Extraction, operations source UNRESOLVED — needs operator |
 
 ## Template
 
@@ -59,3 +60,5 @@ When adding a row, copy this:
 | 2026-06-20 | Step 2 (PR #5/#7) | `services/agent-context/` lift + `001_init_memory.sql` + staging render.yaml | Merged; **staging deployed + parity GREEN**; prod re-source gated on operator |
 | 2026-06-20 | Step 3 (PR #8) | `services/project-registry/` lift + `002_init_projects.sql` | Merged to main; no deploy |
 | 2026-06-21 | Step 4 (branch `migration/04-engine`) | engine **Refactor**: `skill-compiler` + `skill-making` (import rewrites, bridge contract preserved) | Code refactored + verified; runbook `proposed`; deploy shape TBD; no deploy |
+| 2026-06-21 | Step 5a (PR #12) | `packages/cli/` lift (`loom_cli`) | Merged to main (`fe6888f`); not published |
+| 2026-06-21 | Step 5b (branch `migration/05b-software-template`) | `templates/software-project/` assembled from `project-starter` `_common`+`ui-app` | First template; other 3 kinds pending taxonomy/source decision |

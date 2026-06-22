@@ -60,38 +60,44 @@ For why each mechanism exists and how they form a recursive loop where miscommun
 
 The mechanisms above don't exist in the abstract — they're concrete pieces wired into your project repo plus pieces hosted on the platform side.
 
+Two simpler diagrams beat one dense one. First, what's in your repo and what each piece enables on the platform:
+
 ```mermaid
-flowchart LR
-  subgraph PROJECT["Your project repo"]
-    direction TB
-    MCP[".mcp.json<br/>declares MCP servers"]
-    SETTINGS[".claude/settings.json<br/>enables plugins"]
+flowchart TB
+  subgraph PROJECT["Your project repo (5 files)"]
+    SETTINGS[".claude/settings.json"]
+    MCP[".mcp.json"]
     ENV[".env<br/>LOOM_PROJECT_ID"]
-    PI[".project-intelligence/<br/>per-project agent config"]
-    SNAP["scripts/architecture_*.py<br/>+ docs/architecture-snapshots/"]
+    PI[".project-intelligence/"]
+    SNAP["scripts/architecture_*.py"]
   end
 
-  subgraph PLATFORM["Tapestry platform"]
-    direction TB
+  subgraph PLATFORM["Tapestry platform (hosted)"]
     PLUGIN1["loom-discipline plugin"]
     PLUGIN2["liz-patterns plugin"]
-    PLUGIN3["per-project guard plugin<br/>(optional)"]
-    MEMORY["loom-memory MCP server<br/>(hosted)"]
+    PLUGIN3["per-project guard<br/>(optional)"]
+    MEMORY["loom-memory MCP"]
   end
 
-  AGENT(["Agent session"])
+  SETTINGS -->|enables| PLUGIN1
+  SETTINGS -->|enables| PLUGIN2
+  SETTINGS -->|enables| PLUGIN3
+  MCP -->|wires| MEMORY
+  ENV -->|scopes hooks| PLUGIN1
+  PLUGIN1 -->|reads| MEMORY
+  PLUGIN2 -->|hosts scripts| SNAP
+```
 
-  MCP -->|"wires"| MEMORY
-  SETTINGS -->|"enables"| PLUGIN1
-  SETTINGS -->|"enables"| PLUGIN2
-  SETTINGS -->|"enables"| PLUGIN3
-  PLUGIN1 -->|"declares"| MEMORY
-  PLUGIN1 -->|"4 hooks"| AGENT
-  PLUGIN3 -->|"project-specific hooks"| AGENT
-  PLUGIN2 -->|"hosts canonical scripts"| SNAP
-  ENV -->|"scopes hooks +<br/>tags memory writes"| PLUGIN1
-  PI -->|"per-project agent profile"| AGENT
-  SNAP -->|"snapshot pipeline<br/>at SessionStart"| AGENT
+Then how each piece reaches the agent in your session:
+
+```mermaid
+flowchart TB
+  PLUGIN1["loom-discipline"] -->|4 hooks| AGENT
+  PLUGIN3["per-project guard"] -->|project hooks| AGENT
+  MEMORY["loom-memory MCP"] -->|recall on SessionStart| AGENT
+  PI[".project-intelligence/"] -->|agent profile| AGENT
+  SNAP["scripts/architecture_*.py"] -->|snapshot on SessionStart| AGENT
+  AGENT(["Agent session"])
 ```
 
 The five concrete pieces in your repo:

@@ -68,7 +68,7 @@ The Tapestry dashboard reads from OTel-backed telemetry. It is not Grafana. Graf
 
 ## Current state
 
-The transport is wired ([`the-loom/adapters/claude-code/loom-discipline/scripts/_observability.py`](https://github.com/Lizo-RoadTown/the-loom/blob/main/adapters/claude-code/loom-discipline/scripts/_observability.py)) — OTLP/HTTP push to Grafana Cloud via raw urllib, no SDK dependency.
+The transport is wired ([`integrations/claude-code/tapestry-discipline/scripts/_observability.py`](https://github.com/Lizo-RoadTown/tapestry/blob/main/integrations/claude-code/tapestry-discipline/scripts/_observability.py)) — OTLP/HTTP push to Grafana Cloud via raw urllib, no SDK dependency. The same source also lives in `the-loom/adapters/claude-code/loom-discipline/scripts/_observability.py` during the transition window; both copies are byte-identical per PR #42.
 
 Current attributes per event: `hook_name`, `event`, `exit_code`, `elapsed_ms`, `action`, `note`. The `note` field carries unstructured strings (`out_of_scope`, `malformed_input`, etc.) that this contract is meant to replace with typed attributes.
 

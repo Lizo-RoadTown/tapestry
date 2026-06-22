@@ -49,8 +49,8 @@ your-project/scripts/architecture_diff.py       ← thin wrapper (~50 lines)
 Each wrapper looks up the canonical implementation in the `tapestry-patterns` plugin and dispatches to it with your repo root as an argument. The canonical bodies live at:
 
 ```
-~/.claude/plugins/cache/lizo-skills/liz-patterns/<version>/scripts/architecture_snapshot.py
-~/.claude/plugins/cache/lizo-skills/liz-patterns/<version>/scripts/architecture_diff.py
+~/.claude/plugins/cache/tapestry/tapestry-patterns/<version>/scripts/architecture_snapshot.py
+~/.claude/plugins/cache/tapestry/tapestry-patterns/<version>/scripts/architecture_diff.py
 ```
 
 This is the Pillar 1 discipline (ONE pattern, ONE home) applied to the snapshot scripts: every project shares the same canonical implementation, so when the canonical evolves, every project gets the improvement on next pull. The per-project wrappers exist only so existing callers (the SessionStart hook, CI, manual `python scripts/architecture_snapshot.py` invocation) keep working — they're a routing layer, not a copy.
@@ -59,7 +59,7 @@ If the canonical isn't found, the wrapper writes a clear error pointing you to i
 
 ## When the snapshot fires
 
-The `loom-discipline` plugin's `SessionStart` hook does this on every new conversation:
+The `tapestry-discipline` plugin's `SessionStart` hook does this on every new conversation:
 
 1. Looks for `scripts/architecture_snapshot.py` in your repo.
 2. If it's missing, logs `snapshot_script_absent` and silently no-ops on the snapshot piece. Session still proceeds. **You lose the architecture context but everything else works.**
@@ -127,6 +127,6 @@ Neither is actually expensive to lose — both are recoverable. But losing them 
 ## Related
 
 - [The discipline stack](/explanation/discipline-stack/) — how the snapshot fits with the other pieces
-- [The plugins](/explanation/plugins/) — the SessionStart hook in the `loom-discipline` plugin is what runs the pipeline
+- [The plugins](/explanation/plugins/) — the SessionStart hook in the `tapestry-discipline` plugin is what runs the pipeline
 - [Load-bearing files](/reference/load-bearing-files/) — file-by-file reference
 - [Recover from common failures](/how-to/recover-from-common-failures/) — symptoms when this breaks

@@ -49,7 +49,7 @@ The prior `/plugin install loom-discipline@lizo-loom` (sourced from the-loom) st
 **What it does:**
 - Hosts the reusable agents and skills (`documentation`, `deep-research-pattern`, `next-actions-planning`, `infrastructure-mapping`, `agentic-skill-design`, `proposal-authoring`, and others).
 - Hosts the canonical implementations of the architecture-snapshot scripts that your project's `scripts/architecture_snapshot.py` thin wrappers dispatch to.
-- Provides the `liz-patterns:<name>` invocation surface so any project can invoke a canonical pattern by name.
+- Provides the `tapestry-patterns:<name>` invocation surface so any project can invoke a canonical pattern by name.
 
 **What you'd lose without it:**
 - The architecture-snapshot pipeline can't run (wrappers can't find the canonical → write an error → SessionStart hook proceeds without the snapshot).
@@ -69,11 +69,11 @@ The prior `/plugin install liz-patterns@lizo-skills` (sourced from claude-skills
 
 ## Per-project guards (the `sde-extraction-guard` pattern)
 
-**What they do:** add a project-specific discipline layer ON TOP of `loom-discipline`. The canonical example is `sde-extraction-guard`, which installs two hooks:
+**What they do:** add a project-specific discipline layer ON TOP of `tapestry-discipline`. The canonical example is `sde-extraction-guard`, which installs two hooks:
 - `UserPromptSubmit` — injects a framing-clarification gate that catches the recurring drift where the operator asks for a "layer" and the agent builds a separate deployed system.
 - `PostToolUse` (matched against `Edit|Write|MultiEdit`) — runs the project's existing `scripts/check_schema.py` after extraction-surface edits to block broken schemas.
 
-**Important: they COMPLEMENT `loom-discipline`, they don't replace it.** The `sde-extraction-guard` plugin's own `plugin.json` description says it explicitly. Both plugins should be enabled simultaneously.
+**Important: they COMPLEMENT `tapestry-discipline`, they don't replace it.** The `sde-extraction-guard` plugin's own `plugin.json` description says it explicitly. Both plugins should be enabled simultaneously.
 
 **Where the guard plugin lives:** in the project's own repo at `plugins/<your-guard-name>/`, AND cached at `~/.claude/plugins/cache/<marketplace>/<your-guard-name>/`. The worked example to copy from is [`sde-extraction-guard`](https://github.com/Lizo-RoadTown/sde-extraction/tree/main/plugins/sde-extraction-guard) — a project-specific guard plugin built for a real research project that consumes the platform.
 
@@ -87,9 +87,9 @@ A typical session start with all three enabled:
 flowchart TB
   start(["Claude Code session opens"])
 
-  start --> ldsess["loom-discipline<br/>SessionStart hook"]
+  start --> ldsess["tapestry-discipline<br/>SessionStart hook"]
   ldsess --> recall["calls v1/recall on loom-memory MCP"]
-  ldsess --> snapshot["runs architecture_snapshot.py<br/>(wrapper to liz-patterns)"]
+  ldsess --> snapshot["runs architecture_snapshot.py<br/>(wrapper to tapestry-patterns)"]
   recall --> inject1["injects memories as additionalContext"]
   snapshot --> inject2["injects snapshot diff narrative as additionalContext"]
   inject1 --> ready["Agent ready with full context"]
@@ -97,7 +97,7 @@ flowchart TB
 
   ready --> prompt["Operator sends a message"]
 
-  prompt --> ldprompt["loom-discipline<br/>UserPromptSubmit hook"]
+  prompt --> ldprompt["tapestry-discipline<br/>UserPromptSubmit hook"]
   prompt --> guardprompt["per-project guard<br/>UserPromptSubmit hook"]
   ldprompt --> probe["injects PROBE-discipline reminder"]
   guardprompt --> clarify["injects framing-clarification gate"]
@@ -107,13 +107,13 @@ flowchart TB
 
   agent --> edit["Agent performs an edit"]
 
-  edit --> ldedit["loom-discipline<br/>PreToolUse hook"]
+  edit --> ldedit["tapestry-discipline<br/>PreToolUse hook"]
   edit --> guardedit["per-project guard<br/>PostToolUse hook"]
   ldedit --> dualmode["dual-mode boundary check"]
   guardedit --> schema["schema validation"]
 
   agent --> stop["Turn ends"]
-  stop --> ldstop["loom-discipline<br/>Stop hook"]
+  stop --> ldstop["tapestry-discipline<br/>Stop hook"]
   ldstop --> audit["upskilling audit"]
   ldstop --> observer["Path A observer<br/>updates candidates"]
 ```
@@ -145,11 +145,11 @@ This is the most common source of "I added the plugin but nothing's happening" c
 Shows all plugins enabled for the current project. To see what's INSTALLED but maybe not enabled, look in the cache directly:
 
 ```sh
-ls ~/.claude/plugins/cache/lizo-loom/
-ls ~/.claude/plugins/cache/lizo-skills/
+ls ~/.claude/plugins/cache/tapestry/
+ls ~/.claude/plugins/cache/tapestry/
 ```
 
-Each plugin directory contains version subdirectories (e.g., `loom-discipline/0.1.13/`). Multiple versions can coexist; Claude Code uses whichever the marketplace currently points at.
+Each plugin directory contains version subdirectories (e.g., `tapestry-discipline/0.1.15/`). Multiple versions can coexist; Claude Code uses whichever the marketplace currently points at.
 
 ### Updating
 
@@ -207,13 +207,13 @@ You DO need a custom plugin when:
 
 - Your project has a recurring drift class that the general discipline doesn't catch. The canonical example: the `sde-extraction-guard` framing-clarification gate exists because one project kept hitting a specific drift where the operator asked for a "layer in the existing app" and the agent built a whole separate deployed system instead. The guard injects a per-turn gate that forces the agent to restate what kind of artifact it's building before scaffolding anything.
 - Your project has a project-specific invariant check that runs on every edit to a particular surface (schema integrity, contract conformance, lint that the general discipline doesn't enforce).
-- Your project bundles a methodology skill that's specific enough to belong with the project, not in the universal `liz-patterns`.
+- Your project bundles a methodology skill that's specific enough to belong with the project, not in the universal `tapestry-patterns`.
 
-The pattern: bundle a project's own `plugins/<name>/` directory in the repo, register it as a local marketplace via `.claude-plugin/marketplace.json`, and enable alongside `loom-discipline` in `.claude/settings.json`. Worked example to copy: [`sde-extraction-guard` in a real consuming project](https://github.com/Lizo-RoadTown/sde-extraction/tree/main/plugins/sde-extraction-guard).
+The pattern: bundle a project's own `plugins/<name>/` directory in the repo, register it as a local marketplace via `.claude-plugin/marketplace.json`, and enable alongside `tapestry-discipline` in `.claude/settings.json`. Worked example to copy: [`sde-extraction-guard` in a real consuming project](https://github.com/Lizo-RoadTown/sde-extraction/tree/main/plugins/sde-extraction-guard).
 
 ## Related
 
 - [The discipline stack](/explanation/discipline-stack/) — how plugins fit with MCP and per-project config
-- [Memory MCP](/explanation/memory-mcp/) — what the loom-memory MCP that `loom-discipline` wires actually does
+- [Memory MCP](/explanation/memory-mcp/) — what the loom-memory MCP that `tapestry-discipline` wires actually does
 - [Architecture snapshots](/explanation/architecture-snapshots/) — the snapshot pipeline that the SessionStart hook runs
 - [Load-bearing files](/reference/load-bearing-files/) — file-by-file reference of the plugin configs

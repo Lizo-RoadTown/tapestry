@@ -5,7 +5,7 @@ description: Step-by-step checklist to wire a new project so the agent in it get
 
 This is the procedural how-to for setting up a new project that plugs into the Tapestry platform. Follow it top to bottom in a fresh repo and you'll have the full discipline stack wired correctly from day one.
 
-If any of the names referenced below feel unfamiliar (`loom-discipline`, `lizo-loom`, etc.), see [Names you'll see in these docs](/start/names-you-will-see/) for one-line explanations.
+If any of the names referenced below feel unfamiliar (`tapestry-discipline`, `lizo-loom`, etc.), see [Names you'll see in these docs](/start/names-you-will-see/) for one-line explanations.
 
 For the concepts behind these steps, read [The discipline stack](/explanation/discipline-stack/) first. For recovery from failures, see [Recover from common failures](/how-to/recover-from-common-failures/).
 
@@ -13,8 +13,8 @@ For the concepts behind these steps, read [The discipline stack](/explanation/di
 
 - Claude Code installed and working.
 - `node` available (for plugin marketplace install).
-- The `lizo-loom` marketplace added to your Claude Code: `/plugin marketplace add Lizo-RoadTown/the-loom`. Confirm by running `/plugin marketplace list`.
-- (Optional, recommended) `lizo-skills` marketplace too, if you'll use the patterns plugin: `/plugin marketplace add Lizo-RoadTown/claude-skills-marketplace`.
+- The `tapestry` marketplace added to your Claude Code: `/plugin marketplace add Lizo-RoadTown/tapestry`. Confirm by running `/plugin marketplace list`.
+- (Optional, recommended) `tapestry` marketplace too, if you'll use the patterns plugin: `/plugin marketplace add Lizo-RoadTown/tapestry`.
 
 ## Step 1 — Pick a stable project ID
 
@@ -184,7 +184,7 @@ Plugin hooks bind at session start. To pick up the new plugin enable + MCP wirin
 After restart, you should see:
 
 1. A SessionStart auto-recall block at the start of the conversation, with relevant memories tagged for your project.
-2. A discipline reminder line at the top of every one of your messages: `[tapestry-discipline] Discipline check: PROBE files before asserting (cite file:line). Distinguish dev-tooling from runtime ...`
+2. A discipline reminder line at the top of every one of your messages: `[loom-discipline] Discipline check: PROBE files before asserting (cite file:line). Distinguish dev-tooling from runtime ...`
 3. `memory_recall`, `memory_write`, etc. available when you ask the agent to use them.
 4. If you ask the agent "check loom memory for what we did last session in this project," it actually does it.
 
@@ -195,6 +195,6 @@ If any of these don't appear, see [Recover from common failures](/how-to/recover
 - You don't need to clone the platform repos to build your project. Your project is a CONSUMER of the platform, not part of it.
 - You don't need to write your own discipline plugin unless you need project-specific guards beyond the general discipline.
 - You don't need to set up your own memory store. The hosted `loom-memory` MCP serves all consuming projects.
-- You don't need to put architecture-snapshot CODE in your repo — just the thin wrapper scripts that dispatch to the canonical scripts in `liz-patterns`.
+- You don't need to put architecture-snapshot CODE in your repo — just the thin wrapper scripts that dispatch to the canonical scripts in `tapestry-patterns`.
 
 The point of the platform is that the heavy infrastructure lives once (hosted; see [Names you'll see](/start/names-you-will-see/) for current host details), and consuming projects get the benefits with a small wiring layer per project.

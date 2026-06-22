@@ -1,19 +1,23 @@
 ---
 title: The observer
-description: The central character of Tapestry. The component that watches user-agent interfaces evolve over time and decides what's worth surfacing. Memory, telemetry, architecture snapshots, transcripts, and cross-project signals are its sensors; the candidate registry, policy, and skill compiler are its output pipeline.
+description: The component Tapestry uses to watch coordination health across many signals — memory, telemetry, architecture snapshots, transcripts, friction, corrections, interface lifecycle, cross-project signals. The observer isn't the system; it's the mechanism Tapestry uses to know when coordination needs reinforcement and when a coordination pattern has stabilized enough to earn durable structure.
 ---
 
-The observer is the central character of the platform. Read [User-agent interface](/start/user-agent-interface/), [Project shape](/start/project-shape/), and [What Tapestry is not](/start/what-tapestry-is-not/) before this page if you haven't already — the observer doesn't make sense outside that frame.
+The observer is the component Tapestry uses to watch coordination health. It is one of the reinforcement mechanisms.
 
-## Why the observer is first-class
+## What the observer is for
 
-Most platforms organize around their storage. *"We're a memory system."* *"We're a metrics database."* *"We're a vector store."* The storage is the noun; everything else is a feature on top.
+Tapestry exists to reinforce the coordination between operator and agents. To do that, the platform needs to know:
 
-Tapestry inverts that. The observer is the noun. Memory is one of its sensors. Telemetry is another. Architecture snapshots are a third. The candidate registry is its output. The policy gate is what acts on its decisions. The skill compiler is what materializes the result.
+- When coordination is healthy and proceeding without intervention
+- When coordination is degrading and needs reinforcement (which mechanism, where)
+- When a coordination pattern has stabilized enough to deserve durable structure
 
-What the observer is *for* is the [user-agent interface](/start/user-agent-interface/) — the recurring coordination surface between operator and agents. Everything below is evidence about how those interfaces are evolving; everything above is what the platform produces when an interface stabilizes enough to earn durable structure.
+That's what the observer is for. It synthesizes evidence from every reinforcement mechanism — memory health, telemetry, architecture changes, friction patterns, correction recurrence, interface lifecycle, cross-project signals — into a picture of *coordination quality and trajectory* that the platform's other mechanisms can act on.
 
-If you draw the platform with the observer at the center, the rest of the architecture falls into place:
+The observer is not the system. It is one of the mechanisms the system uses, alongside memory, telemetry, architecture analysis, friction analysis, correction analysis, upskilling, policy, and skill formation. It sits in the middle of the loop because its job is interpretation — turning evidence into decisions about where to reinforce.
+
+If you draw the platform with the observer in the middle, the rest of the architecture falls into place:
 
 ```mermaid
 flowchart TB
@@ -43,7 +47,7 @@ None of those sensors *is* the platform. They feed the platform's central reason
 
 ## What the observer watches for
 
-The observer's primary job is to track the lifecycle state of every user-agent interface it knows about, and to detect transitions between states early. The five lifecycle states (from [user-agent interface](/start/user-agent-interface/#interface-lifecycle)):
+The observer's primary job is to track **coordination health and trajectory** by synthesizing signals from many sources. Interface lifecycle is one of those signals — useful, but not the whole picture. The five interface lifecycle states (from [user-agent interfaces](/start/user-agent-interface/#what-the-observer-looks-at-when-it-watches-interfaces)):
 
 | State | What the observer surfaces |
 |---|---|
@@ -53,26 +57,26 @@ The observer's primary job is to track the lifecycle state of every user-agent i
 | **Degraded** | Failure signals; recurring corrections that aren't sticking; agent confusion across handoffs |
 | **Stabilized** | Pattern → candidate → durable structure pipeline; reusable skill emergence |
 
-Interface lifecycle is the *what*. The observer derives lifecycle state from underlying *shape* evidence — the four shape verbs from [project shape](/start/project-shape/#the-four-shape-verbs):
+Interface lifecycle is one input. The observer also reads from **project shape**, **memory health**, **telemetry signals**, **friction recurrence**, and **correction patterns** — the four shape verbs from [project shape](/start/project-shape/#the-four-shape-verbs) are one of the strongest signals about coordination change:
 
-| Shape verb | What it tells the observer about the interface |
+| Shape verb | What it tells the observer about coordination |
 |---|---|
-| **Drift** | An interface is becoming misaligned with operator intent; corrections aren't sticking |
-| **Stabilize** | An interface is converging — patterns becoming candidates becoming skills |
-| **Fragment** | One interface is fragmenting into incoherent variants across subagents or services |
-| **Cohere** | Multiple interface variants are converging on one canonical form |
+| **Drift** | Coordination is becoming misaligned with operator intent; corrections aren't sticking |
+| **Stabilize** | Coordination is converging — patterns becoming candidates becoming skills |
+| **Fragment** | Coordination is splitting into incoherent variants across subagents or services |
+| **Cohere** | Variant coordination patterns are converging on one canonical form |
 
 What the observer is **not** interested in:
 
 - Individual raw events (telemetry ingestion handles those)
 - Single-event state ("did this call succeed?" — that's observability's job, not the observer's)
-- Current architecture snapshots in isolation (those are inputs; the observer cares about *deltas* — what changed about which interface)
+- Current architecture snapshots in isolation (those are inputs; the observer cares about *deltas* — what changed and how that affects coordination)
 
 The observer sits at the *patterns* level of the [signal hierarchy](/explanation/signal-hierarchy/) — events flow through telemetry → signals → patterns before the observer touches them.
 
-## What each tracked interface carries
+## What the observer holds per tracked unit
 
-For each interface the observer tracks, it holds (per [user-agent interface](/start/user-agent-interface/#what-each-interface-carries)):
+For each interface the observer tracks (per [user-agent interfaces](/start/user-agent-interface/#what-each-tracked-interface-carries)):
 
 - **Purpose** — what coordination this surface supports
 - **Participating agents** — which agents and operator take part
@@ -80,11 +84,13 @@ For each interface the observer tracks, it holds (per [user-agent interface](/st
 - **Memory dependencies** — which memory entries the interface relies on
 - **Architecture dependencies** — which platform/repo structure supports it
 - **Runtime signals** — telemetry exposing how the interface is being exercised
-- **Friction signals** — where the interface is misaligned with intent
+- **Friction signals** — where coordination at this interface is misaligned with intent
 - **Correction history** — what the operator has corrected and when
-- **Candidate durable structures** — what could earn promotion if the interface stabilizes
+- **Candidate durable structures** — what could earn promotion if this pattern stabilizes
 
-Today's observer implementation tracks a subset of this (skills invoked + recurring patterns from the upskilling report + cross-repo signal-rule output). The full set is the target shape; the gap between target and current is one of the open architectural questions.
+Interfaces are one tracked unit. The observer also tracks longer-running coordination patterns that span interfaces — recurring friction shapes, cross-project skill emergence, architecture changes affecting many surfaces at once. The full picture is *coordination quality across the project, not just per-interface state*.
+
+Today's implementation tracks a subset (skills invoked + recurring patterns from the upskilling report + cross-repo signal-rule output). The full set is the target shape; the gap is one of the open architectural questions.
 
 ## The two observer implementations
 

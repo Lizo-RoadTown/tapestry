@@ -1,124 +1,47 @@
 ---
 title: Tapestry
-description: A user/agent support and reinforcement system. Projects, interfaces, memory, telemetry, observability, architecture analysis, friction analysis, and upskilling are mechanisms used to observe, strengthen, stabilize, and evolve coordination between the operator and agents.
+description: A user/agent support and reinforcement system. The mechanisms — memory, telemetry, observability, architecture analysis, friction analysis, upskilling — observe, strengthen, and stabilize coordination between the operator and agents.
 template: splash
 hero:
-  tagline: Tapestry is a user/agent support and reinforcement system. Its purpose is to strengthen, stabilize, and evolve coordination between the operator and the agents working on their behalf — across many projects, over time. Memory, telemetry, observability, architecture analysis, friction analysis, correction analysis, upskilling, policy, and skill formation are reinforcement mechanisms it uses.
+  tagline: Tapestry strengthens coordination between you and the agents working on your behalf — across many projects, over time.
   actions:
-    - text: What Tapestry is not
-      link: /start/what-tapestry-is-not/
-      icon: right-arrow
-    - text: Project shape
-      link: /start/project-shape/
-      variant: secondary
     - text: Set up a new project
       link: /how-to/set-up-a-new-project/
-      icon: external
+      icon: rocket
+    - text: The agent is drifting
+      link: /how-to/recover-from-common-failures/
+      icon: warning
+      variant: secondary
+    - text: What Tapestry is not
+      link: /start/what-tapestry-is-not/
       variant: minimal
 ---
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
 
-:::note[First-time reader?]
-These docs reference a few transitional names from the platform's beta period — `the-loom`, `Make_Skills`, `SDE_Extraction`, plugin marketplaces called `lizo-loom` and `lizo-skills`. **If any name feels unfamiliar, see [Names you'll see in these docs](/start/names-you-will-see/) first.** It's a one-page glossary that explains every name in plain terms.
-:::
-
-## What Tapestry is
+## What it is
 
 Tapestry is a user/agent support and reinforcement system.
 
-Projects, interfaces, memory, telemetry, observability, architecture analysis, friction analysis, and upskilling are mechanisms used to observe, strengthen, stabilize, and evolve coordination between the operator and agents.
+Memory, telemetry, observability, architecture analysis, friction analysis, and upskilling are the mechanisms it uses to observe, strengthen, and stabilize coordination between the operator and agents.
 
-## The focal phenomenon: user/agent coordination
-
-Coordination is the recurring back-and-forth between the operator and the agents working on their behalf. Operator intent shapes agent behavior. Agent behavior surfaces patterns. The operator corrects. The agent learns. Friction emerges in some places and stabilizes in others. The working relationship matures across changing project conditions, over time.
-
-Tapestry watches that coordination, surfaces what's healthy and what's degrading, and helps recurring patterns crystallize into durable structure that doesn't need to be relearned each session.
-
-Different projects expose different conditions for coordination — different interfaces, different memory requirements, different architectural constraints, different friction patterns. Tapestry tracks each of these because they affect coordination quality.
-
-## The reinforcement mechanisms
-
-Each mechanism the platform uses to reinforce coordination:
-
-| Mechanism | What it does for coordination |
-|---|---|
-| **Memory** | Persists what the agent has learned about the operator's intent and the project's conditions, so coordination doesn't restart from zero each session |
-| **Telemetry** | Surfaces signals about how coordination is being exercised — what tools are called, what's running, what's failing |
-| **Observability** | The query API operators and agents use to ask "what's the current state of coordination?" |
-| **Architecture analysis** | Detects when project structure changes in ways that affect how operator and agents need to coordinate (services moving, packages merging, interfaces appearing or disappearing) |
-| **Runtime analysis** | Detects when actual execution diverges from what coordination predicted |
-| **Friction analysis** | Surfaces where coordination is breaking down — operator correcting the same thing repeatedly, agent confusion across handoffs, mismatched expectations |
-| **Correction analysis** | Tracks the operator's binding rules as they accumulate; reveals which corrections are landing, which are drifting back |
-| **Upskilling** | What happens when a coordination pattern stabilizes enough that it deserves to become a reusable skill, tool, agent, or architecture pattern |
-| **Policy** | Decides when a candidate has earned promotion to durable structure |
-| **Skill formation** | Materializes earned coordination patterns into reusable callable form |
-
-Projects and interfaces sit elsewhere in the picture. Projects are environments where coordination happens. Interfaces are observable manifestations of coordination inside those environments. The mechanisms above come to bear on coordination between operator and agents, in those projects, through those interfaces.
-
-## Five descriptions, one system
-
-Five ways Tapestry gets described:
-
-1. A memory system — memory is one reinforcement mechanism
-2. An observability system — observability is one reinforcement mechanism
-3. An upskilling system — upskilling is one reinforcement mechanism
-4. A project portfolio system — the reinforcement loop applied across many projects
-5. A human/agent coordination system — the coordination being reinforced
-
-Each description names one mechanism the platform uses. Five faces of *reinforce user/agent coordination*.
-
-## Reading order
-
-1. **[What Tapestry is not](/start/what-tapestry-is-not/)** — anchoring against the false frames readers reach for first
-2. **[Project shape](/start/project-shape/)** — the conditions for coordination that different projects create
-3. **[User-agent interfaces](/start/user-agent-interface/)** — one observable manifestation of coordination inside projects
-4. **[The signal hierarchy](/explanation/signal-hierarchy/)** — Events → Signals → Patterns → Candidates → Skills → Structure
-5. **[The observer](/explanation/the-observer/)** — the component that watches coordination health across the mechanisms
-6. **[How the platform upskills itself](/explanation/upskilling/)** — what happens when coordination patterns stabilize enough to earn durable structure
-7. **[Sharing intelligence across projects](/explanation/sharing-intelligence-across-projects/)** — coordination reinforcement compounding across the fleet
-8. **[The memory MCP](/explanation/memory-mcp/)** — the substrate where coordination state accumulates
-9. **[The plugins](/explanation/plugins/)** + **[The discipline stack](/explanation/discipline-stack/)** + **[Architecture snapshots](/explanation/architecture-snapshots/)** — the concrete moving parts; architecture diffs reveal changes that affect coordination
-
-## Why projects plug in
-
-**Coordination compounds across projects when they share a reinforcement layer.** Every Tapestry-consuming project shares one memory store, one cross-agent communication channel, one pattern-recognition layer. Three concrete things flow:
-
-- **Memory persists across sessions and across projects** — a correction you give in one project becomes a binding rule the agent applies next session, and a sibling project's agent sees it too.
-- **Agents update each other directly** — a memo written in one project's session is in the next session's auto-recall context for a sibling project, before the operator even types a message.
-- **Patterns and skills spread** — repeated behavior the observer notices in one project becomes a candidate; recurring across multiple projects, it becomes a stronger candidate for promotion into a reusable skill every project can invoke by name.
-
-See [Sharing intelligence across projects](/explanation/sharing-intelligence-across-projects/) for how the mechanism works, and [How the platform upskills itself](/explanation/upskilling/) for how repeated coordination patterns become durable structure (tools, subagents, skills, agents) over time.
-
-## Who this is for
-
-You are setting up a project that plugs into the Tapestry platform. You want the coordination between you and the AI agents working on your behalf to be supported by accumulated memory, observable to you, and improving over time as Tapestry reinforces what's working.
-
-You do not need to know every internal mechanic. You need to know which files are load-bearing, what each one does, and how to recover when one of them goes missing.
-
-## What this site covers — and what lives elsewhere
-
-This site focuses on the operator-facing piece: **what keeps a consuming project on track when it plugs into the platform.** Wiring, hooks, configuration, recovery from common failures, reference of load-bearing files.
-
-Companion material lives in dedicated places:
-
-- **Architecture and design philosophy** — the [MANIFESTO](https://github.com/Lizo-RoadTown/tapestry/blob/main/MANIFESTO.md) and the [architecture umbrella doc](https://github.com/Lizo-RoadTown/tapestry/blob/main/docs/architecture/UMBRELLA.md).
-- **Engineering plan and migration** — the migration docs and ADRs in the repo.
-- **API references for the platform services** — coming as services stabilize their public contracts.
-
-## Find what you need
+## Where to go next
 
 <CardGrid>
-  <Card title="The canonical frame" icon="open-book">
-    Tapestry as a user/agent support and reinforcement system. What it is, what it isn't, what mechanisms it uses.
-  </Card>
   <Card title="Set up a new project" icon="rocket">
-    Concrete steps to wire a new project so it gets the same discipline as the existing ones.
+    Wire a new project into the platform.
   </Card>
-  <Card title="The agent is drifting — what now?" icon="warning">
-    Symptom-to-fix table for the common failure modes: missing plugin, unwired MCP, deleted snapshot, env-var drift.
+  <Card title="The agent is drifting" icon="warning">
+    Symptom-to-fix table for common failures.
   </Card>
-  <Card title="Every load-bearing file" icon="document">
-    Reference of every file, config block, and environment variable the system depends on, with a one-line "why it exists."
+  <Card title="How it works" icon="open-book">
+    The mechanisms, the observer, the loop.
+  </Card>
+  <Card title="Load-bearing files" icon="document">
+    Every file the system depends on.
   </Card>
 </CardGrid>
+
+:::note[Names you'll see]
+These docs reference transitional names from the beta — `the-loom`, `Make_Skills`, `lizo-loom`, `lizo-skills`. See [Names you'll see in these docs](/start/names-you-will-see/) for the one-page glossary.
+:::

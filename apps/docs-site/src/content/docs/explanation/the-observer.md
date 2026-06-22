@@ -3,30 +3,16 @@ title: The observer
 description: The component Tapestry uses to watch coordination health across many signals — memory, telemetry, architecture snapshots, transcripts, friction, corrections, interface lifecycle, cross-project signals. The observer isn't the system; it's the mechanism Tapestry uses to know when coordination needs reinforcement and when a coordination pattern has stabilized enough to earn durable structure.
 ---
 
-The observer is the component Tapestry uses to watch coordination health. It is one of the reinforcement mechanisms.
-
-## What the observer is for
-
-Tapestry exists to reinforce the coordination between operator and agents. To do that, the platform needs to know:
-
-- When coordination is healthy and proceeding without intervention
-- When coordination is degrading and needs reinforcement (which mechanism, where)
-- When a coordination pattern has stabilized enough to deserve durable structure
-
-That's what the observer is for. It synthesizes evidence from every reinforcement mechanism — memory health, telemetry, architecture changes, friction patterns, correction recurrence, interface lifecycle, cross-project signals — into a picture of *coordination quality and trajectory* that the platform's other mechanisms can act on.
-
-The observer is not the system. It is one of the mechanisms the system uses, alongside memory, telemetry, architecture analysis, friction analysis, correction analysis, upskilling, policy, and skill formation. It sits in the middle of the loop because its job is interpretation — turning evidence into decisions about where to reinforce.
-
-If you draw the platform with the observer in the middle, the rest of the architecture falls into place:
+The observer is one of Tapestry's reinforcement mechanisms. It watches coordination health and trajectory, synthesizing signals from memory, telemetry, architecture, friction, corrections, interface lifecycle, and cross-project patterns into a picture the platform's other mechanisms can act on.
 
 ```mermaid
 flowchart TB
-    P[Project<br/>shape evolves over time]
-    OBS[Observer<br/>watches shape change<br/>decides what to surface]
-    CR[Candidate registry<br/>holds shape changes<br/>awaiting structure]
-    POL[Policy<br/>decides when a candidate<br/>has earned structure]
-    SC[Skill compiler<br/>materializes earned<br/>structure into callable form]
-    PL[Plugin distribution<br/>ships the structure<br/>back to every project]
+    P[Project]
+    OBS[Observer]
+    CR[Candidate registry]
+    POL[Policy]
+    SC[Skill compiler]
+    PL[Plugin distribution]
     P -.signals.-> OBS
     OBS --> CR
     CR --> POL
@@ -35,19 +21,11 @@ flowchart TB
     PL -.applied.-> P
 ```
 
-The observer's sensors:
-
-- **Memory** — what the agent has learned about project shape (corrections, decisions, recurring friction)
-- **Telemetry** — what executed, what failed, what was called (the runtime view of shape)
-- **Architecture snapshots** — what structure exists at a point in time (the static view of shape)
-- **Session transcripts** — what happened inside a session (the behavioral view of shape)
-- **Cross-project signals** — what patterns repeat across the fleet (the portfolio view of shape)
-
-None of those sensors *is* the platform. They feed the platform's central reasoner: the observer.
+**Sensors:** memory, telemetry, architecture snapshots, session transcripts, cross-project signals.
 
 ## What the observer watches for
 
-The observer's primary job is to track **coordination health and trajectory** by synthesizing signals from many sources. Interface lifecycle is one of those signals — useful, but not the whole picture. The five interface lifecycle states (from [user-agent interfaces](/start/user-agent-interface/#what-the-observer-looks-at-when-it-watches-interfaces)):
+Interface lifecycle states (one input):
 
 | State | What the observer surfaces |
 |---|---|

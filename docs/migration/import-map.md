@@ -45,6 +45,7 @@ Each row:
 | `classroom-hub-starter` (domain guide) + `project-starter` shapes | `tapestry/templates/classroom-project/{ui,agent}/` + `CLASSROOM_GUIDE.md` | (Step 5b) Assemble + author guide | Imported (Step 5b, 2026-06-21) | course-hub domain; `course-setup` skill + `classroom` adapter; readings/privacy rules; ref impl `summer-2026-hub` |
 | `SDE_Extraction` (domain guide) + `project-starter` shapes | `tapestry/templates/research-project/{ui,agent}/` + `RESEARCH_GUIDE.md` | (Step 5b) Assemble + author guide | Imported (Step 5b, 2026-06-21) | research/synthesis domain; `research-project` adapter; `Agent Drafts/` vs `Human validated/` integrity boundary; deep-research skill set |
 | (no source identified) | `tapestry/templates/operations-project/` | (Step 5b) — | **Deferred** | operator decision 2026-06-21: defer; no source repo for operations — documented slot only, not synthesized |
+| `the-loom/apps/web-dashboard/` (16 tracked files) | `tapestry/apps/web-dashboard/` | Lift | Imported (Step 6, 2026-06-22) | byte-identical (`cmp`, 16/16); Next.js 15 + React 19; routes `/`,`/dashboard`,`/candidates`,`/api/health`; **code only — not deployed**. Consumes Step-7 services (architecture-registry, policy) via `NEXT_PUBLIC_LOOM_*` env (onrender defaults) → URL-repoint at deploy (audit §1.4). **README framing reconciliation owed:** lifted README L9 says "the-loom's running interface… Tapestry unrelated" — predates tapestry-as-container; operator to reconcile |
 
 ## Template
 
@@ -64,3 +65,4 @@ When adding a row, copy this:
 | 2026-06-21 | Step 4 (branch `migration/04-engine`) | engine **Refactor**: `skill-compiler` + `skill-making` (import rewrites, bridge contract preserved) | Code refactored + verified; runbook `proposed`; deploy shape TBD; no deploy |
 | 2026-06-21 | Step 5a (PR #12) | `packages/cli/` lift (`loom_cli`) | Merged to main (`fe6888f`); not published |
 | 2026-06-21 | Step 5b (branch `migration/05b-software-template`) | `templates/` **two-axis** (domain × shape): software/classroom/research × {ui,agent} from `project-starter` + domain guides from `classroom-hub-starter`/`SDE_Extraction`; operations deferred | Operator chose two-axis + defer-operations; built in isolated worktree |
+| 2026-06-22 | Step 6 (branch `migration/06-web-dashboard`) | `apps/web-dashboard/` lift (Next.js 15 dashboard, 16 files byte-identical) | Code lifted + cmp-verified; no deploy; URL-repoint + README-framing reconciliation flagged for operator |

@@ -25,8 +25,9 @@ export default defineConfig({
         },
       ],
       // Explicit sidebar. The full v1 scope is visible.
-      // Ordering reflects the recommended reading sequence: unifying frame
-      // (project shape + what Tapestry is not) before the loop's mechanics
+      // Ordering reflects the recommended reading sequence: primary object
+      // (user-agent interface) before substrate (project shape) before
+      // anti-frame (what Tapestry is not) before the loop's mechanics
       // (signal hierarchy + the observer) before specifics (plugins, memory,
       // discipline stack, architecture snapshots).
       sidebar: [
@@ -34,6 +35,7 @@ export default defineConfig({
           label: "Start here",
           items: [
             { label: "Overview", slug: "index" },
+            { label: "User-agent interface", slug: "start/user-agent-interface" },
             { label: "Project shape", slug: "start/project-shape" },
             { label: "What Tapestry is not", slug: "start/what-tapestry-is-not" },
             { label: "Names you'll see in these docs", slug: "start/names-you-will-see" },

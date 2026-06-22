@@ -1,15 +1,17 @@
 ---
 title: The observer
-description: The central character of Tapestry. The component that watches project shape change over time and decides what's worth surfacing. Everything else in the platform exists to feed or consume the observer.
+description: The central character of Tapestry. The component that watches user-agent interfaces evolve over time and decides what's worth surfacing. Memory, telemetry, architecture snapshots, transcripts, and cross-project signals are its sensors; the candidate registry, policy, and skill compiler are its output pipeline.
 ---
 
-The observer is the central character of the platform. Read [Project shape](/start/project-shape/) and [What Tapestry is not](/start/what-tapestry-is-not/) before this page if you haven't already — the observer doesn't make sense outside that frame.
+The observer is the central character of the platform. Read [User-agent interface](/start/user-agent-interface/), [Project shape](/start/project-shape/), and [What Tapestry is not](/start/what-tapestry-is-not/) before this page if you haven't already — the observer doesn't make sense outside that frame.
 
 ## Why the observer is first-class
 
 Most platforms organize around their storage. *"We're a memory system."* *"We're a metrics database."* *"We're a vector store."* The storage is the noun; everything else is a feature on top.
 
 Tapestry inverts that. The observer is the noun. Memory is one of its sensors. Telemetry is another. Architecture snapshots are a third. The candidate registry is its output. The policy gate is what acts on its decisions. The skill compiler is what materializes the result.
+
+What the observer is *for* is the [user-agent interface](/start/user-agent-interface/) — the recurring coordination surface between operator and agents. Everything below is evidence about how those interfaces are evolving; everything above is what the platform produces when an interface stabilizes enough to earn durable structure.
 
 If you draw the platform with the observer at the center, the rest of the architecture falls into place:
 
@@ -41,22 +43,48 @@ None of those sensors *is* the platform. They feed the platform's central reason
 
 ## What the observer watches for
 
-The observer is interested in *shape change* — the four verbs from [project shape](/start/project-shape/#the-four-shape-verbs):
+The observer's primary job is to track the lifecycle state of every user-agent interface it knows about, and to detect transitions between states early. The five lifecycle states (from [user-agent interface](/start/user-agent-interface/#interface-lifecycle)):
 
-| Verb | What the observer surfaces |
+| State | What the observer surfaces |
 |---|---|
-| **Drift** | Memos that say one thing while code does another; runbooks that no longer match what the system does; assumptions encoded in plugins that don't hold |
-| **Stabilize** | Patterns becoming candidates becoming skills; corrections that stop firing because the agent learned them |
-| **Fragment** | Duplicate logic in non-canonical homes; competing patterns solving the same problem; subagents losing context across handoffs |
-| **Cohere** | Duplicate logic collapsing into a shared library; competing patterns reconciling into one canonical home |
+| **Active** | Health signals; routine telemetry; stable correction history |
+| **Emerging** | Novelty signals; new correction patterns; expanding agent participation |
+| **Changing** | Drift signals; correction-rate changes; memory thrash |
+| **Degraded** | Failure signals; recurring corrections that aren't sticking; agent confusion across handoffs |
+| **Stabilized** | Pattern → candidate → durable structure pipeline; reusable skill emergence |
+
+Interface lifecycle is the *what*. The observer derives lifecycle state from underlying *shape* evidence — the four shape verbs from [project shape](/start/project-shape/#the-four-shape-verbs):
+
+| Shape verb | What it tells the observer about the interface |
+|---|---|
+| **Drift** | An interface is becoming misaligned with operator intent; corrections aren't sticking |
+| **Stabilize** | An interface is converging — patterns becoming candidates becoming skills |
+| **Fragment** | One interface is fragmenting into incoherent variants across subagents or services |
+| **Cohere** | Multiple interface variants are converging on one canonical form |
 
 What the observer is **not** interested in:
 
 - Individual raw events (telemetry ingestion handles those)
 - Single-event state ("did this call succeed?" — that's observability's job, not the observer's)
-- Current architecture snapshots in isolation (those are inputs; the observer cares about *deltas*)
+- Current architecture snapshots in isolation (those are inputs; the observer cares about *deltas* — what changed about which interface)
 
 The observer sits at the *patterns* level of the [signal hierarchy](/explanation/signal-hierarchy/) — events flow through telemetry → signals → patterns before the observer touches them.
+
+## What each tracked interface carries
+
+For each interface the observer tracks, it holds (per [user-agent interface](/start/user-agent-interface/#what-each-interface-carries)):
+
+- **Purpose** — what coordination this surface supports
+- **Participating agents** — which agents and operator take part
+- **Operator expectations** — what "working" looks like from the operator's view
+- **Memory dependencies** — which memory entries the interface relies on
+- **Architecture dependencies** — which platform/repo structure supports it
+- **Runtime signals** — telemetry exposing how the interface is being exercised
+- **Friction signals** — where the interface is misaligned with intent
+- **Correction history** — what the operator has corrected and when
+- **Candidate durable structures** — what could earn promotion if the interface stabilizes
+
+Today's observer implementation tracks a subset of this (skills invoked + recurring patterns from the upskilling report + cross-repo signal-rule output). The full set is the target shape; the gap between target and current is one of the open architectural questions.
 
 ## The two observer implementations
 

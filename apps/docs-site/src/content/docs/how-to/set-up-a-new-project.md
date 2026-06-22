@@ -28,15 +28,16 @@ Conventions:
 
 Examples: `sde-extraction-dev`, `summer-2026-hub`, `your-project-dev`.
 
-## Step 2 — Install the `loom-discipline` plugin
+## Step 2 — Install the `tapestry-discipline` plugin
 
 In any Claude Code session:
 
 ```
-/plugin install loom-discipline@lizo-loom
+/plugin marketplace add Lizo-RoadTown/tapestry
+/plugin install tapestry-discipline@tapestry
 ```
 
-This installs to your machine's plugin cache at `~/.claude/plugins/cache/lizo-loom/loom-discipline/<version>/`. It is now AVAILABLE on your machine. It is NOT YET enabled in any specific project.
+This installs to your machine's plugin cache at `~/.claude/plugins/cache/tapestry/tapestry-discipline/<version>/`. It is now AVAILABLE on your machine. It is NOT YET enabled in any specific project. The prior `loom-discipline@lizo-loom` install command still works during the transition.
 
 ## Step 3 — Enable the plugin in your project's `.claude/settings.json`
 
@@ -45,7 +46,7 @@ Create `.claude/` directory in your project root if it doesn't exist. Then write
 ```json
 {
   "enabledPlugins": {
-    "loom-discipline@lizo-loom": true
+    "tapestry-discipline@tapestry": true
   }
 }
 ```
@@ -55,7 +56,7 @@ If you have a per-project guard plugin you also want enabled (e.g., a SDE-style 
 ```json
 {
   "enabledPlugins": {
-    "loom-discipline@lizo-loom": true,
+    "tapestry-discipline@tapestry": true,
     "your-guard@lizo-skills": true
   }
 }
@@ -65,7 +66,7 @@ If you have a per-project guard plugin you also want enabled (e.g., a SDE-style 
 
 ## Step 4 — (Optional) Add `loom-memory` MCP to `.mcp.json` as defense-in-depth
 
-The `loom-discipline` plugin already declares the `loom-memory` MCP, so enabling the plugin is sufficient to wire it. Adding it explicitly to your project's `.mcp.json` is belt-and-suspenders. If the plugin ever fails to load (cache staleness, version mismatch), the MCP tools remain available.
+The `tapestry-discipline` plugin already declares the `loom-memory` MCP, so enabling the plugin is sufficient to wire it. Adding it explicitly to your project's `.mcp.json` is belt-and-suspenders. If the plugin ever fails to load (cache staleness, version mismatch), the MCP tools remain available.
 
 Create or extend `.mcp.json` at your project root:
 
@@ -148,7 +149,7 @@ For working examples of these JSON configs, see [an example consuming project's 
 
 ## Step 7 — Add architecture-snapshot wrappers (recommended)
 
-The `loom-discipline` plugin's SessionStart hook can run `scripts/architecture_snapshot.py` and `scripts/architecture_diff.py` to capture a structural snapshot at session start. These don't need to be your code — they can be thin wrappers that dispatch to the canonical implementations in the `liz-patterns` plugin.
+The `tapestry-discipline` plugin's SessionStart hook can run `scripts/architecture_snapshot.py` and `scripts/architecture_diff.py` to capture a structural snapshot at session start. These don't need to be your code — they can be thin wrappers that dispatch to the canonical implementations in the `tapestry-patterns` plugin.
 
 See [the wrapper-pattern reference (consuming project PR)](https://github.com/Lizo-RoadTown/sde-extraction/commit/2325e67) for the canonical example.
 
@@ -183,7 +184,7 @@ Plugin hooks bind at session start. To pick up the new plugin enable + MCP wirin
 After restart, you should see:
 
 1. A SessionStart auto-recall block at the start of the conversation, with relevant memories tagged for your project.
-2. A discipline reminder line at the top of every one of your messages: `[loom-discipline] Discipline check: PROBE files before asserting (cite file:line). Distinguish dev-tooling from runtime ...`
+2. A discipline reminder line at the top of every one of your messages: `[tapestry-discipline] Discipline check: PROBE files before asserting (cite file:line). Distinguish dev-tooling from runtime ...`
 3. `memory_recall`, `memory_write`, etc. available when you ask the agent to use them.
 4. If you ask the agent "check loom memory for what we did last session in this project," it actually does it.
 

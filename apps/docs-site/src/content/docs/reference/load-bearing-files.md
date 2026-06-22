@@ -28,7 +28,7 @@ For how the pieces fit together conceptually, see [The discipline stack](/explan
 }
 ```
 
-**Why it exists:** explicit per-project MCP wiring. If the `loom-discipline` plugin's own MCP declaration fails to load for any reason, this file ensures the memory tools remain available.
+**Why it exists:** explicit per-project MCP wiring. If the `tapestry-discipline` plugin's own MCP declaration fails to load for any reason, this file ensures the memory tools remain available.
 
 **If missing:** the agent has no `memory_recall`/`memory_write` tools UNLESS the discipline plugin successfully declares them (it usually does, but defense-in-depth fails when both layers fail).
 
@@ -45,7 +45,7 @@ For how the pieces fit together conceptually, see [The discipline stack](/explan
 ```json
 {
   "enabledPlugins": {
-    "loom-discipline@lizo-loom": true
+    "tapestry-discipline@tapestry": true
   }
 }
 ```
@@ -80,7 +80,7 @@ For how the pieces fit together conceptually, see [The discipline stack](/explan
 LOOM_PROJECT_ID=your-project-id
 ```
 
-**Why it exists:** the `LOOM_PROJECT_ID` is the scope gate for the `loom-discipline` plugin's hooks (v0.1.12+) AND the tag applied to memory writes from this project.
+**Why it exists:** the `LOOM_PROJECT_ID` is the scope gate for the `tapestry-discipline` plugin's hooks (v0.1.12+) AND the tag applied to memory writes from this project.
 
 **If missing or empty:** hooks may no-op (no scope to activate against). Memory writes may be untagged or default-tagged. Cross-project memory recall becomes unfocused.
 
@@ -119,9 +119,9 @@ LOOM_PROJECT_ID=your-project-id
 
 **Location:** `scripts/` at repo root.
 
-**What it is:** snapshot pipeline scripts that produce a structural snapshot of your repo and a diff against the prior baseline. For Tapestry-consuming projects, these should be thin wrappers that dispatch to the canonical implementations in the `liz-patterns` plugin.
+**What it is:** snapshot pipeline scripts that produce a structural snapshot of your repo and a diff against the prior baseline. For Tapestry-consuming projects, these should be thin wrappers that dispatch to the canonical implementations in the `tapestry-patterns` plugin.
 
-**Why it exists:** the `loom-discipline` plugin's SessionStart hook runs these to inject the architecture context into the session's initial state. Without them, the hook silently no-ops on the snapshot piece.
+**Why it exists:** the `tapestry-discipline` plugin's SessionStart hook runs these to inject the architecture context into the session's initial state. Without them, the hook silently no-ops on the snapshot piece.
 
 **If missing:** SessionStart still fires (auto-recall still happens) but no architecture context is added. The agent loses structural awareness at session start.
 
@@ -167,9 +167,9 @@ LOOM_PROJECT_ID=your-project-id
 
 **Health check:** `curl https://loom-agent-context.onrender.com/health` returns `{"status":"ok","service":"loom-agent-context"}`.
 
-### The `loom-discipline` plugin (cached locally per machine)
+### The `tapestry-discipline` plugin (cached locally per machine)
 
-**Location:** `~/.claude/plugins/cache/lizo-loom/loom-discipline/<version>/`.
+**Location:** `~/.claude/plugins/cache/tapestry/tapestry-discipline/<version>/`.
 
 **What it is:** a Claude Code plugin. Contains hook scripts (`hooks/run-python.mjs` dispatcher + Python hook implementations under `scripts/`), agent files, skill files, command files, and a `plugin.json` that declares the `loom-memory` MCP.
 
@@ -177,13 +177,13 @@ LOOM_PROJECT_ID=your-project-id
 
 **If missing:** plugin enable in `.claude/settings.json` resolves to nothing; no hooks fire.
 
-**Install:** `/plugin install loom-discipline@lizo-loom` after `/plugin marketplace add Lizo-RoadTown/the-loom`.
+**Install:** `/plugin marketplace add Lizo-RoadTown/tapestry`, then `/plugin install tapestry-discipline@tapestry`. (The prior `loom-discipline@lizo-loom` sourced from `Lizo-RoadTown/the-loom` still works during the transition.)
 
-**Current version:** check `~/.claude/plugins/cache/lizo-loom/loom-discipline/` for the latest cached version. v0.1.13+ honors `LOOM_PROJECT_ID` as the scope gate; v0.1.12+ added the explicit `mcpServers.loom-memory` declaration.
+**Current version:** check `~/.claude/plugins/cache/tapestry/tapestry-discipline/` for the latest cached version. v0.1.13+ honors `LOOM_PROJECT_ID` as the scope gate; v0.1.12+ added the explicit `mcpServers.loom-memory` declaration.
 
-### The `liz-patterns` plugin (cached locally per machine)
+### The `tapestry-patterns` plugin (cached locally per machine)
 
-**Location:** `~/.claude/plugins/cache/lizo-skills/liz-patterns/<version>/`.
+**Location:** `~/.claude/plugins/cache/tapestry/tapestry-patterns/<version>/`.
 
 **What it is:** the canonical patterns plugin. Contains the reusable agents and skills (`documentation`, `deep-research-pattern`, `next-actions-planning`, `infrastructure-mapping`, etc.) AND the canonical architecture-snapshot scripts that consuming-project wrappers dispatch to.
 
@@ -191,11 +191,11 @@ LOOM_PROJECT_ID=your-project-id
 
 **If missing:** consuming projects can still wrap their own architecture-snapshot scripts but lose access to the canonical agents and skills via the `liz-patterns:` namespace.
 
-**Install:** `/plugin install liz-patterns@lizo-skills` after `/plugin marketplace add Lizo-RoadTown/claude-skills-marketplace`.
+**Install:** `/plugin marketplace add Lizo-RoadTown/tapestry`, then `/plugin install tapestry-patterns@tapestry`. (The prior `liz-patterns@lizo-skills` sourced from `Lizo-RoadTown/claude-skills-marketplace` still works during the transition.)
 
-### The Path A observer (inside the `loom-discipline` plugin)
+### The Path A observer (inside the `tapestry-discipline` plugin)
 
-**Location:** `~/.claude/plugins/cache/lizo-loom/loom-discipline/<version>/scripts/observer.py`.
+**Location:** `~/.claude/plugins/cache/tapestry/tapestry-discipline/<version>/scripts/observer.py`.
 
 **What it is:** the Stop-hook observer that parses session transcripts, counts skill invocations, dedups against `.project-intelligence/<project-id>/workflow-candidates/`, and POSTs candidates to the architecture-registry as evidence accumulates. See [The observer](/explanation/the-observer/).
 
@@ -263,7 +263,7 @@ OTEL_SERVICE_NAME=loom-discipline
 
 **Source:** [`https://github.com/Lizo-RoadTown/the-loom`](https://github.com/Lizo-RoadTown/the-loom) — the platform's beta repo doubles as the marketplace for this plugin, housing it under `adapters/claude-code/loom-discipline/`. (See [Names you'll see](/start/names-you-will-see/) for what "the-loom" is.)
 
-**Contents:** the `loom-discipline` plugin.
+**Contents:** the `tapestry-discipline` plugin.
 
 **Add to Claude Code:** `/plugin marketplace add Lizo-RoadTown/the-loom`.
 
@@ -271,7 +271,7 @@ OTEL_SERVICE_NAME=loom-discipline
 
 **Source:** `https://github.com/Lizo-RoadTown/claude-skills-marketplace`.
 
-**Contents:** the `liz-patterns` plugin and per-project guard plugins (e.g., `sde-extraction-guard`).
+**Contents:** the `tapestry-patterns` plugin and per-project guard plugins (e.g., `sde-extraction-guard`).
 
 **Add to Claude Code:** `/plugin marketplace add Lizo-RoadTown/claude-skills-marketplace`.
 

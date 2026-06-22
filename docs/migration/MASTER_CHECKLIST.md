@@ -108,9 +108,9 @@ Per `tapestry/docs/proposals/2026-06-13-v1-scope-and-roadmap.md` §5 (sequenced 
 - [~] **Step 5** — templates + CLI:
   - [x] **5a CLI lift** — `the-loom/loom-cli/` → `tapestry/packages/cli/` (verbatim Lift, `cmp`-identical; stdlib-only; URL-env-driven; `tapestry_cli.cli` resolves). 2026-06-21, branch `migration/05a-cli`/PR. No publish yet.
   - [ ] **5b templates assembly** — build `templates/{software,classroom,research,operations}-project/` from the starter repos (curation, NOT a lift — web-starter etc. are full apps). Needs scoping: which starter parts → template vs project-specific. Per §6.5 Decision 6 mapping.
-- [ ] **Step 6** — web-dashboard v1 lift
-- [ ] **Step 7** — architecture-registry + policy lift + render.yaml
-- [ ] **Step 7a** — telemetry-ingestion + project-observatory lift
+- [ ] **Step 6** — web-dashboard v1 lift (includes destination-side URL repointing per [migration-plan §6.4](docs/plans/2026-06-18-tapestry-migration-readiness-and-execution.md#64--hardcoded-loom-onrendercom-urls-pr-prep-2-target-list))
+- [ ] **Step 7** — architecture-registry + policy lift + render.yaml (includes destination-side URL repointing per migration-plan §6.4)
+- [ ] **Step 7a** — telemetry-ingestion + project-observatory lift (includes destination-side URL repointing per migration-plan §6.4)
 - [ ] **Step 8** — discipline plugins migrate to `tapestry/integrations/claude-code/` — when activated, includes:
   - the loom-discipline plugin lift itself
   - extended-migration-audit §2.1 — subagents (planner/researcher/coordinator/roadmap-maintenance/schema-migrator) + architecture-analyst — DEFERRED HERE, needs ADR-0004 for destination directory

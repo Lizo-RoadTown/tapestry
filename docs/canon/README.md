@@ -17,4 +17,4 @@ A proposal or ADR that conflicts with a canon document is non-conformant and mus
 
 | Document | Governs |
 |---|---|
-| [`user-agent-interface-observatory.md`](user-agent-interface-observatory.md) | The primary object of observation is the **user-agent interface** (not the project). The observer, architecture-diff purpose, and the dashboard design are all organized around interfaces. |
+| [`user-agent-coordination-reinforcement.md`](user-agent-coordination-reinforcement.md) | Tapestry is a **user/agent support and reinforcement system**: it strengthens, stabilizes, and evolves operator-agent coordination. Memory, telemetry, observability, architecture analysis, friction analysis, and upskilling are reinforcement mechanisms; projects are environments where coordination occurs; interfaces are one manifestation. The observer, telemetry shape, docs, and dashboard organize around coordination — not around any one mechanism or the interface. |

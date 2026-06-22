@@ -1,15 +1,19 @@
 # `templates/software-project/`
 
-**Status:** Slot. No code yet.
+**Status:** Populated — Step 5b, 2026-06-21. Two shapes: `ui/` + `agent/`.
 
-## Purpose
+Seed template for a general software-dev project. This is the **generic** domain — no domain-specific guide; pick a shape and go.
 
-Seed template for software-dev-repo projects.
+## Pick a shape
 
-## Source
+| Shape | When | Clone |
+|---|---|---|
+| [`ui/`](ui/) | Web / frontend app (has a `docs/UX_CONTRACT.md`) | `templates/software-project/ui/` |
+| [`agent/`](agent/) | Agent app with a durable memory backbone | `templates/software-project/agent/` |
 
-web-starter + Make_Skills/adapters/development/default-seed/
+Each shape leaf is self-contained (see [`../README.md`](../README.md) for the file inventory). Clone the leaf, fill the `{{PLACEHOLDER}}` tokens, and you have a Tapestry-wired project.
 
-## When this slot populates
+## Provenance
 
-When the source has stabilized AND the operator approves migration. See [`../../docs/migration/README.md`](../../docs/migration/README.md).
+- `project-starter/templates/_common/` (base) + `project-starter/templates/{ui-app,agent-app}/` (shapes).
+- Companion: [`../../packages/cli/`](../../packages/cli/) (Step 5a) — the `loom` CLI that wires projects post-clone.

@@ -1,0 +1,30 @@
+# agent-app extensions — append to _common/CLAUDE.md
+
+## Skills (agent / LLM-specific additions)
+
+| Skill | When |
+|---|---|
+| `ai-agents-architect` | Designing agent architecture — single agent, multi-agent, orchestration patterns. |
+| `agent-memory-systems` | Designing the memory layer (LanceDB / vector store / structured DB). |
+| `agent-orchestrator` | Multi-agent coordination patterns. |
+| `ralph-loop` (official plugin) | Iterative agent loops (paired with the `/loop` skill). |
+| `claude-api` (official skill) | Building agentic apps with the Anthropic SDK. Triggers on `anthropic` / `@anthropic-ai/sdk` imports. |
+
+## Agent runtime discipline
+
+- **LLM choice is a config, not a discriminator.** The agent's persona, memory, skills, and tools live in a layer above the LLM. Switching providers is a config change, not a rewrite.
+- **Per-user vector memory** is the persistence backbone. Long working sessions don't re-process the full conversation; the agent queries memory on demand.
+- **Skills as callable tools.** Markdown skills compile into tool calls. Per-skill descriptions matter — they're how the LLM decides when to reach for the skill.
+- **Tenant scoping (if multi-user).** Every query through a tenant-scoped repository helper. RLS at the DB layer as defense-in-depth.
+
+## Two-mode commitment (if both self-host and hosted)
+
+Every change considers BOTH self-host AND hosted-multitenant. Use a `PLATFORM_MODE` env var; resolvers and persistence helpers swap implementations at import time.
+
+## Identity portability
+
+Student / user data is decoupled from the LLM and exportable:
+- Switch LLM → memory + skills + tools + integrations stay intact.
+- Export bundle is first-class — `/export` and `/import` endpoints exist from day one.
+
+If the project doesn't need portability now, design as if it will. Schema decisions answer "is this portable?" before "is this convenient?"

@@ -1,15 +1,21 @@
 # `templates/classroom-project/`
 
-**Status:** Slot. No code yet.
+**Status:** Populated — Step 5b, 2026-06-21. Two shapes: `ui/` + `agent/`.
 
-## Purpose
+Seed template for a classroom / course-hub project — a term course hub holding a term's classes, with an embedded study assistant and openable readings.
 
-Seed template for classroom-support-app projects.
+## Pick a shape
 
-## Source
+| Shape | When | Clone |
+|---|---|---|
+| [`ui/`](ui/) | The common case: a deployable course-hub web app | `templates/classroom-project/ui/` |
+| [`agent/`](agent/) | An agent-first classroom tool (e.g. an intake/grading assistant) | `templates/classroom-project/agent/` |
 
-classroom-hub-starter + Make_Skills/adapters/classroom/default-seed/
+## Domain guidance
 
-## When this slot populates
+Read [`CLASSROOM_GUIDE.md`](CLASSROOM_GUIDE.md) before building — it covers the `course-setup` skill, the `classroom` adapter, the readings/privacy rules, and the reference implementation. The base files in each shape leaf are self-contained (see [`../README.md`](../README.md)).
 
-When the source has stabilized AND the operator approves migration. See [`../../docs/migration/README.md`](../../docs/migration/README.md).
+## Provenance
+
+- Base + shape: `project-starter/templates/_common` + `{ui-app,agent-app}`.
+- Domain guidance grounded in `classroom-hub-starter` (reference impl: `Lizo-RoadTown/summer-2026-hub`).

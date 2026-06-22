@@ -1,0 +1,27 @@
+# ui-app extensions — append to _common/CLAUDE.md
+
+## Skills (UI-specific additions)
+
+| Skill | When |
+|---|---|
+| `ui-ux-pro-max` | Any UI structure / visual design / interaction decision. 99 UX guidelines, 161 color palettes, anti-patterns. |
+| `design-system` | Three-layer token architecture (primitive → semantic → component). |
+| `design` | Brand identity, design tokens, UI styling. |
+| `onboarding-psychologist` | First-use flows. IDENTITY-TO-HABIT arc backed by behavioral research. |
+| `frontend-design` (official plugin) | Frontend design companion. |
+| `cc-skill-frontend-patterns` | Frontend code patterns. |
+
+## UX discipline
+
+Every user-facing surface follows `docs/UX_CONTRACT.md`. The contract gates UI PRs — they cite which sections they comply with.
+
+Rule zero: **Attention → Question → Commitment → Feedback → Reveal**. The student / user must commit to a decision before the system reveals structure. No auto-advance, no answer-before-input.
+
+## Accessibility — non-negotiable
+
+- Color contrast ≥ 4.5:1 normal, ≥ 3:1 large.
+- Focus rings visible on every interactive element.
+- Aria labels on icon-only buttons.
+- Keyboard navigation matches visual order.
+- `prefers-reduced-motion` respected.
+- Minimum 44×44px touch targets, 8px+ spacing.

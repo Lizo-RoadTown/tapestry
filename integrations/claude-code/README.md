@@ -24,7 +24,7 @@ The marketplace manifest lives at [`../../.claude-plugin/marketplace.json`](../.
 
 | Plugin | Role |
 |---|---|
-| `tapestry-discipline` | The 4 hook scripts (SessionStart, UserPromptSubmit, PreToolUse, Stop) that auto-inject PROBE discipline, recall top-N memories from `loom-memory`, run the architecture-snapshot pipeline, and emit OTel telemetry per the [coordination contract](https://tapestry-docs.vercel.app/reference/otel-coordination-contract/). Scope-gated by `LOOM_PROJECT_ID` in `.env`. |
+| `tapestry-discipline` | The 4 hook scripts (SessionStart, UserPromptSubmit, PreToolUse, Stop) that auto-inject PROBE discipline, recall top-N memories from `loom-memory`, run the architecture-snapshot pipeline, and emit OTel telemetry per the [coordination contract](https://tapestry-khaki.vercel.app/reference/otel-coordination-contract/). Scope-gated by `LOOM_PROJECT_ID` in `.env`. |
 | `tapestry-patterns` | Reusable agents (drift-watcher, infrastructure-mapping, next-actions-planning, lessons-learned, …) and skills (agentic-skill-design, deep-research-pattern, documentation, …) available by name in every consuming project. |
 
 ## Renaming history

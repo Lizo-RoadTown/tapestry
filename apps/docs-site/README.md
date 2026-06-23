@@ -44,7 +44,7 @@ Configured for Vercel via `vercel.json`. To deploy:
 1. In the Vercel dashboard, import `Lizo-RoadTown/tapestry`.
 2. Set **Root Directory** to `apps/docs-site`.
 3. Vercel auto-detects Astro and applies the `vercel.json` config.
-4. Confirm production URL (defaults to `tapestry-docs.vercel.app` or a Vercel-assigned subdomain).
+4. Confirm production URL (defaults to `tapestry-khaki.vercel.app` or a Vercel-assigned subdomain).
 
 Auto-deploy: pushes to `main` rebuild the production site.
 

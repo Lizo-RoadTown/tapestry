@@ -9,7 +9,7 @@ import vercel from "@astrojs/vercel";
 // MCP, hooks, project-intelligence) so that nothing breaks silently when a load-bearing
 // piece goes missing.
 export default defineConfig({
-  site: "https://tapestry-docs.vercel.app",
+  site: "https://tapestry-khaki.vercel.app",
   // Adapter enables on-demand routes (the Observatory console + /api/episodes.json)
   // while all doc pages stay static (prerendered by default).
   adapter: vercel(),

@@ -5,12 +5,24 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "tapestry-cli"
 version = "0.1.0"
-description = "the-loom command-line interface — onboard projects, inspect state, manage memory."
+description = "Tapestry command-line interface — onboard projects, inspect state, open the Observatory."
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
 authors = [
   {name = "Liz Osborn", email = "lizocontactinfo@gmail.com"},
+]
+keywords = ["tapestry", "agents", "coordination", "observability", "cli"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
 ]
 # Stdlib-only at runtime by design. Cross-platform Python (Windows / macOS / Linux),
 # no compiled deps, no model downloads — `tapestry init` works the moment pip install completes.
@@ -21,8 +33,9 @@ tapestry = "tapestry_cli.cli:main"
 loom = "tapestry_cli.cli:main"  # deprecated alias
 
 [project.urls]
-Homepage = "https://github.com/Lizo-RoadTown/the-loom"
-Repository = "https://github.com/Lizo-RoadTown/the-loom"
+Homepage = "https://github.com/Lizo-RoadTown/tapestry"
+Repository = "https://github.com/Lizo-RoadTown/tapestry"
+Documentation = "https://tapestry-khaki.vercel.app/"
 
 [tool.setuptools]
 packages = ["tapestry_cli"]

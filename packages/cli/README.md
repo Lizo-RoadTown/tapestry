@@ -1,22 +1,52 @@
-# `packages/cli/`
+# tapestry-cli
 
-**Status:** Populated — Step 5a (CLI lift), 2026-06-21. Code lifted; not yet published.
+The command-line interface for [Tapestry](https://github.com/Lizo-RoadTown/tapestry) — project intelligence for AI-native teams.
 
-The `loom` CLI: scaffolds + registers new consuming projects (the cross-platform replacement for the old PowerShell `new-loom-project.ps1`).
+Wire a project into the platform, then open the live console. Stdlib-only, no third-party dependencies, no model downloads — it works the moment `pip install` completes, on Windows, macOS, and Linux.
 
-## What's here
+## Install
 
-Verbatim **Lift** (`cmp`-verified identical) of `the-loom/tapestry-cli/`:
-- `tapestry_cli/cli.py` — argparse entrypoint (`main`).
-- `tapestry_cli/init.py` — `init` command: creates `.env` (OTel propagation + `LOOM_PROJECT_ID`), registers the project, etc.
-- `tapestry_cli/__init__.py`, `__main__.py`, `pyproject.toml`.
+```bash
+pipx install tapestry-cli
+```
 
-Stdlib-only (no third-party deps); **URL-env-driven** (reads `LOOM_MEMORY_MCP_URL` / `LOOM_MEMORY_URL` / `LOOM_PROJECT_ID` — no hardcoded loom hostnames). `tapestry_cli` package name kept (rename deferred, like `loom_auth`).
+(or `pip install tapestry-cli`)
 
-## Migration status
+## Commands
 
-**Decision: Lift.** Verified: files byte-identical to source, compiles, `tapestry_cli.cli` resolves. Companion: Step 5b (templates assembly) — `templates/*` are assembled from the starter repos separately (curation, not a lift).
+```text
+tapestry onboard      Onboard the current directory and write
+                      .claude/settings.json with the Tapestry plugins enabled
+                      (the recommended quickstart path).
+tapestry observatory  Open the Observatory console in a browser.
+tapestry init         Register the project and write .env / .mcp.json /
+                      .project-intelligence/ (granular path; does not touch
+                      .claude/settings.json).
+tapestry version      Print version and platform info.
+```
 
-## Provenance
-- the-loom: `tapestry-cli/` (the cross-platform scaffolder)
-- loom-memory: `tapestry_step3_prod_cutover_complete_2026_06_21` (migration state)
+## Quickstart
+
+```bash
+pipx install tapestry-cli
+tapestry onboard
+tapestry observatory
+```
+
+The agents pick up memory, telemetry, and the discipline rules from there. See the [setup guide](https://tapestry-khaki.vercel.app/how-to/set-up-a-new-project/) for the full walkthrough.
+
+## Configuration
+
+The CLI is URL-env-driven — no hardcoded hostnames. It reads:
+
+- `LOOM_MEMORY_MCP_URL` / `LOOM_MEMORY_URL` — the memory MCP endpoint
+- `LOOM_PROJECT_ID` — the project identifier
+- `TAPESTRY_OBSERVATORY_URL` — override the Observatory URL opened by `tapestry observatory`
+
+## Notes
+
+`tapestry` is the primary entry point; `loom` is kept as a deprecated alias during the transition. The Python package is named `tapestry_cli`.
+
+---
+
+*Provenance: lifted verbatim from `the-loom/tapestry-cli/` during the Tapestry monorepo migration (Step 5a, 2026-06-21) — the cross-platform replacement for the old PowerShell `new-loom-project.ps1` scaffolder.*

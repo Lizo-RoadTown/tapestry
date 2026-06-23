@@ -85,11 +85,11 @@ Built-in harness capabilities (always available, no install): `EnterPlanMode` fo
 
 ## Discipline plugin (recommended)
 
-This project depends on the `loom-discipline` Claude Code plugin (published via the `lizo-loom` marketplace, sourced from `Lizo-RoadTown/the-loom`). Install once per machine:
+This project depends on the `tapestry-discipline` Claude Code plugin (published via the `lizo-loom` marketplace, sourced from `Lizo-RoadTown/the-loom`). Install once per machine:
 
 ```text
 /plugin marketplace add Lizo-RoadTown/claude-skills-marketplace
-/plugin install loom-discipline@lizo-loom
+/plugin install tapestry-discipline@tapestry
 ```
 
 The plugin auto-injects behavioral rules into every Claude Code session in this repo — PROBE before asserting, cite `file:line`, distinguish dev-tooling from runtime, write friction as memory at the moment of correction, cite skills by name, append to the test-runs log.

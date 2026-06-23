@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-UserPromptSubmit hook for loom-discipline.
+UserPromptSubmit hook for tapestry-discipline (preserved runtime label: [loom-discipline]).
 
 Two responsibilities:
 
@@ -177,7 +177,7 @@ def _write_memory_stub(cwd: str, prompt: str) -> Path | None:
         body = (
             "---\n"
             f"name: remember-{ts}\n"
-            "description: STUB — created automatically by loom-discipline UserPromptSubmit hook on detection of repetition phrasing. Fill in the rule + Why + How to apply lines as the response is composed; this stub is meant to be edited before the turn ends.\n"
+            "description: STUB — created automatically by tapestry-discipline UserPromptSubmit hook on detection of repetition phrasing. Fill in the rule + Why + How to apply lines as the response is composed; this stub is meant to be edited before the turn ends.\n"
             "metadata:\n"
             "  type: feedback\n"
             "  auto_created: true\n"
@@ -194,7 +194,7 @@ def _write_memory_stub(cwd: str, prompt: str) -> Path | None:
 
 
 def _in_scope(cwd) -> bool:
-    """True if loom-discipline hooks should run for this repo.
+    """True if tapestry-discipline hooks should run for this repo.
 
     In scope if EITHER the working-directory path contains a known loom
     substring (Make_Skills / the-loom / project-starter / _common), OR

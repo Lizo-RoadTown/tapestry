@@ -50,27 +50,27 @@ This boundary survives the migration to Tapestry: it becomes the rule for what l
 ## Discipline plugin (required)
 
 ```text
-/plugin marketplace add Lizo-RoadTown/claude-skills-marketplace
-/plugin install loom-discipline@lizo-loom
+/plugin marketplace add Lizo-RoadTown/tapestry
+/plugin install tapestry-discipline@tapestry
 ```
 
 The plugin auto-injects behavioral rules into every session — PROBE before asserting, cite `file:line`, distinguish dev-tooling from runtime, write friction as memory at the moment of correction, cite skills by name, append to test-runs log, enforce session-end upskilling reports.
 
-(`loom-discipline` is published via the `lizo-loom` marketplace which sources from `the-loom/adapters/claude-code/loom-discipline/`. The two-discipline-plugin ambiguity was resolved 2026-06-14 per Option A; the `make-skills-discipline` plugin in claude-skills-marketplace has been retired.)
+The plugin source lives at `integrations/claude-code/tapestry-discipline/` (consolidated into the tapestry monorepo in PR #42, 2026-06-22 — renamed from `loom-discipline`). The prior `/plugin install loom-discipline@lizo-loom` still works during the transition window. The runtime hook reminder text consumers see is still `[loom-discipline]` — preserved-identity contract; rename is install-only.
 
 ## Canonical patterns (operator's patterns library)
 
-The canonical home for reusable agents + skills + tools is the `liz-patterns` plugin:
+The canonical home for reusable agents + skills + tools is the `tapestry-patterns` plugin:
 
 ```text
-/plugin install liz-patterns@lizo-skills
+/plugin install tapestry-patterns@tapestry
 ```
 
 This makes the following available **by name in every project**, with one canonical implementation:
 
-- **Agents** (invoke via `Agent({subagent_type: "liz-patterns:<name>", ...})`):
-  `infrastructure-mapping`, `next-actions-planning`, `lessons-learned`, `orchestration-cataloging`, `eval-deep-research`, `web-app-scaffold`, `agentic-upskilling`
-- **Skills** (invoke via Skill tool with `liz-patterns:<name>`):
+- **Agents** (invoke via `Agent({subagent_type: "tapestry-patterns:<name>", ...})`):
+  `infrastructure-mapping`, `next-actions-planning`, `lessons-learned`, `orchestration-cataloging`, `eval-deep-research`, `web-app-scaffold`, `agentic-upskilling`, `drift-watcher`
+- **Skills** (invoke via Skill tool with `tapestry-patterns:<name>`):
   `agentic-skill-design`, `deep-research-pattern`, `design-evaluation`, `documentation`, `document-parsing`, `layered-explanation`, `open-source-documentation`, `proposal-authoring`
 
 Per [MANIFESTO Pillar 1](MANIFESTO.md): every reusable pattern has ONE name, ONE home, available everywhere via reference, not copy. When Tapestry's `engine/` is built out, compiled-skill output will land in this plugin (auto-write loop closure is future scope per MANIFESTO Part 4.7).

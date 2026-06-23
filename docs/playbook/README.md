@@ -52,7 +52,7 @@ Promoted skills live under `tapestry/engine/skills/migration/` (planned) once th
 
 ## Cross-repo discipline
 
-Both `loom-discipline` and `make-skills-discipline` plugins enforce *"save corrections as feedback memory immediately"* at every UserPromptSubmit. The playbook is the synthesis layer for those memories. Future agents (including Tapestry-agent) should treat playbook chapters as binding context — they encode lessons the operator and prior agents already paid for.
+Both `tapestry-discipline` and `make-skills-discipline` plugins enforce *"save corrections as feedback memory immediately"* at every UserPromptSubmit. The playbook is the synthesis layer for those memories. Future agents (including Tapestry-agent) should treat playbook chapters as binding context — they encode lessons the operator and prior agents already paid for.
 
 ## Index
 

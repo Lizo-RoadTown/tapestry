@@ -1,6 +1,6 @@
 {
   "enabledPlugins": {
-    "loom-discipline@lizo-loom": true,
-    "liz-patterns@lizo-skills": true
+    "tapestry-discipline@tapestry": true,
+    "tapestry-patterns@tapestry": true
   }
 }

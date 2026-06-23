@@ -31,9 +31,9 @@ Every "once part of the project" repo beyond the already-planned the-loom + Make
 
 | Repo | Nature (PROBE-cited) | Disposition | Destination / mechanism | Conf. | Operator question |
 |---|---|---|---|---|---|
-| **docs-agent** | Loom-aware doc-specialist repo; its 16 skills + 7 agents were **already consolidated** into the `liz-patterns` plugin (commit `afc2f16`); `skills/`+`agents/` dirs now empty (`docs-agent/CLAUDE.md:37,43`). **Absent from every migration doc.** | ATTACH + (future) adapter | Skills/agents already in the plugin (Pillar 1 done); the only open piece is the empty agent persona Liz will author | med | Does the docs-agent persona become a Tapestry adapter, or stay a standalone published agent? |
+| **docs-agent** | Loom-aware doc-specialist repo; its 16 skills + 7 agents were **already consolidated** into the `tapestry-patterns` plugin (commit `afc2f16`); `skills/`+`agents/` dirs now empty (`docs-agent/CLAUDE.md:37,43`). **Absent from every migration doc.** | ATTACH + (future) adapter | Skills/agents already in the plugin (Pillar 1 done); the only open piece is the empty agent persona Liz will author | med | Does the docs-agent persona become a Tapestry adapter, or stay a standalone published agent? |
 | **loom-platform** | Consumer prototype seed (CLAUDE.md fleet table; absorption "deferred") | DECISION DEFERRED → likely ATTACH or RETIRE | TBD — operator scopes | low | Still "deferred" — does it integrate, attach, or retire? |
-| **claude-skills-marketplace** | Public plugin marketplace; hosts `liz-patterns`, `loom-discipline` (via lizo-loom), `onboarding-psychologist`, `ai-agents-architect` | ATTACH (distribution surface) | Stays the publish target; Tapestry CI publishes INTO it (discipline plugin Step 8) | high | — |
+| **claude-skills-marketplace** | Public plugin marketplace; hosts `tapestry-patterns`, `tapestry-discipline` (via lizo-loom), `onboarding-psychologist`, `ai-agents-architect` | ATTACH (distribution surface) | Stays the publish target; Tapestry CI publishes INTO it (discipline plugin Step 8) | high | — |
 | **classroom-hub-starter** | Classroom hub seed; Next.js + `.mcp.json` + embedded assistant | TEMPLATE-SOURCE | `templates/classroom-project/` | high | Hub-starter vs Make_Skills classroom default-seed — which is canonical? |
 | **web-starter** | Next.js + Auth.js + Postgres template, loom-wired | TEMPLATE-SOURCE → then RETIRE | `templates/software-project/` + `packages/cli/init` | high | — |
 | **ux-starter** | Framework-agnostic app template, loom-wired. **No slot in UMBRELLA template table.** | TEMPLATE-SOURCE → then RETIRE | Fold into `software-project` OR new `templates/app-project/` | med | Does ux-starter need its own template kind, or fold into software-project? |
@@ -50,13 +50,13 @@ Every "once part of the project" repo beyond the already-planned the-loom + Make
 
 *(Confidence = researcher inference from the cited file(s); every disposition is operator-to-confirm, not decided here.)*
 
-**Three findings the existing fleet table misses:** (1) **docs-agent** is absent from all migration docs though its skills/agents were already folded into the `liz-patterns` plugin (commit `afc2f16`) — its repo disposition and empty agent persona are still unaddressed; (2) **three near-duplicate starter clones** (`claude-project-starter`, `web-project-starter`, `paper-explainer`) are archival candidates, not separate sources; (3) **ux-starter has no destination slot** in the template taxonomy.
+**Three findings the existing fleet table misses:** (1) **docs-agent** is absent from all migration docs though its skills/agents were already folded into the `tapestry-patterns` plugin (commit `afc2f16`) — its repo disposition and empty agent persona are still unaddressed; (2) **three near-duplicate starter clones** (`claude-project-starter`, `web-project-starter`, `paper-explainer`) are archival candidates, not separate sources; (3) **ux-starter has no destination slot** in the template taxonomy.
 
 ---
 
 ## §3. Live runtime + agent integration map
 
-What is deployed/running, and how each stays coherent during the parallel-build. **PROBE correction up front:** several items the readiness plan listed as "in flight" have **landed** — the dispatch auto-trigger (A3, commit `63cf1ea`) is live (`the-loom/services/architecture-registry/main.py:234-235`), the self-observer synthesis memo is live (`synthesis.py` + `memory_client.py`, `main.py:187-199` writes `self_observer_synthesis_latest`), and cold-start is reconciled (`render.yaml:80` `plan: starter`, keep-warm cron retired). Also: **there are TWO observers** — the server-side `self-observer` cron (repo scanner) and a client-side `observer.py` inside the loom-discipline plugin (per-session transcript scanner).
+What is deployed/running, and how each stays coherent during the parallel-build. **PROBE correction up front:** several items the readiness plan listed as "in flight" have **landed** — the dispatch auto-trigger (A3, commit `63cf1ea`) is live (`the-loom/services/architecture-registry/main.py:234-235`), the self-observer synthesis memo is live (`synthesis.py` + `memory_client.py`, `main.py:187-199` writes `self_observer_synthesis_latest`), and cold-start is reconciled (`render.yaml:80` `plan: starter`, keep-warm cron retired). Also: **there are TWO observers** — the server-side `self-observer` cron (repo scanner) and a client-side `observer.py` inside the tapestry-discipline plugin (per-session transcript scanner).
 
 | Live piece | Disposition | "Keep up to date" requires during build |
 |---|---|---|
@@ -181,7 +181,7 @@ UMBRELLA bounded-contexts table (C2/C3/C4); roadmap §7-E (C1) + §4 telemetry e
 The outside reviewer accepted this as the integration understanding (not execution authority) and returned decisions; the operator "generally agrees." Recorded here and in loom-memory `tapestry_decision_unified_integration_2026_06_18`.
 
 **Fleet dispositions (decision 1):**
-- **docs-agent** → ATTACH as a future docs/research *adapter*, not a standalone product repo (skills/agents already in `liz-patterns`; only the persona remains).
+- **docs-agent** → ATTACH as a future docs/research *adapter*, not a standalone product repo (skills/agents already in `tapestry-patterns`; only the persona remains).
 - **loom-platform** → RETIRE unless a concrete consumer role is identified (no vague "deferred" repos kept alive).
 - **duplicate starters** (`claude-project-starter`, `web-project-starter`, `paper-explainer`) → ARCHIVE unless one holds unique code not in `project-starter`/`web-starter`.
 - **ux-starter** → fold into a `software-project` variant unless it proves genuinely distinct (then `templates/software-project/variants/ux-first`, not a top-level template yet).

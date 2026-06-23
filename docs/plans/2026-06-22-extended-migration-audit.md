@@ -179,7 +179,7 @@ High utility, won't break Steps 1–8 if deferred to a follow-up cycle. Grouped 
 - `skills_private/concrete-rule/` — methodology for protecting system invariants via defense-in-depth
 - `skills_private/periodic-architectural-checkin/` — structured pause for auditing drift
 
-**Destination:** `tapestry/integrations/claude-code/skills/` (or promote to a `liz-patterns` plugin entry, operator's call).
+**Destination:** `tapestry/integrations/claude-code/skills/` (or promote to a `tapestry-patterns` plugin entry, operator's call).
 
 **Why:** Both are explicitly flagged in `the-loom/skills/README.md` as queued for future migration / promotion review (verify line numbers when lifting; eval finding 1.6 noted the README is at `skills/`, not `skills_private/`). Pair operationally with §2.3's `audit_concrete_rules.py` (the runner for the methodology).
 
@@ -219,7 +219,7 @@ High utility, won't break Steps 1–8 if deferred to a follow-up cycle. Grouped 
 - `Make_Skills/platform/REMOTE_ACCESS.md` — Tailscale remote-access guide
 - `the-loom/docs/runbooks/grafana-dashboard-rebuild.md` — already in §1.1
 - `the-loom/docs/runbooks/mcp-drop-investigation.md` — open investigation
-- `the-loom/docs/howto/onboard-a-project.md` — manual `loom init` flow (CLI is the spec; this is the prose)
+- `the-loom/docs/howto/onboard-a-project.md` — manual `tapestry init` flow (CLI is the spec; this is the prose)
 
 **Destination:** `tapestry/docs/runbooks/` (create the directory; add a brief README explaining the convention — one runbook = one operational task; named `<verb>-<noun>.md`).
 
@@ -309,9 +309,9 @@ Items the audit flagged as actively-deletable, already-superseded, or already in
 | `Make_Skills/docs/_archive/`, `inspiration/`, `_pdfs/` | Historical archive; don't lift |
 | `Make_Skills/docs/runbooks/memory-mcp-local.md` | Superseded by loom's pgvector MCP; LanceDB deprecated upstream |
 | `the-loom/scripts/loom_init.py` | Backwards-compat shim; obsolete once Tapestry CLI publishes |
-| `the-loom/scripts/new-loom-project.ps1` | Pre-CLI manual workflow; superseded by `loom init` |
+| `the-loom/scripts/new-loom-project.ps1` | Pre-CLI manual workflow; superseded by `tapestry init` |
 | `the-loom/scripts/architecture_{snapshot,diff}.py` (thin wrappers) | Per their own docstring, slated for removal once loom-discipline invokes canonical directly |
-| `the-loom/skills/` | Empty by design; README documents the migration to liz-patterns plugin |
+| `the-loom/skills/` | Empty by design; README documents the migration to tapestry-patterns plugin |
 | `the-loom/docs/INTER_AGENT_DIALOGUE.md` | Already marked for retirement in `legacy-repo-inventory.md` |
 | `the-loom/docs/architecture-snapshots/` (as content) | Auto-generated; retain in source repo for audit history but don't lift files |
 | `the-loom/docs/memory-snapshots/` (as content) | Same — auto-generated artifact dir |

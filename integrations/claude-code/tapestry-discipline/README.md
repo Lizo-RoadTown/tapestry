@@ -1,4 +1,4 @@
-# loom-discipline
+# tapestry-discipline
 
 Claude Code plugin. The discipline wrapper for Liz's Claude Code sessions in `Make_Skills`, `the-loom`, `project-starter`-scaffolded repos, and (as of v0.1.12) any repo that sets `LOOM_PROJECT_ID` in its `.env` — the explicit per-project opt-in. Auto-injects PROBE-first behavior, file:line citation enforcement, dev-tooling-vs-runtime distinction, and friction-as-memory writing. Hook scripts inject reminders on every prompt and audit tool args before writes.
 
@@ -6,20 +6,20 @@ Claude Code plugin. The discipline wrapper for Liz's Claude Code sessions in `Ma
 
 ## History
 
-This plugin was developed under the name `make-skills-discipline` at `Lizo-RoadTown/claude-skills-marketplace/plugins/` from v0.1.0 (2026-05-22) through v0.1.5 (2026-05-26). On 2026-05-26 it was **moved into the-loom** at this path (`adapters/claude-code/loom-discipline/`) and renamed to `loom-discipline` to reflect its canonical home under the loom platform.
+This plugin was developed under the name `make-skills-discipline` at `Lizo-RoadTown/claude-skills-marketplace/plugins/` from v0.1.0 (2026-05-22) through v0.1.5 (2026-05-26). On 2026-05-26 it was **moved into the-loom** at this path (`adapters/claude-code/loom-discipline/`) and renamed to `tapestry-discipline` to reflect its canonical home under the loom platform.
 
 The marketplace entry remains for historical install records and gets a deprecation pointer to the new location. New installs should use this version.
 
 | Version | What |
 | --- | --- |
 | v0.1.0–0.1.5 | Marketplace versions — `Lizo-RoadTown/claude-skills-marketplace/plugins/make-skills-discipline/`. See marketplace CHANGELOG for history (v0.1.3 false-positive fixes, v0.1.4 silent-import fix, v0.1.5 the-loom scope broadening). |
-| **v0.1.6 (this)** | First version in the-loom. Renamed `make-skills-discipline` → `loom-discipline`. Added OTLP log exporter alongside the existing `hooks.jsonl` local write. |
+| **v0.1.6 (this)** | First version in the-loom. Renamed `make-skills-discipline` → `tapestry-discipline`. Added OTLP log exporter alongside the existing `hooks.jsonl` local write. |
 
 ## Install locally
 
 ```bash
 # In any Claude Code session:
-/plugin install loom-discipline@<source>
+/plugin install tapestry-discipline@tapestry
 
 # OR symlink directly into Claude's plugin dir for development:
 ln -s C:/Users/Liz/the-loom/adapters/claude-code/loom-discipline ~/.claude/plugins/loom-discipline
@@ -61,7 +61,7 @@ Standard OTel SDK env vars. Set anywhere your Claude Code session inherits — `
 | `OTEL_EXPORTER_OTLP_HEADERS` | same | `Authorization=Basic%20<base64(instance_id:token)>` |
 | `OTEL_EXPORTER_OTLP_PROTOCOL` | same (inline `http/protobuf` in render.yaml) | The wire protocol — we use JSON though; this var documents the OTel SDK convention for downstream services that DO use the SDK |
 | `OTEL_RESOURCE_ATTRIBUTES` | same (inline `service.namespace=loom,deployment.environment=dev`) | Namespace + environment tags |
-| `OTEL_SERVICE_NAME` | per-source (`loom-discipline` for this plugin) | Distinguishes telemetry streams |
+| `OTEL_SERVICE_NAME` | per-source (`tapestry-discipline` for this plugin) | Distinguishes telemetry streams |
 
 If any of these are unset, the plugin still works — only the OTel export skips. The local jsonl write is unconditional.
 
@@ -74,7 +74,7 @@ If any of these are unset, the plugin still works — only the OTel export skips
 ## Files
 
 ```
-loom-discipline/
+tapestry-discipline/
 ├── .claude-plugin/plugin.json    # plugin manifest (name, version, description)
 ├── README.md                      # this file
 ├── hooks/
@@ -86,7 +86,7 @@ loom-discipline/
 │   ├── user_prompt_submit.py     # UserPromptSubmit hook
 │   ├── pre_tool_use.py           # PreToolUse hook (Edit|Write|MultiEdit)
 │   └── stop_audit.py             # Stop hook
-├── skills/loom-discipline/
+├── skills/tapestry-discipline/
 │   └── SKILL.md                  # discipline rules the harness surfaces on every relevant message
 ├── agents/
 │   └── architecture-analyst.md   # subagent invoked by /architecture-report or SessionStart
@@ -99,11 +99,11 @@ loom-discipline/
 ## Tests
 
 ```bash
-cd adapters/claude-code/loom-discipline
+cd integrations/claude-code/tapestry-discipline
 python -m unittest tests.test_pre_tool_use -v
 ```
 
-19/19 should pass (v0.1.5 baseline + future loom-discipline-specific additions).
+19/19 should pass (v0.1.5 baseline + future tapestry-discipline-specific additions).
 
 ## See also
 

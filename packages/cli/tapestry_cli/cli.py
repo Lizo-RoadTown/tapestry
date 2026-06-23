@@ -8,7 +8,7 @@ Subcommands:
   tapestry version   — print version + diagnostic info
 
 Add a new subcommand by:
-  1. Creating loom_cli/<name>.py with add_arguments(parser) + run(args) -> int
+  1. Creating tapestry_cli/<name>.py with add_arguments(parser) + run(args) -> int
   2. Importing + registering it in SUBCOMMANDS below
 """
 from __future__ import annotations

@@ -17,7 +17,7 @@ For the file-by-file reference, see [Load-bearing files](/reference/load-bearing
 
 You will likely enable all three for any non-trivial Tapestry-consuming project.
 
-The two `tapestry-*` plugins were consolidated into the tapestry monorepo 2026-06-22; the prior names + marketplaces (`loom-discipline@lizo-loom`, `liz-patterns@lizo-skills`) remain available during the transition window. New projects should use the `tapestry-*` names.
+The two `tapestry-*` plugins were consolidated into the tapestry monorepo 2026-06-22; the prior names + marketplaces (`tapestry-discipline@tapestry`, `tapestry-patterns@tapestry`) remain available during the transition window. New projects should use the `tapestry-*` names.
 
 ## `tapestry-discipline@tapestry` — the discipline source
 
@@ -42,7 +42,7 @@ The two `tapestry-*` plugins were consolidated into the tapestry monorepo 2026-0
 /plugin install tapestry-discipline@tapestry
 ```
 
-The prior `/plugin install loom-discipline@lizo-loom` (sourced from the-loom) still works during the transition window.
+The prior `/plugin install tapestry-discipline@tapestry` (sourced from the-loom) still works during the transition window.
 
 ## `tapestry-patterns@tapestry` — the canonical patterns
 
@@ -65,7 +65,7 @@ The prior `/plugin install loom-discipline@lizo-loom` (sourced from the-loom) st
 /plugin install tapestry-patterns@tapestry
 ```
 
-The prior `/plugin install liz-patterns@lizo-skills` (sourced from claude-skills-marketplace) still works during the transition window.
+The prior `/plugin install tapestry-patterns@tapestry` (sourced from claude-skills-marketplace) still works during the transition window.
 
 ## Per-project guards (the `sde-extraction-guard` pattern)
 

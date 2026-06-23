@@ -1,4 +1,4 @@
-# liz-patterns
+# tapestry-patterns
 
 **The canonical patterns library for Liz Osborn.** One home for her reusable agents, skills, and tools. Available in every Claude Code session in every project — so when she invokes a pattern by name, it works the same way wherever she invokes it.
 
@@ -48,7 +48,7 @@ Future work: expose those tools as MCP, then move the agent into this plugin. Tr
 
 ```bash
 /plugin marketplace add Lizo-RoadTown/claude-skills-marketplace
-/plugin install liz-patterns@lizo-skills
+/plugin install tapestry-patterns@tapestry
 ```
 
 Restart Claude Code after install. The agents + skills are then available in every session in every project.

@@ -69,7 +69,7 @@ The compute layer: agent loop, observation, compilation, adaptation.
 | Package | Purpose | Source prototype |
 |---|---|---|
 | `sdk/` | Tapestry SDK for consumer integration | Not yet built |
-| `cli/` | `loom init` / `tapestry init` CLI for project spawning | `the-loom/scripts/new-loom-project.ps1` (manual placeholder) |
+| `cli/` | `tapestry init` / `tapestry init` CLI for project spawning | `the-loom/scripts/new-loom-project.ps1` (manual placeholder) |
 | `shared-types/` | TypeScript / Pydantic types shared across apps + services | Scattered today |
 | `schemas/` | OpenAPI + JSON Schema + SQL migrations as schemas | Scattered today |
 | `auth/` | Shared auth: tenant resolution, JWT verification | `the-loom/services/agent-context/auth_bridge.py` + `Make_Skills/core/auth/` |
@@ -81,7 +81,7 @@ The compute layer: agent loop, observation, compilation, adaptation.
 |---|---|---|
 | `mcp/` | MCP server packaging + manifest publishing | `the-loom/services/agent-context/` (already an MCP) |
 | `vscode/` | VSCode extension | Not yet built |
-| `claude-code/` | Claude Code plugin (the discipline plugin) | `Lizo-RoadTown/claude-skills-marketplace/plugins/make-skills-discipline/` (now `loom-discipline`) |
+| `claude-code/` | Claude Code plugin (the discipline plugin) | `Lizo-RoadTown/claude-skills-marketplace/plugins/make-skills-discipline/` (now `tapestry-discipline`) |
 | `codex/` | OpenAI Codex CLI integration | Not yet built |
 | `github/` | GitHub Actions + GitHub App | Not yet built |
 | `grafana/` | Grafana dashboards + alerts | Embedded in `the-loom/services/project-observatory/` |
@@ -109,7 +109,7 @@ The compute layer: agent loop, observation, compilation, adaptation.
 ```text
 Consuming project session
   ↓
-Plugin (loom-discipline) emits telemetry + session-end upskilling report
+Plugin (tapestry-discipline) emits telemetry + session-end upskilling report
   ↓
 services/telemetry-ingestion → services/project-observatory (Grafana)
                               ↘ engine/local-observer

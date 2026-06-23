@@ -388,7 +388,7 @@ The proposal correctly identifies that `orphan/hot_path/degrading` don't fit the
 
 ### 7.4 `agentic-upskilling` plugin skill is the documentation entry-point for the existing self-observer.
 
-Per memory `liz_patterns_plugin_install_test_passed_2026_06_14`, the canonical patterns home is the `liz-patterns` plugin, and `agentic-upskilling` is listed as one of its agents. Per `lesson_self_observer_gap_revealed_by_skill_mislabel_audit_2026_06_13`, the self-observer IS the implementation behind `agentic-upskilling`. When Tapestry absorbs the observer, the agent stub in the plugin needs to point at the new location. The proposal doesn't mention this seam — it's a small thing but it's the kind of detail that becomes a "wait, this is broken" moment six months from now.
+Per memory `liz_patterns_plugin_install_test_passed_2026_06_14`, the canonical patterns home is the `tapestry-patterns` plugin, and `agentic-upskilling` is listed as one of its agents. Per `lesson_self_observer_gap_revealed_by_skill_mislabel_audit_2026_06_13`, the self-observer IS the implementation behind `agentic-upskilling`. When Tapestry absorbs the observer, the agent stub in the plugin needs to point at the new location. The proposal doesn't mention this seam — it's a small thing but it's the kind of detail that becomes a "wait, this is broken" moment six months from now.
 
 ### 7.5 No tripwire for "the proposal was wrong."
 

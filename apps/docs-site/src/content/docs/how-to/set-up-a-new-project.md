@@ -37,7 +37,7 @@ In any Claude Code session:
 /plugin install tapestry-discipline@tapestry
 ```
 
-This installs to your machine's plugin cache at `~/.claude/plugins/cache/tapestry/tapestry-discipline/<version>/`. It is now AVAILABLE on your machine. It is NOT YET enabled in any specific project. The prior `loom-discipline@lizo-loom` install command still works during the transition.
+This installs to your machine's plugin cache at `~/.claude/plugins/cache/tapestry/tapestry-discipline/<version>/`. It is now AVAILABLE on your machine. It is NOT YET enabled in any specific project. The prior `tapestry-discipline@tapestry` install command still works during the transition.
 
 ## Step 3 — Enable the plugin in your project's `.claude/settings.json`
 
@@ -175,7 +175,7 @@ The Tapestry platform includes a Project Registry service that tracks every cons
 
 The registry endpoint is `https://loom-project-registry.onrender.com/projects` (currently hosted from the platform's beta repo; the URL will change when the service migrates into Tapestry — env-var overrides are wired so consuming projects won't have to chase the rename).
 
-When the registry has its public CLI (`loom init`), one command will do all of this. Until then, a `curl POST` to register is the manual step. See the Tapestry MASTER_CHECKLIST for current status.
+When the registry has its public CLI (`tapestry init`), one command will do all of this. Until then, a `curl POST` to register is the manual step. See the Tapestry MASTER_CHECKLIST for current status.
 
 ## Step 10 — Restart Claude Code and verify
 

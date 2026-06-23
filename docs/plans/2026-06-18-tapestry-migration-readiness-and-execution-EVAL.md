@@ -241,7 +241,7 @@ When Tapestry services exist alongside loom services on Render:
 
 The marketplace is the publishing channel for the discipline plugin (per CLAUDE.md). Step 8 says "Marketplace plugin publishes from Tapestry CI (not from the-loom)" but doesn't describe:
 - Does the `lizo-loom` marketplace get updated, or does a new `lizo-tapestry` marketplace get created?
-- What happens to existing `loom-discipline@lizo-loom` installations during cutover?
+- What happens to existing `tapestry-discipline@tapestry` installations during cutover?
 - Cross-repo CI to push from Tapestry to the marketplace repo
 
 **Required edit:** Step 8 expand to enumerate the marketplace cutover.

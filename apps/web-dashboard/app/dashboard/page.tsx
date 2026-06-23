@@ -2,7 +2,7 @@
  * Observability dashboard — Phase 1.
  *
  * Embeds Grafana Cloud panels showing live hook events from the
- * loom-discipline plugin. Auth is currently anonymous Grafana panel sharing
+ * tapestry-discipline plugin. Auth is currently anonymous Grafana panel sharing
  * (Phase 1 open question — tighten to signed-URL embedding before any
  * non-personal use).
  *
@@ -60,7 +60,7 @@ export default function DashboardPage() {
             embed URL.
           </p>
           <p className="text-loom-500 mt-2">
-            Until the loom-discipline plugin starts emitting telemetry (Phase
+            Until the tapestry-discipline plugin starts emitting telemetry (Phase
             1B), the panel will appear empty even when configured.
           </p>
         </section>

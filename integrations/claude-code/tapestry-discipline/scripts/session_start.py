@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-SessionStart hook for loom-discipline.
+SessionStart hook for tapestry-discipline (preserved runtime label: [loom-discipline]).
 
 Triggers the architecture-snapshot pipeline:
 
@@ -254,7 +254,7 @@ def _try_recall(cwd_lower: str, n: int = 5, timeout: float = 6.0) -> list[str]:
 
 
 def _in_scope(cwd) -> bool:
-    """True if loom-discipline hooks should run for this repo.
+    """True if tapestry-discipline hooks should run for this repo.
 
     In scope if EITHER the working-directory path contains a known loom
     substring (Make_Skills / the-loom / project-starter / _common), OR
@@ -390,7 +390,7 @@ def main() -> int:
             msg_lines.append(f"Diff:     {rel_diff_md}")
         msg_lines.append("")
         msg_lines.append(
-            "Invoke the architecture-analyst subagent (in the loom-discipline plugin) "
+            "Invoke the architecture-analyst subagent (in the tapestry-discipline plugin) "
             "to read the snapshot + diff and produce the narrative report at "
             "docs/architecture-snapshots/<timestamp>-narrative.md. Pass the file paths above as input. "
             "If the diff shows no changes, write the minimal narrative form."

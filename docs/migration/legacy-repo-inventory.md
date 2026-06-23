@@ -97,7 +97,7 @@ These don't get imported. They're examples of consuming projects. Their PATTERNS
 
 **Worth keeping:**
 
-- The three plugins (`onboarding-psychologist`, `ai-agents-architect`, `loom-discipline`) — they migrate as `tapestry/packages/cli/` distributions OR remain in claude-skills-marketplace as the public distribution channel
+- The three plugins (`onboarding-psychologist`, `ai-agents-architect`, `tapestry-discipline`) — they migrate as `tapestry/packages/cli/` distributions OR remain in claude-skills-marketplace as the public distribution channel
 - The publishing workflow
 
 **Decision:** Whether `claude-skills-marketplace` absorbs into Tapestry or remains a separate public-distribution repo is **open**. The discipline plugin in particular benefits from being in the marketplace for one-command-install.

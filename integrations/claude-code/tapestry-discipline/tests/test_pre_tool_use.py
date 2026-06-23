@@ -2,7 +2,7 @@
 
 Run from the plugin root:
 
-    python -m unittest plugins/loom-discipline/tests/test_pre_tool_use.py
+    python -m unittest integrations/claude-code/tapestry-discipline/tests/test_pre_tool_use.py
 
 Or via CI: see .github/workflows/validate.yml.
 

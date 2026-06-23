@@ -57,7 +57,7 @@ When the primary updates this document, it commits the change to tapestry repo s
 - [x] **A5.** Delete `claude-skills-marketplace/plugins/make-skills-discipline/` source dir — done
 - [x] **A6.** Remove `make-skills-discipline` entry from `claude-skills-marketplace/.claude-plugin/marketplace.json` — done
 - [x] **A7.** Commit + push claude-skills-marketplace cleanup — pushed `63604cd`
-- [x] **A8.** Sweep **15 files** (PROBE-verified, not 13 as I initially said — drift-watcher catch) replacing `make-skills-discipline@lizo-skills` → `loom-discipline@lizo-loom`:
+- [x] **A8.** Sweep **15 files** (PROBE-verified, not 13 as I initially said — drift-watcher catch) replacing `make-skills-discipline@lizo-skills` → `tapestry-discipline@tapestry`:
   - [x] `c:/Users/Liz/classroom-hub-starter/CLAUDE.md`
   - [x] `c:/Users/Liz/claude-skills-marketplace/CLAUDE.md`
   - [x] `c:/Users/Liz/docs-agent/CLAUDE.md`
@@ -77,7 +77,7 @@ When the primary updates this document, it commits the change to tapestry repo s
 - [x] **A10.** Commit + push each repo — 13 of 14 to main on first try; web-project-starter rebased + pushed at `b46da2d`; humancensys-app + project-starter rode existing feature branches (`bump-sentry-9`, `add-skills-to-scaffold`)
 - [x] **A11.** `feedback_discipline_plugin_reconciliation_deferred_2026_06_14` marked RESOLVED by `loom_discipline_reconciliation_complete_option_a_2026_06_14`
 - [x] **A12.** State snapshot saved (this also signals drift-watcher to stop per its brief)
-- [ ] **A13.** Operator verifies: `/plugin marketplace update` then `/plugin update loom-discipline@lizo-loom` upgrades from 0.1.10 to 0.1.13
+- [ ] **A13.** Operator verifies: `/plugin marketplace update` then `/plugin update tapestry-discipline@tapestry` upgrades from 0.1.10 to 0.1.13
 
 #### Stop conditions / abort
 
@@ -106,7 +106,7 @@ Per `tapestry/docs/proposals/2026-06-13-v1-scope-and-roadmap.md` §5 (sequenced 
 - [x] **Step 3** — project-registry — **PROD CUTOVER COMPLETE 2026-06-21.** `loom-project-registry` re-sourced to the tapestry repo (same URL/loom-postgres; consumers unchanged); verified green (health, GET /projects real data, create→read→delete round-trip). 2nd production migration. the-loom blueprint released (the-loom PR #32). Net-new signup endpoint still deferred. See `tapestry_step3_prod_cutover_complete_2026_06_21`.
 - [x] **Step 4** — engine — **MIGRATION COMPLETE (code-lift) 2026-06-21** (PR #9): `engine/skill-compiler/` + `services/skill-making/` Refactor-lifted (imports → `python/<pkg>/` + bootstrap; **bridge `hmac_verify`+`models` byte-identical**; compile + resolution verified; drift re-verified clean). **NO cutover owed** — operator confirmed `make-skills-api` was a host for a DIFFERENT app and does NOT migrate (`feedback_make_skills_api_is_host_for_other_app_not_a_migration_target_2026_06_21`). The lifted engine logic is canonical Tapestry; it deploys fresh/standalone when the product needs it (bridge DB tables `bridge_idempotency`/`promoted_skills` forklift then). Runbook: `runbooks/04-engine.md`.
 - [~] **Step 5** — templates + CLI:
-  - [x] **5a CLI lift** — `the-loom/loom-cli/` → `tapestry/packages/cli/` (verbatim Lift, `cmp`-identical; stdlib-only; URL-env-driven; `loom_cli.cli` resolves). 2026-06-21, branch `migration/05a-cli`/PR. No publish yet.
+  - [x] **5a CLI lift** — `the-loom/loom-cli/` → `tapestry/packages/cli/` (verbatim Lift, `cmp`-identical; stdlib-only; URL-env-driven; `tapestry_cli.cli` resolves). 2026-06-21, branch `migration/05a-cli`/PR. No publish yet.
   - [ ] **5b templates assembly** — build `templates/{software,classroom,research,operations}-project/` from the starter repos (curation, NOT a lift — web-starter etc. are full apps). Needs scoping: which starter parts → template vs project-specific. Per §6.5 Decision 6 mapping.
 - [ ] **Step 6** — web-dashboard v1 lift
 - [ ] **Step 7** — architecture-registry + policy lift + render.yaml
@@ -121,7 +121,7 @@ Per MANIFESTO Part 4.7 — engine compile output → plugin file → git commit 
 
 Engine ack-defers all kinds except `kind=skill`. Need handlers for `agent`, `inline_tool`, `external_tool`, `architecture_pattern`, `service`, `machine_support`, `process`, `orchestration`.
 
-### Q5. roadmap-maintenance migration into liz-patterns plugin
+### Q5. roadmap-maintenance migration into tapestry-patterns plugin
 
 Blocked on exposing the in-process Make_Skills `@tool`-decorated roadmap tools (`services/admin/roadmap/tools.py:22, 69, 106`) as MCP first.
 
@@ -193,18 +193,18 @@ Per `cleanup_complete_pre_tapestry_2026_06_14`:
 - 36 obsolete candidates batch-rejected in production
 - Drift-watcher caught a real drift mid-session
 
-### 2026-06-14 — liz-patterns plugin install test
+### 2026-06-14 — tapestry-patterns plugin install test
 
 Per `liz_patterns_plugin_install_test_passed_2026_06_14`:
 - Plugin install verified
 - Skill invocation verified
-- Agent invocation verified (`Agent({subagent_type: "liz-patterns:infrastructure-mapping", ...})`)
+- Agent invocation verified (`Agent({subagent_type: "tapestry-patterns:infrastructure-mapping", ...})`)
 - Canonical-home model proven end-to-end
 
 ### 2026-06-13 — Plugin migration to canonical home
 
 Per `canonical_patterns_home_landed_liz_patterns_plugin_2026_06_14`:
-- liz-patterns plugin shipped at commit `cb11df7`
+- tapestry-patterns plugin shipped at commit `cb11df7`
 - 7 agents + 8 skills migrated from docs-agent
 - Marketplace registration + README updates
 

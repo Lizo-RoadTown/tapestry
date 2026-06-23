@@ -1,6 +1,6 @@
 ---
 title: Quickstart — VS Code
-description: 4-step setup for a new Tapestry-consuming project in VS Code. Uses the Claude Code extension + the `loom onboard` CLI to bootstrap configuration in one command.
+description: 4-step setup for a new Tapestry-consuming project in VS Code. Uses the Claude Code extension + the `tapestry onboard` CLI to bootstrap configuration in one command.
 ---
 
 Get a new project wired into Tapestry in about 5 minutes.
@@ -9,7 +9,7 @@ Get a new project wired into Tapestry in about 5 minutes.
 
 - VS Code installed
 - The [Claude Code extension](https://marketplace.visualstudio.com/items?itemName=Anthropic.claude-code) installed in VS Code
-- `loom-cli` installed: `pip install loom-cli` (or run it from the tapestry monorepo via `python -m loom_cli`)
+- `tapestry-cli` installed: `pip install tapestry-cli` (or run it from the tapestry monorepo via `python -m tapestry_cli`)
 
 ## 4 steps
 
@@ -26,7 +26,7 @@ Get a new project wired into Tapestry in about 5 minutes.
 **3. In the integrated terminal (or any terminal at your project root):**
 
 ```sh
-loom onboard my-project-name
+tapestry onboard my-project-name
 ```
 
 This single command writes:
@@ -49,7 +49,7 @@ Open the Claude Code chat panel and start a new session. You should see:
 
 If neither appears, see [Recover from common failures](/how-to/recover-from-common-failures/).
 
-## What `loom onboard` does NOT do
+## What `tapestry onboard` does NOT do
 
 - Install the Claude Code extension itself (do that from the VS Code marketplace)
 - Run the plugin installs (those happen inside Claude Code chat — step 2 above)
@@ -62,5 +62,5 @@ For the comprehensive walkthrough including those items, see [Set up a new proje
 ## Notes
 
 - **Runtime emission strings**: the discipline reminder you'll see in your chat says `[loom-discipline]` — that's the runtime label, distinct from the install name `tapestry-discipline`. Both are correct.
-- **Re-running `loom onboard`**: idempotent. It merges into existing files rather than overwriting. Safe to re-run if you want to ensure the configuration is current.
-- **Other IDEs**: per-IDE quickstart pages are coming. The underlying setup (run `loom onboard`, install the two plugins, reload) is the same across IDEs; what differs is how you reach the Claude Code chat panel + how you reload.
+- **Re-running `tapestry onboard`**: idempotent. It merges into existing files rather than overwriting. Safe to re-run if you want to ensure the configuration is current.
+- **Other IDEs**: per-IDE quickstart pages are coming. The underlying setup (run `tapestry onboard`, install the two plugins, reload) is the same across IDEs; what differs is how you reach the Claude Code chat panel + how you reload.

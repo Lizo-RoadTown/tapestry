@@ -29,7 +29,7 @@ The diff between the two folders is the evidence of the human's contribution. Tr
 
 ## Research skill set
 
-Lean on these (from the `liz-patterns` plugin, by name):
+Lean on these (from the `tapestry-patterns` plugin, by name):
 
 - `deep-research-pattern` — the playbook for heavy literature/data work.
 - `eval-deep-research` — evaluating research outputs.

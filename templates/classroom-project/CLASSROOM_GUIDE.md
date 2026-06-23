@@ -10,7 +10,7 @@ A **term course hub**: one deployable app holding all of a term's classes, with 
 
 ## Domain skill + adapter
 
-- **`course-setup` skill** — drives the per-class intake (syllabus + Canvas pastes → registry entries). This is a domain skill that stays with the classroom template; it is **not** part of the general `liz-patterns` library.
+- **`course-setup` skill** — drives the per-class intake (syllabus + Canvas pastes → registry entries). This is a domain skill that stays with the classroom template; it is **not** part of the general `tapestry-patterns` library.
 - **`classroom` adapter** — the project-type adapter that carries the domain judgment (parsing syllabi, Canvas → assignments, dates, accommodations). Domain judgment lives in the skill/adapter, not baked into the app scaffold.
 
 ## What you change vs. what's fixed

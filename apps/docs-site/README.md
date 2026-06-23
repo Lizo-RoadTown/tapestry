@@ -61,9 +61,9 @@ sidebar updates. loom-agent's role here ends with this initial scaffold + v1 con
 
 - A NEW failure mode is discovered (someone hits a new way the discipline can silently
   drop) → add a row to `how-to/recover-from-common-failures.md`.
-- The `loom-discipline` plugin gains a new hook or behavior → update
+- The `tapestry-discipline` plugin gains a new hook or behavior → update
   `explanation/discipline-stack.md` and `reference/load-bearing-files.md`.
-- The setup steps change (e.g., when `loom init` CLI lands) → update
+- The setup steps change (e.g., when `tapestry init` CLI lands) → update
   `how-to/set-up-a-new-project.md`.
 - Tapestry services migrate from `the-loom` (per the migration plan) → update URLs
   in `reference/load-bearing-files.md` and the host references throughout.

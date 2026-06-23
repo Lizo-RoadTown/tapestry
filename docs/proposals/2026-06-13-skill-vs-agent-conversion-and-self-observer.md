@@ -86,7 +86,7 @@ Per operator directive *"must be automated and not inside a repo or specific pro
 
 - **Coverage**: hooks fire only when a developer starts a session. Weekends, focused-elsewhere days, vacation = no observation. A cloud cron observes every interval regardless of who is working.
 - **Cost attribution**: hook runs in developer's session context → token cost lands on the session. Cloud service has its own LLM budget tracked separately, with its own quota.
-- **Scope**: hook inside `loom-discipline` only sees what the active session's repo gives it. A cloud observer queries GitHub for all platform-owned repos without being inside any of them.
+- **Scope**: hook inside `tapestry-discipline` only sees what the active session's repo gives it. A cloud observer queries GitHub for all platform-owned repos without being inside any of them.
 - **Rule that generalizes:** any "observer" or "discipline check" capability that produces candidates / surfaces drift / runs continuously belongs in a deployed cloud service, NOT a developer-session hook. Hooks are for interactive guardrails (per-response checks). Cloud services are for continuous observation.
 
 ### Concrete shape

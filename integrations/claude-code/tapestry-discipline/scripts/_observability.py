@@ -1,5 +1,5 @@
 """
-Shared observability helper for loom-discipline hook scripts.
+Shared observability helper for tapestry-discipline hook scripts (preserved runtime label: [loom-discipline] + OTel service.name).
 
 Each hook calls log_event() to produce TWO outputs:
 

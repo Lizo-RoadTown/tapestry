@@ -2,7 +2,7 @@
 
 Run from the plugin root:
 
-    python -m unittest adapters/claude-code/loom-discipline/tests/test_scope.py
+    python -m unittest integrations/claude-code/tapestry-discipline/tests/test_scope.py
 
 v0.1.12 fix: the scope gate used to be a cwd-substring allowlist only
 (Make_Skills / the-loom / project-starter / _common). A fully-wired

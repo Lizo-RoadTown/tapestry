@@ -13,7 +13,7 @@ authors = [
   {name = "Liz Osborn", email = "lizocontactinfo@gmail.com"},
 ]
 # Stdlib-only at runtime by design. Cross-platform Python (Windows / macOS / Linux),
-# no compiled deps, no model downloads — `loom init` works the moment pip install completes.
+# no compiled deps, no model downloads — `tapestry init` works the moment pip install completes.
 dependencies = []
 
 [project.scripts]

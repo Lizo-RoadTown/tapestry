@@ -6,17 +6,17 @@ The `loom` CLI: scaffolds + registers new consuming projects (the cross-platform
 
 ## What's here
 
-Verbatim **Lift** (`cmp`-verified identical) of `the-loom/loom-cli/`:
-- `loom_cli/cli.py` — argparse entrypoint (`main`).
-- `loom_cli/init.py` — `init` command: creates `.env` (OTel propagation + `LOOM_PROJECT_ID`), registers the project, etc.
-- `loom_cli/__init__.py`, `__main__.py`, `pyproject.toml`.
+Verbatim **Lift** (`cmp`-verified identical) of `the-loom/tapestry-cli/`:
+- `tapestry_cli/cli.py` — argparse entrypoint (`main`).
+- `tapestry_cli/init.py` — `init` command: creates `.env` (OTel propagation + `LOOM_PROJECT_ID`), registers the project, etc.
+- `tapestry_cli/__init__.py`, `__main__.py`, `pyproject.toml`.
 
-Stdlib-only (no third-party deps); **URL-env-driven** (reads `LOOM_MEMORY_MCP_URL` / `LOOM_MEMORY_URL` / `LOOM_PROJECT_ID` — no hardcoded loom hostnames). `loom_cli` package name kept (rename deferred, like `loom_auth`).
+Stdlib-only (no third-party deps); **URL-env-driven** (reads `LOOM_MEMORY_MCP_URL` / `LOOM_MEMORY_URL` / `LOOM_PROJECT_ID` — no hardcoded loom hostnames). `tapestry_cli` package name kept (rename deferred, like `loom_auth`).
 
 ## Migration status
 
-**Decision: Lift.** Verified: files byte-identical to source, compiles, `loom_cli.cli` resolves. Companion: Step 5b (templates assembly) — `templates/*` are assembled from the starter repos separately (curation, not a lift).
+**Decision: Lift.** Verified: files byte-identical to source, compiles, `tapestry_cli.cli` resolves. Companion: Step 5b (templates assembly) — `templates/*` are assembled from the starter repos separately (curation, not a lift).
 
 ## Provenance
-- the-loom: `loom-cli/` (the cross-platform scaffolder)
+- the-loom: `tapestry-cli/` (the cross-platform scaffolder)
 - loom-memory: `tapestry_step3_prod_cutover_complete_2026_06_21` (migration state)

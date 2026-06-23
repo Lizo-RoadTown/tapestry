@@ -19,7 +19,7 @@ Usage:
     python architecture_diff.py --repo-root /path/to/repo
     python architecture_diff.py --prev <path> --current <path>
 
-CANONICAL HOME: claude-skills-marketplace/plugins/liz-patterns/scripts/
+CANONICAL HOME: tapestry/integrations/claude-code/tapestry-patterns/scripts/ (this file). Lifted 2026-06-22 from claude-skills-marketplace/plugins/liz-patterns/scripts/
 Consuming projects should call this via a thin wrapper, not copy the body.
 """
 from __future__ import annotations

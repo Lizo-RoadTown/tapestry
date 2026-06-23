@@ -502,7 +502,7 @@ def _save_local_record(path: Path, record: dict[str, Any]) -> None:
 
 def _read_project_uuid(project_intelligence_dir: Path) -> Optional[str]:
     """Read the UUID from .project-intelligence/project-context.json (per
-    loom_cli/init.py:_write_project_intelligence). Returns None if
+    tapestry_cli/init.py:_write_project_intelligence). Returns None if
     absent — observer skips when it can't resolve the project_id."""
     path = project_intelligence_dir / "project-context.json"
     if not path.exists():

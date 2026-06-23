@@ -14,7 +14,7 @@ The `make-skills-discipline` plugin enforces PROBE-first behavior, `file:line` c
 
 ```text
 /plugin marketplace add Lizo-RoadTown/claude-skills-marketplace
-/plugin install make-skills-discipline@lizo-skills
+/plugin install make-skills-discipline@tapestry
 ```
 
 ---
@@ -23,29 +23,29 @@ The `make-skills-discipline` plugin enforces PROBE-first behavior, `file:line` c
 
 Skills that shape *how* Claude works in this repo regardless of the specific task.
 
-### `lizo-skills/ai-agents-architect`
+### `tapestry/ai-agents-architect`
 
 Liz Osborn's decision framework for agent architecture: autonomy spectrum, ReAct vs Plan-and-Execute vs Tree-of-Thoughts, single-vs-multi-agent, when to introduce an orchestrator. Activates on agent-design questions.
 
 ```text
 /plugin marketplace add Lizo-RoadTown/claude-skills-marketplace
-/plugin install ai-agents-architect@lizo-skills
+/plugin install ai-agents-architect@tapestry
 ```
 
-### `lizo-skills/agentic-skill-design` — *coming in marketplace v0.3.0*
+### `tapestry/agentic-skill-design` — *coming in marketplace v0.3.0*
 
 Liz Osborn's meta-skill on designing agentic-form skills (PROBE → DECIDE → ACT → REPORT) vs passive-form. Companion to `agentic-upskilling`. **Not yet published.** Track [the marketplace](https://github.com/Lizo-RoadTown/claude-skills-marketplace/blob/main/CHANGELOG.md) for v0.3.0; install when available:
 
 ```text
-/plugin install agentic-skill-design@lizo-skills
+/plugin install agentic-skill-design@tapestry
 ```
 
-### `lizo-skills/agentic-upskilling` — *coming in marketplace v0.2.0*
+### `tapestry/agentic-upskilling` — *coming in marketplace v0.2.0*
 
 Liz Osborn's headline framework — observe user workflow, identify recurring skill invocations, promote skills to tools when promotion criteria are met. The named framework that makes the project's agent sharper at the user's actual work over time. **Not yet published.** Track [the marketplace](https://github.com/Lizo-RoadTown/claude-skills-marketplace/blob/main/CHANGELOG.md) for v0.2.0; install when available:
 
 ```text
-/plugin install agentic-upskilling@lizo-skills
+/plugin install agentic-upskilling@tapestry
 ```
 
 ### `claude-api`

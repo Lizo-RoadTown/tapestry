@@ -72,6 +72,17 @@ export default defineConfig({
           ],
         },
         {
+          label: "Systems",
+          items: [
+            { label: "Observer", slug: "systems/observer" },
+            { label: "Memory", slug: "systems/memory" },
+            { label: "Telemetry", slug: "systems/telemetry" },
+            { label: "Registry", slug: "systems/registry" },
+            { label: "Observatory", slug: "systems/observatory" },
+            { label: "Docs MCP (planned)", slug: "systems/docs-mcp" },
+          ],
+        },
+        {
           label: "The Observatory",
           items: [
             { label: "What it is", slug: "observatory/about" },

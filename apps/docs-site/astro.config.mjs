@@ -2,6 +2,7 @@
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
 import mermaid from "astro-mermaid";
+import vercel from "@astrojs/vercel";
 
 // Tapestry documentation (Astro Starlight). Public site for an operator setting up a
 // project that plugs into the Tapestry platform. Explains the discipline stack (plugins,
@@ -9,6 +10,9 @@ import mermaid from "astro-mermaid";
 // piece goes missing.
 export default defineConfig({
   site: "https://tapestry-docs.vercel.app",
+  // Adapter enables on-demand routes (the Observatory console + /api/episodes.json)
+  // while all doc pages stay static (prerendered by default).
+  adapter: vercel(),
   integrations: [
     // astro-mermaid must precede starlight so ```mermaid blocks render as diagrams.
     mermaid({ theme: "dark" }),

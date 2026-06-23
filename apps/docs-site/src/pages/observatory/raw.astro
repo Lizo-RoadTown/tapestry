@@ -1,0 +1,55 @@
+---
+export const prerender = false;
+/** Raw events / debug tab — the unrolled hook telemetry. Not the observatory. */
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Raw events (debug) — Tapestry Observatory</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="wordmark" href="/">Tapestry</a>
+      <nav class="topnav"><a href="/">Docs</a><a href="/observatory">Observatory</a><a class="here" href="/observatory/raw">Raw events</a></nav>
+    </header>
+    <main>
+      <section class="hero">
+        <p class="eyebrow mono" id="src">debug · raw telemetry</p>
+        <h1 class="display">Raw events <span class="ac">(debug)</span></h1>
+        <p class="lede">The unrolled hook telemetry — for debugging the feed. The meaningful view is the <a href="/observatory">Observatory</a>.</p>
+      </section>
+      <section class="summary" id="summary"></section>
+      <section><div id="episodes" class="eplist"><p class="loading mono">loading…</p></div></section>
+    </main>
+    <script>
+      const esc = (s: string) => String(s).replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]!));
+      async function load() {
+        const d = await (await fetch("/api/episodes.json", { cache: "no-store" })).json();
+        (document.getElementById("src") as HTMLElement).textContent = "debug · raw telemetry · source: " + d.source;
+        const s = d.summary;
+        (document.getElementById("summary") as HTMLElement).innerHTML = [["episodes", s.episodes], ["sessions", s.sessions], ["projects", s.projects], ["tool calls", s.toolCalls]].map(([k, v]) => `<div class="stat"><span class="num mono">${v}</span><span class="lab">${k}</span></div>`).join("");
+        const eps = d.episodes;
+        (document.getElementById("episodes") as HTMLElement).innerHTML = eps.map((e: any) => {
+          const tools = e.tools.map((t: any) => esc(t.name) + (t.count > 1 ? "·" + t.count : "")).join(" ") || "—";
+          return `<div class="ep mono">${esc((e.start || "").slice(0, 19))} · ${esc(e.project)} · intent=${esc(e.intent)} · tools[${e.toolCalls}]: ${tools} · durable=${e.durableCandidates}</div>`;
+        }).join("");
+      }
+      load();
+    </script>
+    <style is:global>
+      :root{color-scheme:dark;--surface:#0a0d0e;--raised:#16191b;--edge:#2a2f31;--ink:#f3f5f4;--dim:#c4ccca;--faint:#8b9492;--brand:#5fd3da;--font-d:"Instrument Serif",Georgia,serif;--font-s:"Inter",system-ui,sans-serif;--font-m:"JetBrains Mono",ui-monospace,Consolas,monospace}
+      *{box-sizing:border-box}body{margin:0;font:16px/1.55 var(--font-s);color:var(--ink);background:var(--surface);-webkit-font-smoothing:antialiased}
+      a{color:var(--brand)}.mono{font-family:var(--font-m)}.display{font-family:var(--font-d)}.ac{font-family:var(--font-d);font-style:italic;color:var(--brand)}
+      .topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid var(--edge)}
+      .wordmark{font-family:var(--font-d);font-size:20px;text-decoration:none;color:var(--ink)}.topnav{display:flex;gap:18px;font-size:14px}.topnav a{color:var(--faint);text-decoration:none}.topnav .here{color:var(--ink)}
+      main{max-width:1000px;margin:0 auto;padding:36px 24px 80px}
+      .eyebrow{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin:0 0 6px}
+      .hero h1{font-size:clamp(34px,6vw,52px);margin:0 0 8px}.lede{color:var(--dim);margin:0 0 24px}
+      .summary{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px}.stat{border:1px solid var(--edge);border-radius:10px;padding:10px 14px;display:flex;flex-direction:column}.stat .num{font-size:20px;font-weight:600}.stat .lab{font-size:11px;color:var(--faint);text-transform:uppercase}
+      .eplist{display:grid;gap:3px}.ep{font-size:11.5px;color:var(--dim);padding:5px 8px;border:1px solid #2a2f3155;border-radius:6px;overflow-x:auto;white-space:nowrap}.loading{color:var(--faint)}
+    </style>
+  </body>
+</html>

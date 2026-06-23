@@ -3,7 +3,7 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "loom-cli"
+name = "tapestry-cli"
 version = "0.1.0"
 description = "the-loom command-line interface — onboard projects, inspect state, manage memory."
 readme = "README.md"
@@ -17,11 +17,12 @@ authors = [
 dependencies = []
 
 [project.scripts]
-loom = "loom_cli.cli:main"
+tapestry = "tapestry_cli.cli:main"
+loom = "tapestry_cli.cli:main"  # deprecated alias
 
 [project.urls]
 Homepage = "https://github.com/Lizo-RoadTown/the-loom"
 Repository = "https://github.com/Lizo-RoadTown/the-loom"
 
 [tool.setuptools]
-packages = ["loom_cli"]
+packages = ["tapestry_cli"]

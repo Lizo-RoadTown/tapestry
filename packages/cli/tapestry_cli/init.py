@@ -291,7 +291,7 @@ def _write_project_intelligence(
                     "capabilities": ["hooks", "mcp", "skills", "plugins"],
                 }
             ],
-            "generated_by": "loom_cli.init",
+            "generated_by": "tapestry_cli.init",
         }, indent=2), encoding="utf-8")
         print(f"  wrote {agent_profile_path}")
 
@@ -302,7 +302,7 @@ def _write_project_intelligence(
             "slug": slug,
             "name": project_name,
             "hostname": socket.gethostname(),
-            "registered_via": "loom_cli.init",
+            "registered_via": "tapestry_cli.init",
         }, indent=2), encoding="utf-8")
         print(f"  wrote {project_context_path}")
 

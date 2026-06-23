@@ -73,6 +73,7 @@ export default defineConfig({
           items: [
             { label: "Load-bearing files", slug: "reference/load-bearing-files" },
             { label: "OTel coordination contract", slug: "reference/otel-coordination-contract" },
+            { label: "Platform dependencies", slug: "reference/platform-dependencies" },
             // Observatory console lives at src/pages/observatory.astro (custom Astro page,
             // not a Starlight content doc), so it's wired as a manual link, not a slug.
             { label: "Observatory console", link: "/observatory" },

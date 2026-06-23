@@ -42,7 +42,7 @@ The two `tapestry-*` plugins were consolidated into the tapestry monorepo 2026-0
 /plugin install tapestry-discipline@tapestry
 ```
 
-The prior `/plugin install tapestry-discipline@tapestry` (sourced from the-loom) still works during the transition window.
+The prior `/plugin install loom-discipline@lizo-loom` (sourced from the-loom) still works during the transition window.
 
 ## `tapestry-patterns@tapestry` — the canonical patterns
 
@@ -65,7 +65,7 @@ The prior `/plugin install tapestry-discipline@tapestry` (sourced from the-loom)
 /plugin install tapestry-patterns@tapestry
 ```
 
-The prior `/plugin install tapestry-patterns@tapestry` (sourced from claude-skills-marketplace) still works during the transition window.
+The prior `/plugin install liz-patterns@lizo-skills` (sourced from claude-skills-marketplace) still works during the transition window.
 
 ## Per-project guards (the `sde-extraction-guard` pattern)
 

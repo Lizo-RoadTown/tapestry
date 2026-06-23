@@ -177,7 +177,7 @@ LOOM_PROJECT_ID=your-project-id
 
 **If missing:** plugin enable in `.claude/settings.json` resolves to nothing; no hooks fire.
 
-**Install:** `/plugin marketplace add Lizo-RoadTown/tapestry`, then `/plugin install tapestry-discipline@tapestry`. (The prior `tapestry-discipline@tapestry` sourced from `Lizo-RoadTown/the-loom` still works during the transition.)
+**Install:** `/plugin marketplace add Lizo-RoadTown/tapestry`, then `/plugin install tapestry-discipline@tapestry`. (The prior `loom-discipline@lizo-loom` sourced from `Lizo-RoadTown/the-loom` still works during the transition.)
 
 **Current version:** check `~/.claude/plugins/cache/tapestry/tapestry-discipline/` for the latest cached version. v0.1.13+ honors `LOOM_PROJECT_ID` as the scope gate; v0.1.12+ added the explicit `mcpServers.loom-memory` declaration.
 
@@ -191,7 +191,7 @@ LOOM_PROJECT_ID=your-project-id
 
 **If missing:** consuming projects can still wrap their own architecture-snapshot scripts but lose access to the canonical agents and skills via the `tapestry-patterns:` namespace.
 
-**Install:** `/plugin marketplace add Lizo-RoadTown/tapestry`, then `/plugin install tapestry-patterns@tapestry`. (The prior `tapestry-patterns@tapestry` sourced from `Lizo-RoadTown/claude-skills-marketplace` still works during the transition.)
+**Install:** `/plugin marketplace add Lizo-RoadTown/tapestry`, then `/plugin install tapestry-patterns@tapestry`. (The prior `liz-patterns@lizo-skills` sourced from `Lizo-RoadTown/claude-skills-marketplace` still works during the transition.)
 
 ### The Path A observer (inside the `tapestry-discipline` plugin)
 

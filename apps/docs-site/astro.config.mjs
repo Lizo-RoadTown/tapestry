@@ -21,6 +21,19 @@ export default defineConfig({
       description:
         "What keeps a project on track when it plugs into the Tapestry platform: the discipline stack of plugins, MCP wiring, hooks, and project intelligence — and how to recover when one piece goes missing.",
       customCss: ["./src/styles/custom.css"],
+      // Brand fonts, matching the marketing front page (/home):
+      // Instrument Serif (display) / Inter (body) / JetBrains Mono (code).
+      head: [
+        { tag: "link", attrs: { rel: "preconnect", href: "https://fonts.googleapis.com" } },
+        { tag: "link", attrs: { rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: true } },
+        {
+          tag: "link",
+          attrs: {
+            rel: "stylesheet",
+            href: "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap",
+          },
+        },
+      ],
       social: [
         {
           icon: "github",

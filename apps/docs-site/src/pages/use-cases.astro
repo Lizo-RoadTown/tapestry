@@ -1,0 +1,75 @@
+---
+/**
+ * Marketing page — Use Cases. Organized by pain, not feature (operator copy,
+ * 2026-06-23). Each case: the recognizable problem, then what Tapestry helps.
+ */
+import MarketingLayout from "../layouts/MarketingLayout.astro";
+
+const SETUP = "/how-to/set-up-a-new-project/";
+
+const CASES = [
+  { who: "AI prototyping", pain: "You're moving quickly, experimenting constantly, and working across multiple repositories.", help: "Tapestry helps preserve decisions, surface recurring patterns, and reduce the amount of context that must be rebuilt between sessions." },
+  { who: "Long-running projects", pain: "The longer a project lives, the harder it becomes to understand why things are the way they are.", help: "Tapestry captures project intelligence as work happens, making it easier to understand how the project evolved." },
+  { who: "Research teams", pain: "Knowledge often lives in conversations, notebooks, documents, and individual contributors.", help: "Tapestry helps make project intelligence observable and easier to share across a team." },
+  { who: "Agent workflows", pain: "As agent usage grows, coordination becomes harder than generation.", help: "Tapestry helps teams understand how agents, memory, workflows, and project structure interact over time." },
+  { who: "Organizational learning", pain: "The most valuable lessons are often rediscovered repeatedly.", help: "Tapestry helps identify reusable patterns, emerging skills, and durable structures that can be applied across projects." },
+];
+---
+
+<MarketingLayout title="Use cases — Tapestry" description="Organized by the problem, not the feature. Where project intelligence helps — from fast AI prototyping to long-running projects, research teams, agent workflows, and organizational learning." activeNav="platform">
+  <section class="uc-hero">
+    <div class="uc-glow" aria-hidden="true"></div>
+    <div class="uc-hero-in reveal">
+      <p class="kicker mono">Use cases</p>
+      <h1 class="display">Different scale.<br />Same thing <span class="accent">leaks away.</span></h1>
+      <p class="uc-sub">Whatever you're building, context disappears between sessions and across projects. Here's where keeping it changes the outcome.</p>
+      <div class="cta-row"><a class="btn btn-lg" href={SETUP}>Set up a project</a></div>
+    </div>
+  </section>
+
+  <section class="uc-grid-wrap">
+    <div class="uc-grid">
+      {CASES.map((c) => (
+        <article class="uc-card reveal">
+          <h2 class="uc-who">{c.who}</h2>
+          <p class="uc-pain">{c.pain}</p>
+          <p class="uc-help"><span class="uc-tick" aria-hidden="true">→</span>{c.help}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="uc-cta">
+    <div class="uc-cta-glow" aria-hidden="true"></div>
+    <div class="reveal">
+      <h2 class="display uc-cta-title">Keep what your projects<br /><span class="accent">already learned.</span></h2>
+      <div class="cta-row center"><a class="btn btn-lg" href={SETUP}>Set up a project</a><a class="btn btn-ghost btn-lg" href="/project-intelligence">What is project intelligence? →</a></div>
+    </div>
+  </section>
+</MarketingLayout>
+
+<style>
+  .uc-hero { position: relative; overflow: hidden; padding: clamp(72px, 12vw, 140px) 24px clamp(40px, 7vw, 72px); text-align: center; }
+  .uc-glow { position: absolute; inset: -20% 0 auto 0; height: 660px; background: radial-gradient(58% 65% at 50% 0%, #5fd3da26 0, #5fd3da0d 38%, transparent 70%); pointer-events: none; }
+  .uc-hero-in { position: relative; max-width: 800px; margin: 0 auto; }
+  .uc-hero h1 { font-size: clamp(44px, 7.6vw, 80px); line-height: 1.03; margin: 0 0 20px; letter-spacing: -0.01em; }
+  .uc-sub { font-size: clamp(17px, 2.05vw, 20px); line-height: 1.55; color: var(--dim); max-width: 56ch; margin: 0 auto; }
+  .cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 30px; }
+  .cta-row.center { justify-content: center; }
+
+  .uc-grid-wrap { border-top: 1px solid var(--edge-soft); padding: clamp(48px, 8vw, 88px) 0; }
+  .uc-grid { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .uc-card { padding: 30px 28px; border: 1px solid var(--edge); border-radius: 18px; background: linear-gradient(180deg, var(--raised), var(--surface-2)); display: flex; flex-direction: column; transition: transform 0.25s var(--ease), border-color 0.25s, box-shadow 0.25s; }
+  .uc-card:hover { transform: translateY(-4px); border-color: #34474a; box-shadow: 0 24px 50px -28px #000, 0 0 0 1px #5fd3da22; }
+  .uc-who { font-family: var(--font-d); font-weight: 400; font-size: 27px; color: var(--ink); margin: 0 0 14px; }
+  .uc-pain { font-size: 15.5px; line-height: 1.6; color: var(--dim); margin: 0 0 18px; }
+  .uc-help { font-size: 15px; line-height: 1.6; color: var(--ink); margin: auto 0 0; display: flex; gap: 10px; align-items: baseline; }
+  .uc-tick { color: var(--brand); font-family: var(--font-m); flex: none; }
+
+  .uc-cta { position: relative; overflow: hidden; text-align: center; padding: clamp(80px, 13vw, 150px) 24px; border-top: 1px solid var(--edge-soft); }
+  .uc-cta-glow { position: absolute; inset: auto 0 -40% 0; height: 540px; background: radial-gradient(55% 70% at 50% 100%, #5fd3da22 0, transparent 70%); pointer-events: none; }
+  .uc-cta-title { position: relative; font-size: clamp(32px, 5.5vw, 62px); line-height: 1.08; margin: 0 0 34px; }
+
+  @media (max-width: 900px) { .uc-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 580px) { .uc-grid { grid-template-columns: 1fr; } }
+</style>

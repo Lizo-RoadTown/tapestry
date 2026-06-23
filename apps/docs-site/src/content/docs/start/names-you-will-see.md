@@ -17,10 +17,11 @@ The platform is in a beta transition. A few names appear throughout the docs tha
 
 | Name | What it is |
 |---|---|
-| **`loom-discipline`** | The Claude Code plugin that provides the universal discipline stack — PROBE hooks, memory wiring, auto-recall, observer, upskilling audit. Installed once per machine; enabled per project. See [The plugins](/explanation/plugins/). |
-| **`liz-patterns`** | A second plugin: the canonical reusable agents, skills, and scripts (documentation, deep-research, infrastructure-mapping, etc.). Also hosts the architecture-snapshot scripts. |
-| **`lizo-loom`** | The Claude Code plugin marketplace that publishes `loom-discipline`. Add via `/plugin marketplace add Lizo-RoadTown/the-loom`. |
-| **`lizo-skills`** | The Claude Code plugin marketplace that publishes `liz-patterns` and per-project guard plugins. Add via `/plugin marketplace add Lizo-RoadTown/claude-skills-marketplace`. |
+| **`tapestry-discipline`** (formerly `loom-discipline`) | The Claude Code plugin that provides the universal discipline stack — PROBE hooks, memory wiring, auto-recall, observer, upskilling audit. Installed once per machine; enabled per project. Renamed 2026-06-22 (PR #42); the prior `loom-discipline@lizo-loom` install still works during transition. See [The plugins](/explanation/plugins/). |
+| **`tapestry-patterns`** (formerly `liz-patterns`) | A second plugin: the canonical reusable agents, skills, and scripts (documentation, deep-research, infrastructure-mapping, etc.). Also hosts the architecture-snapshot scripts. Renamed 2026-06-22; the prior `liz-patterns@lizo-skills` install still works during transition. |
+| **`tapestry`** (canonical marketplace) | The Claude Code plugin marketplace that publishes `tapestry-discipline` and `tapestry-patterns`. Add via `/plugin marketplace add Lizo-RoadTown/tapestry`. |
+| **`lizo-loom`** (transitional marketplace) | Formerly published `loom-discipline` from `Lizo-RoadTown/the-loom`. Still resolves; new projects should use the `tapestry` marketplace. |
+| **`lizo-skills`** (transitional marketplace) | Formerly published `liz-patterns` from `Lizo-RoadTown/claude-skills-marketplace`. Still hosts per-project guard plugins (`sde-extraction-guard` etc.). New projects should use the `tapestry` marketplace for the consolidated plugins. |
 
 ## Example project referenced throughout
 

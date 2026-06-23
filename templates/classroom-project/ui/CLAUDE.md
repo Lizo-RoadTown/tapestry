@@ -85,10 +85,10 @@ Built-in harness capabilities (always available, no install): `EnterPlanMode` fo
 
 ## Discipline plugin (recommended)
 
-This project depends on the `tapestry-discipline` Claude Code plugin (published via the `lizo-loom` marketplace, sourced from `Lizo-RoadTown/the-loom`). Install once per machine:
+This project depends on the `tapestry-discipline` Claude Code plugin (published via the `tapestry` marketplace, sourced from `Lizo-RoadTown/tapestry`). Install once per machine:
 
 ```text
-/plugin marketplace add Lizo-RoadTown/claude-skills-marketplace
+/plugin marketplace add Lizo-RoadTown/tapestry
 /plugin install tapestry-discipline@tapestry
 ```
 

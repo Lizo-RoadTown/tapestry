@@ -6,26 +6,26 @@ Claude Code plugin. The discipline wrapper for Liz's Claude Code sessions in `Ma
 
 ## History
 
-This plugin was developed under the name `make-skills-discipline` at `Lizo-RoadTown/claude-skills-marketplace/plugins/` from v0.1.0 (2026-05-22) through v0.1.5 (2026-05-26). On 2026-05-26 it was **moved into the-loom** at this path (`adapters/claude-code/loom-discipline/`) and renamed to `tapestry-discipline` to reflect its canonical home under the loom platform.
+This plugin has had three canonical homes:
 
-The marketplace entry remains for historical install records and gets a deprecation pointer to the new location. New installs should use this version.
+| Period | Name | Source repo | Marketplace |
+| --- | --- | --- | --- |
+| 2026-05-22 → 2026-05-26 (v0.1.0–0.1.5) | `make-skills-discipline` | `Lizo-RoadTown/claude-skills-marketplace/plugins/` | `lizo-skills` |
+| 2026-05-26 → 2026-06-22 (v0.1.6–0.1.15) | `loom-discipline` | `Lizo-RoadTown/the-loom/adapters/claude-code/` | `lizo-loom` |
+| 2026-06-22 → today | **`tapestry-discipline`** | `Lizo-RoadTown/tapestry/integrations/claude-code/` (this directory) | `tapestry` |
 
-| Version | What |
-| --- | --- |
-| v0.1.0–0.1.5 | Marketplace versions — `Lizo-RoadTown/claude-skills-marketplace/plugins/make-skills-discipline/`. See marketplace CHANGELOG for history (v0.1.3 false-positive fixes, v0.1.4 silent-import fix, v0.1.5 the-loom scope broadening). |
-| **v0.1.6 (this)** | First version in the-loom. Renamed `make-skills-discipline` → `tapestry-discipline`. Added OTLP log exporter alongside the existing `hooks.jsonl` local write. |
+The 2026-05-26 move folded the plugin into the-loom under the name `loom-discipline` (added OTLP log exporter alongside the existing `hooks.jsonl` local write). The 2026-06-22 consolidation (PR #42) renamed it to `tapestry-discipline` and lifted the source into the tapestry monorepo. The prior install commands (`loom-discipline@lizo-loom`) still resolve during the transition window.
 
 ## Install locally
 
 ```bash
 # In any Claude Code session:
+/plugin marketplace add Lizo-RoadTown/tapestry
 /plugin install tapestry-discipline@tapestry
 
 # OR symlink directly into Claude's plugin dir for development:
-ln -s C:/Users/Liz/the-loom/adapters/claude-code/loom-discipline ~/.claude/plugins/loom-discipline
+ln -s C:/Users/Liz/tapestry/integrations/claude-code/tapestry-discipline ~/.claude/plugins/tapestry-discipline
 ```
-
-(Specific install command depends on whether the-loom is published as a marketplace or installed directly from the repo. Pending Phase 5 decisions.)
 
 After install, restart Claude Code so the loader binds the new plugin.
 

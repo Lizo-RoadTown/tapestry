@@ -2,100 +2,105 @@
 /**
  * Marketing page — Project Shape.
  *
- * One of Tapestry's differentiators, pulled onto the website per the
- * reader-intent IA split (operator, 2026-06-23). Content is grounded in the
- * docs concept page (src/content/docs/start/project-shape.md, by loom-agent):
- * the observable structure of a project over time; the four shape verbs; shape
- * change as the strongest signal about coordination change. The docs page
- * stays as the concept reference; this is the "why you should care" version.
+ * Pulled onto the website per the reader-intent IA split. Copy leads with the
+ * pain (some projects get easier, some harder; the things that decide it
+ * happen outside the code) and introduces the label second — per
+ * [[feedback-marketing-lead-with-pain-not-label]]. The docs concept page
+ * (src/content/docs/start/project-shape.md) keeps the precise definition.
  */
 import MarketingLayout from "../layouts/MarketingLayout.astro";
 
 const CONCEPT = "/start/project-shape/";
 const OBSERVATORY = "/observatory";
 
-// Shape moves even when the code doesn't (from the concept page).
-const CHANGES = [
-  "A correction you give once becomes a binding rule in memory. The agent behaves differently next session.",
-  "A pattern recurs three times. The observer surfaces it as a candidate.",
-  "An external MCP changes its contract. The project's wiring still assumes the old one.",
-  "You stop correcting a behavior the agent learned. The pattern has stabilized.",
+// What project shape is made of.
+const PATTERNS = [
+  "how knowledge is stored",
+  "how agents behave",
+  "how work gets done",
+  "what corrections keep recurring",
+  "what skills become reusable",
+  "where coordination breaks down",
 ];
 
-// The four shape verbs (meanings verbatim from the concept page).
-const VERBS = [
-  { verb: "Drift", body: "Shape moves away from what you and the agent think it is.", glyph: `<path d="M3 18h18" stroke-dasharray="2.5 3" opacity="0.5"/><path d="M4 18C10 18 11 8 20 5"/><circle cx="20" cy="5" r="1.6" fill="currentColor" stroke="none"/>` },
-  { verb: "Stabilize", body: "Shape converges; corrections stop firing.", glyph: `<path d="M3 6c2 0 2 8 3.5 8S8 8 9.5 8 11 13 12.5 13 14 10 15.5 10 17 12 18.5 12H21"/>` },
-  { verb: "Fragment", body: "Shape splits into incoherent pieces.", glyph: `<rect x="3" y="9" width="6.5" height="6.5" rx="1"/><path d="M9.5 11h3M9.5 14h5" opacity="0.5"/><rect x="13" y="5" width="4.5" height="4.5" rx="1"/><rect x="16" y="14" width="4.5" height="4.5" rx="1"/>` },
-  { verb: "Cohere", body: "Fragments converge on a canonical form.", glyph: `<circle cx="4" cy="5" r="1.6"/><circle cx="4" cy="12" r="1.6"/><circle cx="4" cy="19" r="1.6"/><path d="M6 5.5 17 11M6 12h9M6 18.5 17 13" opacity="0.5"/><circle cx="19" cy="12" r="2.6" fill="currentColor" stroke="none"/>` },
+// What those patterns determine.
+const OUTCOMES = [
+  "new contributors ramp up quickly",
+  "agents make the same mistakes repeatedly",
+  "knowledge survives between sessions",
+  "workflows improve over time",
+  "coordination scales as complexity grows",
+];
+
+// How a project changes over time — consequence-language, not the verb table.
+const MOTIONS = [
+  { title: "Things drift", body: "The project behaves differently than everyone expects. Agents need more corrections. Knowledge becomes harder to find.", glyph: `<path d="M3 18h18" stroke-dasharray="2.5 3" opacity="0.5"/><path d="M4 18C10 18 11 8 20 5"/><circle cx="20" cy="5" r="1.6" fill="currentColor" stroke="none"/>` },
+  { title: "Things stabilize", body: "The same corrections stop appearing. Workflows become predictable. The project becomes easier to operate.", glyph: `<path d="M3 6c2 0 2 8 3.5 8S8 8 9.5 8 11 13 12.5 13 14 10 15.5 10 17 12 18.5 12H21"/>` },
+  { title: "Things fragment", body: "Different parts of the project develop conflicting assumptions. Knowledge gets duplicated. Coordination becomes harder.", glyph: `<rect x="3" y="9" width="6.5" height="6.5" rx="1"/><path d="M9.5 11h3M9.5 14h5" opacity="0.5"/><rect x="13" y="5" width="4.5" height="4.5" rx="1"/><rect x="16" y="14" width="4.5" height="4.5" rx="1"/>` },
+  { title: "Things come together", body: "Previously disconnected workflows, knowledge, and practices start reinforcing each other. The project becomes more coherent.", glyph: `<circle cx="4" cy="5" r="1.6"/><circle cx="4" cy="12" r="1.6"/><circle cx="4" cy="19" r="1.6"/><path d="M6 5.5 17 11M6 12h9M6 18.5 17 13" opacity="0.5"/><circle cx="19" cy="12" r="2.6" fill="currentColor" stroke="none"/>` },
 ];
 ---
 
-<MarketingLayout title="Project shape — Tapestry" description="Project shape is the observable structure of a project over time. Different shape creates different conditions for how you and your agents coordinate — and shape change is the strongest signal that coordination is changing." activeNav="learn">
-  <!-- hero -->
+<MarketingLayout title="Project shape — Tapestry" description="Some projects become easier to work in over time; some become harder. The things that decide whether AI collaboration succeeds often happen outside the code. Tapestry tracks them — we call it project shape." activeNav="learn">
+  <!-- hero: the pain, in plain language -->
   <section class="ps-hero">
     <div class="ps-glow" aria-hidden="true"></div>
     <div class="ps-hero-in reveal">
-      <p class="kicker mono">Concept · differentiator</p>
-      <h1 class="display">Every project<br />has a <span class="accent">shape.</span></h1>
-      <p class="lede">Project shape is the observable structure of a project over time — architecture, memory, agents, workflows, skills, friction, corrections. Different shape creates different conditions for how you and your agents coordinate.</p>
+      <h1 class="display">Every project develops<br />a <span class="accent">personality.</span></h1>
+      <p class="ps-para">Some projects become easier to work in. Others become harder. The code may barely change — but suddenly everyone knows how things work, decisions are easier to make, and agents stop needing the same corrections over and over.</p>
+      <p class="ps-para">Or the opposite happens. Knowledge fragments. Workflows drift. Context disappears. The same mistakes keep coming back.</p>
       <div class="cta-row">
-        <a class="btn btn-lg" href={CONCEPT}>Read the concept →</a>
-        <a class="btn btn-ghost btn-lg" href={OBSERVATORY}>Watch shape move →</a>
+        <a class="btn btn-lg" href={CONCEPT}>Learn about project shape →</a>
+        <a class="btn btn-ghost btn-lg" href={OBSERVATORY}>Watch it move →</a>
       </div>
     </div>
   </section>
 
-  <!-- definition -->
-  <section class="ps-def">
-    <p class="ps-lead">
-      Shape is the accumulated pattern of architecture, repositories, memory, agents, workflows,
-      skills, friction, corrections, dependencies, and runtime behavior. It's what you'd describe if
-      someone asked <em>“what kind of project is this, and what's it like to work in?”</em>
-      <span class="ps-strong">The codebase is one input to shape — not shape itself.</span>
-    </p>
-  </section>
-
-  <!-- shape changes without code -->
-  <section class="ps-changes">
-    <header class="sec-head">
-      <p class="kicker mono">The part most tools miss</p>
-      <h2 class="display sec-title">Shape changes without<br /><span class="accent">the code changing.</span></h2>
-      <p class="sec-sub">A project drifts, stabilizes, fragments, or coheres through things that never show up in a diff. Those are the changes that decide whether coordination holds.</p>
-    </header>
-    <ul class="ps-change-grid">
-      {CHANGES.map((c, i) => (
-        <li class="ps-change reveal"><span class="ps-change-n mono">{String(i + 1).padStart(2, "0")}</span><span>{c}</span></li>
-      ))}
-    </ul>
-  </section>
-
-  <!-- four verbs -->
-  <section class="ps-verbs">
-    <header class="sec-head">
-      <p class="kicker mono">How shape moves</p>
-      <h2 class="display sec-title">Four shape verbs.</h2>
-      <p class="sec-sub">Every change to a project's shape is one of four motions. Naming them is what makes shape trackable.</p>
-    </header>
-    <div class="ps-verb-grid">
-      {VERBS.map((v) => (
-        <article class="ps-verb reveal">
-          <span class="ps-verb-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" set:html={v.glyph} /></span>
-          <h3 class="ps-verb-name display">{v.verb}</h3>
-          <p class="ps-verb-body">{v.body}</p>
-        </article>
-      ))}
+  <!-- name it second -->
+  <section class="ps-name">
+    <div class="ps-name-in">
+      <p class="ps-lead reveal">
+        Most tools only see the code. Tapestry tracks the things that make a project easier or harder
+        to work in over time. <span class="ps-strong">We call that project shape.</span>
+      </p>
+      <ul class="ps-patterns reveal">
+        {PATTERNS.map((p) => (<li><span class="tick" aria-hidden="true">→</span>{p}</li>))}
+      </ul>
+      <p class="ps-because reveal">Because those things often determine project success long before the code does.</p>
     </div>
   </section>
 
   <!-- why it matters -->
   <section class="ps-why">
     <div class="ps-why-in reveal">
-      <p class="kicker mono">Why Tapestry tracks it</p>
-      <h2 class="display ps-why-title">Shape change is the strongest signal that <span class="accent">coordination is changing.</span></h2>
-      <p class="ps-why-body">When shape shifts, the coordination patterns inside the project shift with it — interfaces emerge or disappear, memory attachment points move, friction patterns change. Tapestry watches shape over time so the shift is visible while you can still steer it, instead of after the agent has already drifted.</p>
-      <a class="pillar-link" href={CONCEPT}>Read the full concept →</a>
+      <p class="kicker mono">Why it matters</p>
+      <h2 class="display sec-title">Same repository.<br /><span class="accent">Different outcome.</span></h2>
+      <p class="ps-why-body">Two projects can have identical repositories and completely different outcomes. One feels predictable. The other feels chaotic. The difference is rarely the code itself — it's the accumulated decisions, habits, corrections, workflows, and knowledge surrounding it.</p>
+      <p class="ps-why-sub">Those patterns determine whether:</p>
+      <ul class="ps-outcomes">
+        {OUTCOMES.map((o) => (<li><span class="tick" aria-hidden="true">→</span>{o}</li>))}
+      </ul>
+      <p class="ps-why-close">Tapestry makes those patterns visible.</p>
     </div>
+  </section>
+
+  <!-- what changes over time -->
+  <section class="ps-motions">
+    <header class="sec-head">
+      <p class="kicker mono">What changes over time</p>
+      <h2 class="display sec-title">A few patterns keep appearing.</h2>
+      <p class="sec-sub">As projects evolve, the same handful of motions show up again and again.</p>
+    </header>
+    <div class="ps-motion-grid">
+      {MOTIONS.map((m) => (
+        <article class="ps-motion reveal">
+          <span class="ps-motion-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" set:html={m.glyph} /></span>
+          <h3 class="ps-motion-name display">{m.title}</h3>
+          <p class="ps-motion-body">{m.body}</p>
+        </article>
+      ))}
+    </div>
+    <p class="ps-motion-foot reveal">The observer tracks these changes so they can be understood before they become problems.</p>
   </section>
 
   <!-- cta -->
@@ -109,40 +114,42 @@ const VERBS = [
 </MarketingLayout>
 
 <style>
-  .ps-hero { position: relative; overflow: hidden; padding: clamp(72px, 12vw, 140px) 24px clamp(48px, 8vw, 88px); text-align: center; }
+  .ps-hero { position: relative; overflow: hidden; padding: clamp(72px, 12vw, 140px) 24px clamp(48px, 8vw, 80px); text-align: center; }
   .ps-glow { position: absolute; inset: -20% 0 auto 0; height: 680px; background: radial-gradient(58% 65% at 50% 0%, #5fd3da26 0, #5fd3da0d 38%, transparent 70%); pointer-events: none; }
-  .ps-hero-in { position: relative; max-width: 880px; margin: 0 auto; }
-  .ps-hero h1 { font-size: clamp(46px, 8vw, 86px); line-height: 1.02; margin: 0 0 22px; letter-spacing: -0.01em; }
-  .lede { font-size: clamp(17px, 2.1vw, 21px); line-height: 1.55; color: var(--dim); max-width: 58ch; margin: 0 auto; }
-  .cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 34px; }
+  .ps-hero-in { position: relative; max-width: 800px; margin: 0 auto; }
+  .ps-hero h1 { font-size: clamp(46px, 8vw, 84px); line-height: 1.03; margin: 0 0 26px; letter-spacing: -0.01em; }
+  .ps-para { font-size: clamp(17px, 2.05vw, 20px); line-height: 1.6; color: var(--dim); max-width: 60ch; margin: 0 auto 16px; }
+  .cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 30px; }
   .cta-row.center { justify-content: center; }
 
-  /* definition */
-  .ps-def { border-top: 1px solid var(--edge-soft); padding: clamp(48px, 8vw, 88px) 24px; }
-  .ps-lead { max-width: 760px; margin: 0 auto; font-size: clamp(19px, 2.5vw, 26px); line-height: 1.5; color: var(--dim); font-weight: 400; }
-  .ps-lead em { font-family: var(--font-d); font-style: italic; color: var(--ink); }
-  .ps-strong { display: block; margin-top: 18px; color: var(--ink); font-weight: 500; }
-
-  /* changes */
-  .ps-changes { border-top: 1px solid var(--edge-soft); padding: clamp(56px, 9vw, 104px) 0; }
-  .ps-change-grid { list-style: none; padding: 0 24px; margin: 46px auto 0; max-width: var(--maxw); display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .ps-change { display: flex; gap: 16px; align-items: flex-start; padding: 24px 24px; border: 1px solid var(--edge); border-radius: 14px; background: var(--surface-2); font-size: 16px; line-height: 1.5; color: var(--dim); }
-  .ps-change-n { color: var(--brand); font-size: 13px; flex: none; padding-top: 2px; }
-
-  /* verbs */
-  .ps-verbs { border-top: 1px solid var(--edge-soft); padding: clamp(56px, 9vw, 104px) 0; }
-  .ps-verb-grid { max-width: var(--maxw); margin: 46px auto 0; padding: 0 24px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
-  .ps-verb { padding: 30px 26px; border: 1px solid var(--edge); border-radius: 18px; background: linear-gradient(180deg, var(--raised), var(--surface-2)); transition: transform 0.25s var(--ease), border-color 0.25s, box-shadow 0.25s; }
-  .ps-verb:hover { transform: translateY(-4px); border-color: #34474a; box-shadow: 0 24px 50px -28px #000, 0 0 0 1px #5fd3da22; }
-  .ps-verb-ic { display: inline-flex; align-items: center; justify-content: center; width: 50px; height: 50px; border-radius: 13px; color: var(--brand); background: #5fd3da14; border: 1px solid #5fd3da33; margin-bottom: 18px; }
-  .ps-verb-name { font-size: 28px; margin: 0 0 10px; }
-  .ps-verb-body { font-size: 15px; line-height: 1.55; color: var(--dim); margin: 0; }
+  /* name it */
+  .ps-name { border-top: 1px solid var(--edge-soft); padding: clamp(56px, 9vw, 96px) 24px; }
+  .ps-name-in { max-width: 720px; margin: 0 auto; }
+  .ps-lead { font-size: clamp(20px, 2.6vw, 27px); line-height: 1.5; color: var(--dim); margin: 0 0 26px; }
+  .ps-strong { color: var(--ink); font-weight: 500; }
+  .ps-patterns { list-style: none; padding: 0; margin: 0 0 26px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px 28px; }
+  .ps-patterns li, .ps-outcomes li { display: flex; gap: 11px; align-items: baseline; font-size: 16px; color: var(--dim); }
+  .tick { color: var(--brand); font-family: var(--font-m); flex: none; }
+  .ps-because { font-family: var(--font-d); font-size: clamp(19px, 2.3vw, 24px); line-height: 1.4; color: var(--ink); margin: 0; }
 
   /* why */
-  .ps-why { border-top: 1px solid var(--edge-soft); padding: clamp(64px, 10vw, 120px) 24px; }
-  .ps-why-in { max-width: 820px; margin: 0 auto; text-align: center; }
-  .ps-why-title { font-size: clamp(28px, 4.4vw, 46px); line-height: 1.1; margin: 0 0 22px; }
-  .ps-why-body { font-size: clamp(16px, 1.9vw, 19px); line-height: 1.6; color: var(--dim); max-width: 60ch; margin: 0 auto 24px; }
+  .ps-why { border-top: 1px solid var(--edge-soft); padding: clamp(56px, 9vw, 104px) 24px; }
+  .ps-why-in { max-width: 760px; margin: 0 auto; }
+  .ps-why .sec-title { text-align: left; }
+  .ps-why-body { font-size: clamp(17px, 2vw, 20px); line-height: 1.6; color: var(--dim); margin: 0 0 24px; }
+  .ps-why-sub { font-size: 16px; color: var(--faint); margin: 0 0 14px; }
+  .ps-outcomes { list-style: none; padding: 0; margin: 0 0 28px; display: flex; flex-direction: column; gap: 12px; }
+  .ps-why-close { font-family: var(--font-d); font-size: clamp(20px, 2.4vw, 26px); color: var(--ink); margin: 0; }
+
+  /* motions */
+  .ps-motions { border-top: 1px solid var(--edge-soft); padding: clamp(56px, 9vw, 104px) 0; }
+  .ps-motion-grid { max-width: var(--maxw); margin: 46px auto 0; padding: 0 24px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .ps-motion { padding: 30px 26px; border: 1px solid var(--edge); border-radius: 18px; background: linear-gradient(180deg, var(--raised), var(--surface-2)); transition: transform 0.25s var(--ease), border-color 0.25s, box-shadow 0.25s; }
+  .ps-motion:hover { transform: translateY(-4px); border-color: #34474a; box-shadow: 0 24px 50px -28px #000, 0 0 0 1px #5fd3da22; }
+  .ps-motion-ic { display: inline-flex; align-items: center; justify-content: center; width: 50px; height: 50px; border-radius: 13px; color: var(--brand); background: #5fd3da14; border: 1px solid #5fd3da33; margin-bottom: 18px; }
+  .ps-motion-name { font-size: 25px; margin: 0 0 10px; }
+  .ps-motion-body { font-size: 14.5px; line-height: 1.55; color: var(--dim); margin: 0; }
+  .ps-motion-foot { max-width: var(--maxw); margin: 34px auto 0; padding: 0 24px; font-size: clamp(16px, 1.9vw, 19px); color: var(--faint); text-align: center; }
 
   /* cta */
   .ps-cta { position: relative; overflow: hidden; text-align: center; padding: clamp(80px, 13vw, 150px) 24px; border-top: 1px solid var(--edge-soft); }
@@ -150,10 +157,10 @@ const VERBS = [
   .ps-cta-title { position: relative; font-size: clamp(32px, 5.5vw, 62px); line-height: 1.08; margin: 0 0 34px; }
 
   @media (max-width: 980px) {
-    .ps-verb-grid { grid-template-columns: repeat(2, 1fr); }
-    .ps-change-grid { grid-template-columns: 1fr; }
+    .ps-motion-grid { grid-template-columns: repeat(2, 1fr); }
   }
   @media (max-width: 560px) {
-    .ps-verb-grid { grid-template-columns: 1fr; }
+    .ps-motion-grid { grid-template-columns: 1fr; }
+    .ps-patterns { grid-template-columns: 1fr; }
   }
 </style>

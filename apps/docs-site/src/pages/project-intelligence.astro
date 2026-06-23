@@ -1,0 +1,146 @@
+---
+/**
+ * Marketing page — Project Intelligence (the category page).
+ *
+ * Pain-first per [[feedback-marketing-lead-with-pain-not-label]]: open with
+ * the forgetting/starting-over pain everyone recognizes, then name "project
+ * intelligence" as the thing that accumulates when nothing gets thrown away.
+ * Each layer is backed by a real mechanism (memory, observer, upskilling,
+ * project shape) — no fabricated capability.
+ */
+import MarketingLayout from "../layouts/MarketingLayout.astro";
+
+const SETUP = "/how-to/set-up-a-new-project/";
+const OBSERVATORY = "/observatory";
+
+// What a project accumulates that isn't code — each backed by a real mechanism.
+const LAYERS = [
+  { title: "Context & decisions", mech: "Memory", body: "What was decided, what was tried, and why — carried between sessions instead of re-explained every time.", href: "/systems/memory/", icon: `<ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/><path d="M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/>` },
+  { title: "Corrections", mech: "Discipline + memory", body: "The fix you make once becomes a rule the agent keeps. The same mistake stops coming back.", href: "/explanation/discipline-stack/", icon: `<path d="M20 6 9 17l-5-5"/>` },
+  { title: "Patterns", mech: "Observer", body: "What recurs across the work — what keeps breaking, what keeps working — surfaced as findings, not raw logs.", href: "/systems/observer/", icon: `<path d="M12 2a9 9 0 1 0 9 9"/><path d="M12 7v5l3 2"/><path d="M16 3l5 2-2 5"/>` },
+  { title: "Reusable skills", mech: "Upskilling", body: "Repeated work compiles into named skills, available in every project by reference instead of rebuilt.", href: "/explanation/upskilling/", icon: `<path d="M12 3 2 8l10 5 10-5-10-5Z"/><path d="M2 14l10 5 10-5"/><path d="M2 11l10 5 10-5"/>` },
+  { title: "Project shape", mech: "Architecture analysis", body: "How the project's structure drifts, stabilizes, fragments, or coheres over time.", href: "/project-shape", icon: `<path d="M3 12h4l3 8 4-16 3 8h4"/>` },
+];
+---
+
+<MarketingLayout title="Project intelligence — Tapestry" description="Every session starts from zero. Project intelligence is everything a project accumulates that isn't the code — context, decisions, corrections, patterns, and skills — kept and made usable across sessions and projects." activeNav="platform">
+  <!-- hero: the pain -->
+  <section class="pi-hero">
+    <div class="pi-glow" aria-hidden="true"></div>
+    <div class="pi-hero-in reveal">
+      <p class="kicker mono">Project intelligence</p>
+      <h1 class="display">Every session<br />starts from <span class="accent">zero.</span></h1>
+      <p class="pi-para">The model is brilliant and forgetful. The context you built yesterday is gone. The correction you made last week comes back as the same mistake. The workflow that finally worked isn't there next time — so you explain it again, and again.</p>
+      <p class="pi-para pi-para-strong">Across ten projects, you're not one operator with ten projects' worth of experience. You're starting over, ten times.</p>
+      <div class="cta-row">
+        <a class="btn btn-lg" href={SETUP}>Set up a project</a>
+        <a class="btn btn-ghost btn-lg" href="#layers">What accumulates →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- name it -->
+  <section class="pi-name">
+    <p class="pi-lead reveal">
+      Project intelligence is everything a project accumulates that <em>isn't</em> the code — context,
+      decisions, corrections, patterns, and skills — <span class="pi-strong">kept and made usable across
+      sessions and projects.</span> Tapestry is how it accumulates instead of evaporating.
+    </p>
+  </section>
+
+  <!-- generation vs continuity -->
+  <section class="pi-gen">
+    <div class="pi-gen-in reveal">
+      <p class="kicker mono">The category</p>
+      <h2 class="display sec-title">Generation is the easy part.</h2>
+      <p class="pi-gen-body">Most AI tools optimize how fast you can generate. But the value was never in the generating — it's in everything around it: why you chose this approach, what already failed, which corrections stuck, what became reusable. That's the part that disappears when the session ends. Tapestry keeps it.</p>
+    </div>
+  </section>
+
+  <!-- what accumulates -->
+  <section class="pi-layers" id="layers">
+    <header class="sec-head">
+      <p class="kicker mono">What accumulates</p>
+      <h2 class="display sec-title">Five things that survive the session.</h2>
+      <p class="sec-sub">Each one is kept by a mechanism that keeps running across every project.</p>
+    </header>
+    <div class="pi-layer-grid">
+      {LAYERS.map((l) => (
+        <a class="pi-layer reveal" href={l.href}>
+          <span class="pi-layer-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" set:html={l.icon} /></span>
+          <div class="pi-layer-txt">
+            <h3 class="pi-layer-name">{l.title}<span class="pi-layer-mech mono">{l.mech}</span></h3>
+            <p class="pi-layer-body">{l.body}</p>
+          </div>
+          <span class="pi-layer-arrow" aria-hidden="true">→</span>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- it compounds -->
+  <section class="pi-compound">
+    <div class="pi-compound-in reveal">
+      <p class="kicker mono">Why it's worth keeping</p>
+      <h2 class="display sec-title">Kept knowledge<br /><span class="accent">compounds.</span></h2>
+      <p class="pi-compound-body">Context that survives doesn't just help today's session. Each project makes the next one faster. Corrections become rules. Patterns become skills. Skills become available across every project. You accumulate capability instead of rebuilding it — and the gap between you-with-Tapestry and you-without widens the longer you work.</p>
+      <a class="pillar-link" href={OBSERVATORY}>See it accumulate in the Observatory →</a>
+    </div>
+  </section>
+
+  <!-- cta -->
+  <section class="pi-cta">
+    <div class="pi-cta-glow" aria-hidden="true"></div>
+    <div class="reveal">
+      <h2 class="display pi-cta-title">Accumulate capability.<br /><span class="accent">Stop starting over.</span></h2>
+      <div class="cta-row center"><a class="btn btn-lg" href={SETUP}>Set up a project</a><a class="btn btn-ghost btn-lg" href="/home">Back to overview →</a></div>
+    </div>
+  </section>
+</MarketingLayout>
+
+<style>
+  .pi-hero { position: relative; overflow: hidden; padding: clamp(72px, 12vw, 140px) 24px clamp(48px, 8vw, 80px); text-align: center; }
+  .pi-glow { position: absolute; inset: -20% 0 auto 0; height: 680px; background: radial-gradient(58% 65% at 50% 0%, #5fd3da26 0, #5fd3da0d 38%, transparent 70%); pointer-events: none; }
+  .pi-hero-in { position: relative; max-width: 820px; margin: 0 auto; }
+  .pi-hero h1 { font-size: clamp(46px, 8vw, 86px); line-height: 1.02; margin: 0 0 24px; letter-spacing: -0.01em; }
+  .pi-para { font-size: clamp(17px, 2.05vw, 20px); line-height: 1.6; color: var(--dim); max-width: 60ch; margin: 0 auto 16px; }
+  .pi-para-strong { color: var(--ink); font-weight: 500; }
+  .cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 30px; }
+  .cta-row.center { justify-content: center; }
+
+  /* name it */
+  .pi-name { border-top: 1px solid var(--edge-soft); padding: clamp(56px, 9vw, 96px) 24px; }
+  .pi-lead { max-width: 760px; margin: 0 auto; font-size: clamp(20px, 2.6vw, 27px); line-height: 1.5; color: var(--dim); }
+  .pi-lead em { font-family: var(--font-d); font-style: italic; color: var(--ink); }
+  .pi-strong { color: var(--ink); font-weight: 500; }
+
+  /* generation */
+  .pi-gen { border-top: 1px solid var(--edge-soft); padding: clamp(56px, 9vw, 104px) 24px; }
+  .pi-gen-in { max-width: 760px; margin: 0 auto; }
+  .pi-gen .sec-title { text-align: left; }
+  .pi-gen-body { font-size: clamp(17px, 2vw, 20px); line-height: 1.6; color: var(--dim); margin: 0; }
+
+  /* layers */
+  .pi-layers { border-top: 1px solid var(--edge-soft); padding: clamp(56px, 9vw, 104px) 0; }
+  .pi-layer-grid { max-width: 880px; margin: 46px auto 0; padding: 0 24px; display: flex; flex-direction: column; gap: 14px; }
+  .pi-layer { display: flex; align-items: center; gap: 20px; padding: 22px 24px; border: 1px solid var(--edge); border-radius: 16px; background: var(--surface-2); transition: transform 0.2s var(--ease), border-color 0.2s, background 0.2s; }
+  .pi-layer:hover { transform: translateX(4px); border-color: #34474a; background: linear-gradient(180deg, var(--raised), var(--surface-2)); }
+  .pi-layer-ic { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 46px; height: 46px; border-radius: 12px; color: var(--brand); background: #5fd3da14; border: 1px solid #5fd3da33; }
+  .pi-layer-txt { flex: 1; }
+  .pi-layer-name { font-size: 18px; font-weight: 500; color: var(--ink); margin: 0 0 4px; display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .pi-layer-mech { font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--faint); font-weight: 400; }
+  .pi-layer-body { font-size: 14.5px; line-height: 1.55; color: var(--dim); margin: 0; }
+  .pi-layer-arrow { flex: none; color: var(--faint); font-family: var(--font-m); transition: color 0.2s, transform 0.2s; }
+  .pi-layer:hover .pi-layer-arrow { color: var(--brand); transform: translateX(3px); }
+
+  /* compound */
+  .pi-compound { border-top: 1px solid var(--edge-soft); padding: clamp(64px, 10vw, 120px) 24px; }
+  .pi-compound-in { max-width: 760px; margin: 0 auto; text-align: center; }
+  .pi-compound .sec-title { font-size: clamp(30px, 4.6vw, 50px); }
+  .pi-compound-body { font-size: clamp(17px, 2vw, 20px); line-height: 1.6; color: var(--dim); max-width: 62ch; margin: 0 auto 24px; }
+
+  /* cta */
+  .pi-cta { position: relative; overflow: hidden; text-align: center; padding: clamp(80px, 13vw, 150px) 24px; border-top: 1px solid var(--edge-soft); }
+  .pi-cta-glow { position: absolute; inset: auto 0 -40% 0; height: 540px; background: radial-gradient(55% 70% at 50% 100%, #5fd3da22 0, transparent 70%); pointer-events: none; }
+  .pi-cta-title { position: relative; font-size: clamp(32px, 5.5vw, 62px); line-height: 1.08; margin: 0 0 34px; }
+</style>

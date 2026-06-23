@@ -3,6 +3,10 @@ title: Sharing intelligence across projects
 description: How agents in different repositories share memory, decisions, and proposals through the platform — what the mechanism is, what to use it for, and how to wire it intentionally.
 ---
 
+:::tip[On the marketing site]
+For the value framing — "across ten projects, you're not one operator with ten projects' worth of experience" — see [Project intelligence](/project-intelligence/) on the marketing site. This page is the mechanism: what flows between projects, what to use it for, how to wire it on purpose.
+:::
+
 The headline value of plugging a project into Tapestry: **agents in different projects share intelligence.** This page is the practical guide to that capability — what the mechanism actually is, what to use it for, and how to wire it on purpose rather than by accident.
 
 For the underlying memory mechanism in detail, see [The memory MCP](/explanation/memory-mcp/). For the pattern-recognition layer that turns observed behaviors into shared candidates, see [The observer](/explanation/the-observer/).

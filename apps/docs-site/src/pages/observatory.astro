@@ -1,11 +1,11 @@
 ---
 export const prerender = false;
 /**
- * The Observatory — what the telemetry EXPLAINS, not the telemetry itself.
- * Four meaning views: project-shape timeline (narrative), the observer speaking
- * (by confidence), the project-shape map (states + movement), and friction over
- * time. Counters are evidence, not the story — they live in /observatory/raw.
- * Honest: where the observer can't speak yet, it says so. Nothing faked.
+ * The Observatory — an interactive variable-overlay cockpit.
+ * Telemetry is modeled as selectable variables over time; pick a variable and an
+ * overlay and the observer explains what the view can expose. Variable-driven,
+ * not card-driven. Honest: blind variables (friction/memory/corrections) are
+ * selectable but plotted as "not instrumented", never faked.
  */
 const CANON = "https://github.com/Lizo-RoadTown/tapestry/blob/main/docs/canon/user-agent-coordination-reinforcement.md";
 ---
@@ -26,123 +26,125 @@ const CANON = "https://github.com/Lizo-RoadTown/tapestry/blob/main/docs/canon/us
 
     <main>
       <section class="hero">
-        <p class="eyebrow mono" id="src">project observatory · loading…</p>
-        <h1 class="display">Project <span class="ac">Observatory</span></h1>
-        <p class="lede">How the project is changing, what the observer sees, and whether coordination between you and your agents is getting better or worse.</p>
+        <p class="eyebrow mono" id="src">pattern cockpit · loading…</p>
+        <h1 class="display">The <span class="ac">Observatory</span></h1>
+        <p class="lede">Choose variables, overlay them, and let the observer explain what patterns the view can expose.</p>
       </section>
 
-      <!-- View 1: Project shape timeline (narrative) -->
-      <section>
-        <h2 class="display sec">How the project is changing</h2>
-        <div id="timeline" class="timeline"><p class="loading mono">loading…</p></div>
+      <section class="controls">
+        <label>Show <select id="y"></select></label>
+        <label>over <span class="mono">time</span></label>
+        <label>overlaid with <select id="overlay"></select></label>
       </section>
 
-      <!-- View 3: Observer feed (the observer speaks) -->
-      <section>
-        <h2 class="display sec">What the observer sees</h2>
-        <p class="hint">The observer, speaking — grouped by how sure it is.</p>
-        <div id="observer" class="obs"><p class="loading mono">loading…</p></div>
-      </section>
+      <section class="chartwrap"><div id="chart" class="chart"><p class="loading mono">loading…</p></div><div id="legend" class="legend"></div></section>
 
-      <!-- View 4: Project shape map (states + movement) -->
-      <section>
-        <h2 class="display sec">Project shape</h2>
-        <p class="hint">Where each part of the system stands.</p>
-        <div id="shapemap" class="shapemap"><p class="loading mono">loading…</p></div>
-      </section>
+      <section class="interp" id="interp"></section>
 
-      <!-- View 2: Friction over time -->
-      <section>
-        <h2 class="display sec">Is coordination getting better or worse?</h2>
-        <div id="friction" class="friction"><p class="loading mono">loading…</p></div>
-      </section>
-
-      <footer class="foot"><p class="mono">Raw counters + hook events: <a href="/observatory/raw">Raw events (debug)</a>. Canon: <a href={CANON}>user-agent-coordination-reinforcement</a>.</p></footer>
+      <footer class="foot"><p class="mono">Raw counters + events: <a href="/observatory/raw">Raw events (debug)</a>. Canon: <a href={CANON}>user-agent-coordination-reinforcement</a>.</p></footer>
     </main>
 
     <script>
+      type V = { id: string; label: string; lens: string; kind: "real" | "blind"; unit: string; series: (number | null)[] };
       const esc = (s: any) => String(s).replace(/[&<>]/g, (c: string) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]!));
-      const day = (iso: string | null) => (iso ? new Date(iso).toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "");
+      const LABEL: Record<string, string> = { arch_changes: "architecture changes", episodes: "working episodes", tool_activity: "tool activity", observer_candidates: "observer candidates", friction: "friction recurrence", memory_miss: "memory misses", corrections: "correction frequency" };
+      const CURATED: Record<string, { why: string; patterns: string[] }> = {
+        "arch_changes+friction": { why: "Tests whether project-shape changes are followed by coordination friction.", patterns: ["architecture churn causing coordination degradation", "friction dropping after durable structure forms"] },
+        "friction+memory_miss": { why: "Tests whether missing memory increases repeated correction / friction.", patterns: ["memory misses preceding friction spikes", "friction dampened when memory recall succeeds"] },
+        "arch_changes+memory_miss": { why: "Tests whether structural changes are followed by memory misses — the system forgetting what just changed.", patterns: ["memory misses following structural changes", "observer confidence lagging behind project changes"] },
+        "episodes+observer_candidates": { why: "Tests whether more working activity yields more durable structure.", patterns: ["durable structure forming after sustained work", "candidate rate flat despite activity (loop not closing)"] },
+      };
+
+      let DAYS: string[] = [], VARS: V[] = [];
+      const v = (id: string) => VARS.find((x) => x.id === id)!;
+
+      function interpret(yId: string, oId: string | null) {
+        const y = v(yId), o = oId ? v(oId) : null;
+        const blind = [y, o].filter((x) => x && x.kind === "blind").map((x) => x!.label);
+        const key = [yId, oId].filter(Boolean).sort().join("+");
+        const c = CURATED[key];
+        const looking = o ? `${LABEL[yId]} over time, overlaid with ${LABEL[oId!]}` : `${LABEL[yId]} over time`;
+        const why = c?.why || (o ? `Tests whether ${LABEL[yId]} and ${LABEL[oId!]} move together over time.` : `Shows how ${LABEL[yId]} is trending.`);
+        const patterns = c?.patterns || (o ? [`${LABEL[yId]} rising/falling with ${LABEL[oId!]}`, "no relationship — the two move independently"] : [`${LABEL[yId]} increasing or decreasing over time`]);
+        const finding = blind.length === 2 ? "Neither variable is instrumented yet — this relationship cannot be measured. Shown so you can see what's missing." : blind.length === 1 ? `${blind[0]} isn't instrumented yet, so the relationship can't be measured; the other variable is real and plotted.` : "Both variables are real and plotted. The observer doesn't yet interpret the relationship — that needs transcript-derived signals.";
+        return { looking, why, patterns, finding, blind };
+      }
+
+      function line(series: (number | null)[], color: string, dashed: boolean) {
+        const W = 620, H = 200, P = 24;
+        const real = series.map((s, i) => [i, s] as [number, number | null]).filter(([, s]) => s != null) as [number, number][];
+        if (!real.length) return `<line x1="${P}" y1="${H / 2}" x2="${W - P}" y2="${H / 2}" stroke="${color}" stroke-width="2" stroke-dasharray="5 6" opacity="0.5"/>`;
+        const max = Math.max(1, ...real.map(([, s]) => s));
+        const n = Math.max(1, series.length - 1);
+        const pt = (i: number, s: number) => [P + (i / n) * (W - 2 * P), H - P - (s / max) * (H - 2 * P)];
+        const d = real.map(([i, s], k) => `${k ? "L" : "M"}${pt(i, s).map((x) => x.toFixed(1)).join(" ")}`).join(" ");
+        const dots = real.map(([i, s]) => { const [x, y] = pt(i, s); return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" fill="${color}"/>`; }).join("");
+        return `<path d="${d}" fill="none" stroke="${color}" stroke-width="2" ${dashed ? 'stroke-dasharray="5 6"' : ""}/>${dots}`;
+      }
+
+      function render() {
+        const yId = (document.getElementById("y") as HTMLSelectElement).value;
+        const oId = (document.getElementById("overlay") as HTMLSelectElement).value || null;
+        const y = v(yId), o = oId ? v(oId) : null;
+        const W = 620, H = 200, P = 24;
+        const axis = `<line x1="${P}" y1="${H - P}" x2="${W - P}" y2="${H - P}" stroke="#2a2f31"/><line x1="${P}" y1="${P}" x2="${P}" y2="${H - P}" stroke="#2a2f31"/>`;
+        const labels = DAYS.map((d, i) => { const x = P + (i / Math.max(1, DAYS.length - 1)) * (W - 2 * P); return `<text x="${x.toFixed(1)}" y="${H - 6}" fill="#8b9492" font-size="9" text-anchor="middle" font-family="monospace">${esc(d.slice(5))}</text>`; }).join("");
+        const yLine = line(y.series, "#5fd3da", y.kind === "blind");
+        const oLine = o ? line(o.series, "#d8b06a", o.kind === "blind") : "";
+        (document.getElementById("chart") as HTMLElement).innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%">${axis}${labels}${yLine}${oLine}</svg>`;
+        const tag = (vv: V, col: string) => `<span class="lg"><span class="sw" style="background:${col}"></span>${esc(vv.label)} <span class="u mono">${esc(vv.unit)}</span>${vv.kind === "blind" ? '<span class="bl">⊘ not instrumented</span>' : ""}</span>`;
+        (document.getElementById("legend") as HTMLElement).innerHTML = tag(y, "#5fd3da") + (o ? tag(o, "#d8b06a") : "");
+
+        const it = interpret(yId, oId);
+        (document.getElementById("interp") as HTMLElement).innerHTML = `
+          <div class="ic"><div class="ih">What you're looking at</div><p>${esc(it.looking)}</p></div>
+          <div class="ic"><div class="ih">Why these matter together</div><p>${esc(it.why)}</p></div>
+          <div class="ic"><div class="ih">Patterns this view may expose</div><ul>${it.patterns.map((p) => `<li>${esc(p)}</li>`).join("")}</ul></div>
+          <div class="ic finding"><div class="ih">What the observer currently thinks</div><p>${esc(it.finding)}</p></div>
+          ${it.blind.length ? `<div class="ic blind"><div class="ih">Blind / low-confidence</div><p>${it.blind.map(esc).join(" · ")} — not instrumented yet.</p></div>` : ""}`;
+      }
 
       async function load() {
         const d = await (await fetch("/api/episodes.json", { cache: "no-store" })).json();
-        const sl: Record<string, string> = { "live:central-store": "live", "dev:hooks.jsonl": "live · this machine", "snapshot:events-sample": "real snapshot (wire the hooks for live)" };
-        (document.getElementById("src") as HTMLElement).textContent = "project observatory · " + (sl[d.source] || d.source);
-
-        // View 1 — timeline
-        const tl = d.timeline;
-        (document.getElementById("timeline") as HTMLElement).innerHTML = tl.length
-          ? tl.map((e: any) => `<div class="tl"><div class="tl-dot ${e.kind}"></div><div class="tl-body"><div class="tl-when mono">${esc(day(e.ts))}</div><div class="tl-title">${esc(e.title)}</div><ul class="tl-detail">${e.detail.map((x: string) => `<li>${esc(x)}</li>`).join("")}</ul></div></div>`).join("")
-          : '<div class="tl"><div class="tl-dot stable"></div><div class="tl-body"><div class="tl-title">Architecture has been stable</div><p class="muted">No shape changes in the captured window. Evolution events appear here as the project moves.</p></div></div>';
-
-        // View 3 — observer feed
-        const obs = d.observer;
-        const groups: Array<["high" | "medium" | "low", string]> = [["high", "High confidence"], ["medium", "Medium confidence"], ["low", "Low confidence"]];
-        (document.getElementById("observer") as HTMLElement).innerHTML = groups.map(([c, lab]) => {
-          const items = obs.filter((o: any) => o.confidence === c);
-          if (!items.length) return "";
-          return `<div class="ogrp ${c}"><div class="ohead"><span class="dot"></span>${lab}</div>${items.map((o: any) => `<div class="ob"><p class="ot">${esc(o.text)}</p><p class="obasis mono">${esc(o.basis)}</p></div>`).join("")}</div>`;
-        }).join("");
-
-        // View 4 — shape map
-        const sm = d.shapeMap;
-        (document.getElementById("shapemap") as HTMLElement).innerHTML = sm.map((m: any) => `<div class="mech ${m.state}"><div class="mtop"><span class="mname">${esc(m.name)}</span><span class="mstate">${esc(m.state)}</span></div><p class="mnote">${esc(m.note)}</p></div>`).join("");
-
-        // View 2 — friction
-        const f = d.friction; const fh = document.getElementById("friction") as HTMLElement;
-        if (!f.instrumented) {
-          fh.innerHTML = `<div class="fchart blind"><svg viewBox="0 0 600 160" preserveAspectRatio="none" aria-hidden="true"><line x1="0" y1="80" x2="600" y2="80" stroke="#2a2f31" stroke-dasharray="5 6"/></svg><div class="foverlay"><span class="g mono">⊘</span><p>${esc(f.note)}</p></div></div>`;
-        } else {
-          fh.innerHTML = "<p class='loading mono'>chart</p>";
-        }
+        const sl: Record<string, string> = { "live:central-store": "live", "dev:hooks.jsonl": "live · this machine", "snapshot:events-sample": "real snapshot" };
+        (document.getElementById("src") as HTMLElement).textContent = "pattern cockpit · " + (sl[d.source] || d.source);
+        DAYS = d.cockpit.days; VARS = d.cockpit.variables;
+        const pickable = VARS.filter((x: V) => x.id !== "time");
+        const opt = (x: V) => `<option value="${x.id}">${esc(x.label)}${x.kind === "blind" ? " ⊘" : ""}</option>`;
+        (document.getElementById("y") as HTMLElement).innerHTML = pickable.map(opt).join("");
+        (document.getElementById("overlay") as HTMLElement).innerHTML = `<option value="">— none —</option>` + pickable.map(opt).join("");
+        (document.getElementById("y") as HTMLSelectElement).value = "arch_changes";
+        (document.getElementById("overlay") as HTMLSelectElement).value = "friction";
+        document.getElementById("y")!.addEventListener("change", render);
+        document.getElementById("overlay")!.addEventListener("change", render);
+        render();
       }
-      load().catch((e) => { (document.getElementById("timeline") as HTMLElement).innerHTML = '<p class="loading mono">feed error: ' + esc(e) + "</p>"; });
+      load().catch((e) => { (document.getElementById("chart") as HTMLElement).innerHTML = '<p class="loading mono">feed error: ' + esc(e) + "</p>"; });
     </script>
 
     <style is:global>
-      :root{color-scheme:dark;--surface:#0a0d0e;--raised:#16191b;--edge:#2a2f31;--ink:#f3f5f4;--dim:#c4ccca;--faint:#8b9492;--brand:#5fd3da;--ok:#8fa99b;--warn:#d8b06a;--lineage:#9d92c4;--font-d:"Instrument Serif",Georgia,serif;--font-s:"Inter",system-ui,sans-serif;--font-m:"JetBrains Mono",ui-monospace,Consolas,monospace}
+      :root{color-scheme:dark;--surface:#0a0d0e;--raised:#16191b;--edge:#2a2f31;--ink:#f3f5f4;--dim:#c4ccca;--faint:#8b9492;--brand:#5fd3da;--warn:#d8b06a;--font-d:"Instrument Serif",Georgia,serif;--font-s:"Inter",system-ui,sans-serif;--font-m:"JetBrains Mono",ui-monospace,Consolas,monospace}
       *{box-sizing:border-box}html,body{height:100%}
       body{margin:0;font:16px/1.55 var(--font-s);color:var(--ink);background:radial-gradient(120% 80% at 50% 120%,#5fd3da12 0,transparent 60%),var(--surface);background-attachment:fixed;-webkit-font-smoothing:antialiased}
       a{color:inherit}.mono{font-family:var(--font-m);font-variant-numeric:tabular-nums}.display{font-family:var(--font-d);font-weight:400}.ac{font-family:var(--font-d);font-style:italic;color:var(--brand)}
       .topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid var(--edge);position:sticky;top:0;z-index:10;background:#0a0d0ecc;backdrop-filter:blur(8px)}
       .wordmark{font-family:var(--font-d);font-size:20px;text-decoration:none}.topnav{display:flex;gap:18px;font-size:14px}.topnav a{color:var(--faint);text-decoration:none}.topnav a:hover{color:var(--ink)}.topnav .here{color:var(--ink);border-bottom:2px solid var(--brand)}
-      main{max-width:860px;margin:0 auto;padding:42px 24px 90px}section{margin-bottom:48px}
+      main{max-width:760px;margin:0 auto;padding:40px 24px 90px}section{margin-bottom:28px}
       .eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin:0 0 6px}
-      .hero h1{font-size:clamp(40px,7vw,62px);margin:0 0 10px;line-height:1.03}.lede{font-size:18px;color:var(--dim);max-width:60ch;margin:0}
-      .sec{font-size:27px;margin:0 0 6px}.hint{font-size:13.5px;color:var(--faint);margin:0 0 18px}.muted{color:var(--faint);font-size:13px;margin:4px 0 0}.loading{color:var(--faint);font-size:13px}
-      /* timeline */
-      .timeline{position:relative}
-      .tl{display:flex;gap:16px;padding:0 0 22px;position:relative}
-      .tl::before{content:"";position:absolute;left:6px;top:16px;bottom:-6px;width:2px;background:var(--edge)}.tl:last-child::before{display:none}
-      .tl-dot{width:14px;height:14px;border-radius:50%;margin-top:3px;flex:none;background:var(--brand);box-shadow:0 0 0 4px #5fd3da1a}
-      .tl-dot.stable{background:var(--faint);box-shadow:none}
-      .tl-when{font-size:12px;color:var(--faint)}.tl-title{font-size:16px;font-weight:600;margin:2px 0 0}
-      .tl-detail{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:4px}.tl-detail li{font-size:13.5px;color:var(--dim);font-family:var(--font-m);font-size:12.5px;border-left:2px solid var(--edge);padding-left:10px}
-      /* observer feed */
-      .obs{display:grid;gap:16px}
-      .ogrp{border:1px solid var(--edge);border-radius:14px;padding:16px;background:color-mix(in srgb,var(--raised) 50%,transparent)}
-      .ohead{display:flex;align-items:center;gap:8px;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--faint);margin-bottom:12px}
-      .ohead .dot{width:8px;height:8px;border-radius:50%}
-      .ogrp.high{border-left:3px solid var(--warn)}.ogrp.high .dot{background:var(--warn)}
-      .ogrp.medium{border-left:3px solid var(--brand)}.ogrp.medium .dot{background:var(--brand)}
-      .ogrp.low{border-left:3px solid var(--faint)}.ogrp.low .dot{background:var(--faint)}
-      .ob{padding:10px 0;border-top:1px solid #2a2f3144}.ob:first-of-type{border-top:none;padding-top:0}
-      .ot{margin:0;font-size:15px;color:var(--ink);line-height:1.5}.obasis{margin:6px 0 0;font-size:11px;color:var(--faint)}
-      /* shape map */
-      .shapemap{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-      .mech{border:1px solid var(--edge);border-radius:12px;padding:13px 14px;background:color-mix(in srgb,var(--raised) 50%,transparent);border-top-width:3px}
-      .mech.changing{border-top-color:var(--brand)}.mech.active{border-top-color:var(--ok)}.mech.emerging{border-top-color:var(--lineage)}.mech.stable{border-top-color:var(--faint)}.mech.blind{border-top-color:var(--edge)}
-      .mtop{display:flex;align-items:baseline;justify-content:space-between;gap:8px}.mname{font-size:15px;font-weight:600}
-      .mstate{font-size:11px;text-transform:uppercase;letter-spacing:.05em}
-      .mech.changing .mstate{color:var(--brand)}.mech.active .mstate{color:var(--ok)}.mech.emerging .mstate{color:var(--lineage)}.mech.stable .mstate,.mech.blind .mstate{color:var(--faint)}
-      .mnote{margin:7px 0 0;font-size:12px;color:var(--faint)}
-      /* friction */
-      .friction .fchart{position:relative;border:1px solid var(--edge);border-radius:14px;height:160px;background:color-mix(in srgb,var(--raised) 40%,transparent);overflow:hidden}
-      .fchart.blind{border-style:dashed}.fchart svg{width:100%;height:100%;display:block;opacity:.5}
-      .foverlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:0 30px;text-align:center}
-      .foverlay .g{font-size:20px;color:var(--faint)}.foverlay p{margin:0;font-size:13px;color:var(--dim);max-width:60ch}
-      .foot{margin-top:24px}.foot p{font-size:12px;color:var(--faint)}.foot a{color:var(--dim)}
-      @media(max-width:680px){.shapemap{grid-template-columns:1fr 1fr}}
+      .hero h1{font-size:clamp(38px,7vw,58px);margin:0 0 10px;line-height:1.03}.lede{font-size:18px;color:var(--dim);max-width:60ch;margin:0}.hero{margin-bottom:32px}
+      .controls{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;padding:14px 16px;border:1px solid var(--edge);border-radius:13px;background:var(--raised);font-size:14px;color:var(--dim)}
+      .controls label{display:inline-flex;align-items:center;gap:7px}
+      select{background:var(--surface);color:var(--ink);border:1px solid var(--edge);border-radius:8px;padding:6px 9px;font:13px var(--font-s);cursor:pointer}
+      .chartwrap{border:1px solid var(--edge);border-radius:14px;padding:16px;background:color-mix(in srgb,var(--raised) 45%,transparent)}
+      .chart svg{display:block}.loading{color:var(--faint);font-size:13px}
+      .legend{display:flex;flex-wrap:wrap;gap:16px;margin-top:10px;font-size:12px;color:var(--dim)}
+      .lg{display:inline-flex;align-items:center;gap:6px}.sw{width:14px;height:3px;border-radius:2px;display:inline-block}.u{color:var(--faint);font-size:11px}.bl{color:var(--warn);font-size:11px;margin-left:4px}
+      .interp{display:grid;gap:12px}
+      .ic{border:1px solid var(--edge);border-radius:12px;padding:13px 15px;background:color-mix(in srgb,var(--raised) 40%,transparent)}
+      .ic .ih{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--faint);margin-bottom:6px}
+      .ic p{margin:0;font-size:15px;color:var(--ink);line-height:1.5}.ic ul{margin:0;padding-left:18px}.ic li{font-size:14px;color:var(--dim);margin:3px 0}
+      .ic.finding{border-left:3px solid var(--brand)}.ic.blind{border-left:3px solid var(--warn);border-style:solid}.ic.blind p{color:var(--dim)}
+      .foot{margin-top:30px}.foot p{font-size:12px;color:var(--faint)}.foot a{color:var(--dim)}
     </style>
   </body>
 </html>

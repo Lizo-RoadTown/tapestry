@@ -92,4 +92,4 @@ See [Platform dependencies](/reference/platform-dependencies/) for the full Rend
 - [The signal hierarchy](/explanation/signal-hierarchy/) — Candidates and Skills are levels in the hierarchy
 - [Observer](/systems/observer/) — the primary writer
 - [Observatory](/systems/observatory/) — where operators review candidates
-- [Make_Skills engine bridge](https://github.com/Lizo-RoadTown/tapestry/blob/main/docs/integrations/make-skills-bridge.md) — the bidirectional contract with Make_Skills
+- **Make_Skills engine bridge** — the bidirectional contract with `Lizo-RoadTown/Make_Skills`. The Architecture Registry pushes promotion candidates; the engine pushes back registered-skill metadata + runtime telemetry. HMAC-signed via `BRIDGE_HMAC_SECRET`; implementation lives in `the-loom/services/architecture-registry/bridge_hmac.py` + `bridge_models.py`. A public docs page is planned but not yet written.

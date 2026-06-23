@@ -1,0 +1,152 @@
+---
+/**
+ * Shared marketing chrome — head, fonts, nav mega-menu, footer, and the
+ * reveal/menu scripts. Pages provide their own <slot> content + page-scoped
+ * <style>. The design system is imported globally from marketing.css so the
+ * nav/footer here AND each page's slotted content share the same classes.
+ *
+ * Props: title, description, activeNav ("platform" | "learn" | "docs").
+ */
+import "../styles/marketing.css";
+
+const { title, description, activeNav } = Astro.props as {
+  title: string;
+  description: string;
+  activeNav?: "platform" | "learn" | "docs";
+};
+
+const GITHUB = "https://github.com/Lizo-RoadTown/tapestry";
+const DOCS = "/";
+const OBSERVATORY = "/observatory";
+const SETUP = "/how-to/set-up-a-new-project/";
+
+const PLATFORM_MENU = [
+  {
+    heading: "Observe & understand",
+    items: [
+      { title: "Observatory", desc: "The live pattern console", href: OBSERVATORY, icon: `<circle cx="12" cy="12" r="3"/><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/>` },
+      { title: "Observer", desc: "Patterns surfaced from what happens", href: "/systems/observer/", icon: `<path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="12" r="3"/>` },
+      { title: "Telemetry", desc: "Sessions become coordination episodes", href: "/systems/telemetry/", icon: `<path d="M3 12h4l3 8 4-16 3 8h4"/>` },
+    ],
+  },
+  {
+    heading: "Accumulate & reuse",
+    items: [
+      { title: "Memory", desc: "Knowledge that carries across projects", href: "/systems/memory/", icon: `<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/>` },
+      { title: "Upskilling", desc: "Repeated work becomes reusable skills", href: "/explanation/upskilling/", icon: `<path d="M12 3 2 8l10 5 10-5-10-5Z"/><path d="M2 14l10 5 10-5"/>` },
+      { title: "Registry", desc: "Durable project structure", href: "/systems/registry/", icon: `<path d="M21 8 12 3 3 8v8l9 5 9-5V8Z"/><path d="m3 8 9 5 9-5"/><path d="M12 13v8"/>` },
+    ],
+  },
+];
+const LEARN_MENU = [
+  { title: "Project Shape", href: "/project-shape" },
+  { title: "Project intelligence vs the Observatory", href: "/explanation/project-intelligence-vs-observatory/" },
+  { title: "Signal → interpretation → pattern", href: "/explanation/signal-interpretation-pattern/" },
+  { title: "Observatory lenses", href: "/explanation/observatory-lenses/" },
+  { title: "What Tapestry is not", href: "/start/what-tapestry-is-not/" },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <header class="nav">
+      <div class="nav-in">
+        <a class="wordmark" href="/home">Tapestry</a>
+        <nav class="links" aria-label="Primary">
+          <div class="menu" data-menu>
+            <button class="menu-trigger" aria-haspopup="true" aria-expanded="false">Platform <span class="caret" aria-hidden="true">▾</span></button>
+            <div class="menu-panel mega" role="menu">
+              {PLATFORM_MENU.map((group) => (
+                <div class="mega-col">
+                  <p class="mega-h mono">{group.heading}</p>
+                  {group.items.map((it) => (
+                    <a class="mega-item" role="menuitem" href={it.href}>
+                      <span class="mega-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" set:html={it.icon} /></span>
+                      <span class="mega-txt"><span class="mega-t">{it.title}</span><span class="mega-d">{it.desc}</span></span>
+                    </a>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+          <div class="menu" data-menu>
+            <button class="menu-trigger" aria-haspopup="true" aria-expanded="false">Learn <span class="caret" aria-hidden="true">▾</span></button>
+            <div class="menu-panel list" role="menu">
+              {LEARN_MENU.map((it) => (<a class="list-item" role="menuitem" href={it.href}>{it.title}</a>))}
+            </div>
+          </div>
+          <a class="navlink" href={DOCS} aria-current={activeNav === "docs" ? "page" : undefined}>Docs</a>
+          <a href={GITHUB} class="gh" aria-label="GitHub repository">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M12 .5A12 12 0 0 0 8.2 23.9c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.3-1.7-1.3-1.7-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2 0-.4-.5-1.6.2-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17 4.6 18 4.9 18 4.9c.7 1.6.2 2.8.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .5Z"/></svg>
+          </a>
+        </nav>
+        <a class="btn btn-sm" href={SETUP}>Get started</a>
+      </div>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer class="footer">
+      <div class="foot-in">
+        <div class="foot-brand">
+          <span class="wordmark">Tapestry</span>
+          <p class="foot-tag">Project intelligence for AI-native teams. Accumulate capability instead of rebuilding context.</p>
+        </div>
+        <div class="foot-cols">
+          <div class="foot-col"><p class="foot-h mono">Platform</p><a href="/home#what">What it does</a><a href={OBSERVATORY}>Observatory</a><a href="/project-shape">Project shape</a></div>
+          <div class="foot-col"><p class="foot-h mono">Learn</p><a href="/explanation/project-intelligence-vs-observatory/">Concepts</a><a href="/reference/otel-coordination-contract/">Reference</a><a href="/start/what-tapestry-is-not/">What it is not</a></div>
+          <div class="foot-col"><p class="foot-h mono">Docs</p><a href={DOCS}>Documentation</a><a href={SETUP}>Quickstart</a><a href="/how-to/recover-from-common-failures/">Recover from drift</a></div>
+          <div class="foot-col"><p class="foot-h mono">Community</p><a href={GITHUB}>GitHub</a><a href="/explanation/discipline-stack/">Discipline stack</a></div>
+        </div>
+      </div>
+      <p class="foot-fine mono">Built in parallel with the fleet it will eventually hold. Names are transitional.</p>
+    </footer>
+
+    <script>
+      const rm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const els = Array.from(document.querySelectorAll<HTMLElement>(".reveal"));
+      if (rm || !("IntersectionObserver" in window)) {
+        els.forEach((e) => e.classList.add("in"));
+      } else {
+        const io = new IntersectionObserver((entries) => {
+          entries.forEach((en) => { if (en.isIntersecting) { (en.target as HTMLElement).classList.add("in"); io.unobserve(en.target); } });
+        }, { rootMargin: "0px 0px -10% 0px", threshold: 0.08 });
+        els.forEach((e) => io.observe(e));
+      }
+
+      const menus = Array.from(document.querySelectorAll<HTMLElement>("[data-menu]"));
+      const closeAll = (except?: HTMLElement) => {
+        menus.forEach((m) => {
+          if (m === except) return;
+          m.classList.remove("open");
+          m.querySelector(".menu-trigger")?.setAttribute("aria-expanded", "false");
+        });
+      };
+      menus.forEach((m) => {
+        const trigger = m.querySelector<HTMLButtonElement>(".menu-trigger")!;
+        trigger.addEventListener("click", (e) => {
+          e.preventDefault();
+          const open = m.classList.toggle("open");
+          trigger.setAttribute("aria-expanded", String(open));
+          closeAll(m);
+        });
+        m.addEventListener("mouseenter", () => trigger.setAttribute("aria-expanded", "true"));
+        m.addEventListener("mouseleave", () => { if (!m.classList.contains("open")) trigger.setAttribute("aria-expanded", "false"); });
+      });
+      document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeAll(); });
+      document.addEventListener("click", (e) => { if (!(e.target as Element).closest("[data-menu]")) closeAll(); });
+    </script>
+  </body>
+</html>

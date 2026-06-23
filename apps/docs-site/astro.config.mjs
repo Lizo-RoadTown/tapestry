@@ -125,7 +125,7 @@ export default defineConfig({
             { label: "Telemetry", slug: "systems/telemetry" },
             { label: "Registry", slug: "systems/registry" },
             { label: "Observatory", slug: "systems/observatory" },
-            { label: "Docs MCP (planned)", slug: "systems/docs-mcp" },
+            { label: "Docs MCP", slug: "systems/docs-mcp" },
             { label: "The plugins", slug: "explanation/plugins" },
             { label: "The memory MCP", slug: "explanation/memory-mcp" },
             { label: "The discipline stack (orientation)", slug: "explanation/discipline-stack" },

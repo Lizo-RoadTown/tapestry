@@ -21,6 +21,14 @@ export default defineConfig({
       description:
         "What keeps a project on track when it plugs into the Tapestry platform: the discipline stack of plugins, MCP wiring, hooks, and project intelligence — and how to recover when one piece goes missing.",
       customCss: ["./src/styles/custom.css"],
+      // Component overrides — Tapestry-specific.
+      components: {
+        // Adds a "Copy page" dropdown to the right of every page's <h1>.
+        // Items: Copy page as Markdown / View as Markdown / llms.txt.
+        // Backed by /llms.txt + /raw/<slug>.md, both produced by
+        // scripts/generate-static-docs.mjs as a prebuild step.
+        PageTitle: "./src/components/PageActions.astro",
+      },
       social: [
         {
           icon: "github",

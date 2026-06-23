@@ -5,9 +5,10 @@
   "private": true,
   "description": "Public docs site for Tapestry: what keeps a consuming project on track.",
   "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview"
+    "dev": "node scripts/generate-static-docs.mjs && astro dev",
+    "build": "node scripts/generate-static-docs.mjs && astro build",
+    "preview": "astro preview",
+    "generate-static-docs": "node scripts/generate-static-docs.mjs"
   },
   "dependencies": {
     "@astrojs/starlight": "^0.36.0",

@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tapestry-docs-mcp"
+version = "0.1.0"
+description = "Stdio MCP server exposing the Tapestry platform documentation as tools (search, read, list). Runs locally per-client; no hosted backend."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Tapestry contributors" }]
+keywords = ["mcp", "tapestry", "documentation", "stdio"]
+dependencies = [
+    "mcp>=1.0.0",
+]
+
+[project.scripts]
+# Optional console-script alias — `tapestry-docs-mcp` invokes the stdio
+# entry point. Equivalent to `python -m docs_mcp`.
+tapestry-docs-mcp = "docs_mcp.__main__:main"
+
+[project.urls]
+Homepage = "https://github.com/Lizo-RoadTown/tapestry"
+Documentation = "https://tapestry-khaki.vercel.app/systems/docs-mcp/"
+Repository = "https://github.com/Lizo-RoadTown/tapestry"
+
+[tool.setuptools.packages.find]
+include = ["docs_mcp*"]

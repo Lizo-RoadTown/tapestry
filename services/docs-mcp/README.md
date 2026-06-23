@@ -1,18 +1,12 @@
 # tapestry-docs-mcp
 
-MCP server that exposes the Tapestry documentation as queryable tools. Any Claude Code session (or other MCP client) can call `tapestry_docs_search`, `tapestry_docs_read`, `tapestry_docs_list` to read the docs corpus directly instead of fetching individual pages or pattern-matching from training data.
+Stdio MCP server exposing the Tapestry documentation as queryable tools. Any Claude Code session (or other MCP client) can call `tapestry_docs_search`, `tapestry_docs_read`, `tapestry_docs_list` to read the docs corpus directly instead of fetching individual pages or pattern-matching from training data.
 
-Companion to the LangChain / Mintlify [docs-as-MCP pattern](https://llmstxt.org/) — same shape, applied to Tapestry's Astro Starlight site.
-
-## Status
-
-**Skeleton scaffold — not deployed.** This directory contains the service code; deployment to Render is a separate operator step. See [Deploy](#deploy) below.
-
-The forward-looking page at [`apps/docs-site/src/content/docs/systems/docs-mcp.md`](../../apps/docs-site/src/content/docs/systems/docs-mcp.md) describes the consumer-facing experience once the service is live.
+Pairs with the static `/llms.txt` + `/raw/<slug>.md` artifacts published by the docs site itself — see [`apps/docs-site/scripts/generate-static-docs.mjs`](../../apps/docs-site/scripts/generate-static-docs.mjs).
 
 ## What it exposes
 
-Three tools via MCP HTTP transport at `/mcp`:
+Three MCP tools over stdio:
 
 | Tool | Signature | Returns |
 |---|---|---|
@@ -20,79 +14,85 @@ Three tools via MCP HTTP transport at `/mcp`:
 | `tapestry_docs_read` | `slug: str` | Full body of the named doc |
 | `tapestry_docs_list` | `section: str \| None = None` | All slugs (optionally filtered to a section) |
 
-Plus two static endpoints:
+Stdio transport means each MCP client spawns its own subprocess. No network, no hosting, no auth.
 
-| Endpoint | Purpose |
-|---|---|
-| `/llms.txt` | Flattened text corpus per the [llmstxt.org](https://llmstxt.org/) convention. Read by LLM clients that don't speak MCP. |
-| `/.well-known/mcp.json` | MCP discovery manifest. Read by MCP clients to auto-configure the tool list. |
+## Install
+
+```sh
+# from a clone of the tapestry repo
+pip install -e services/docs-mcp
+```
+
+Or, once published to PyPI:
+
+```sh
+pip install tapestry-docs-mcp
+```
+
+## Configure your MCP client
+
+Add to your project's `.mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "tapestry-docs": {
+      "command": "python",
+      "args": ["-m", "docs_mcp"]
+    }
+  }
+}
+```
+
+Restart Claude Code so the MCP loader picks it up.
 
 ## Source of truth
 
-The corpus is the markdown files in `apps/docs-site/src/content/docs/**/*.md{,x}`. The service reads them at startup (in-memory index — corpus is small enough that disk-backed search isn't worth the operational overhead).
+The corpus is the markdown files in `apps/docs-site/src/content/docs/**/*.md{,x}`. The service reads them at startup (in-memory index) and dispatches search/read/list calls against the loaded set.
 
-When the docs site is rebuilt, this service must be redeployed to pick up the changes. Future enhancement: webhook from Vercel build to Render to trigger redeploy automatically.
+By default the package resolves the corpus relative to its install location. Set `DOCS_ROOT` if you need to point it elsewhere:
+
+```sh
+DOCS_ROOT=/path/to/tapestry/apps/docs-site/src/content/docs python -m docs_mcp
+```
 
 ## Files
 
 ```
 services/docs-mcp/
-├── README.md          # this file
-├── main.py            # FastAPI app: /health, /llms.txt, /.well-known/mcp.json, mounts MCP at /mcp
-├── mcp_http.py        # StreamableHTTPSessionManager wrapper (no auth — public read-only)
-├── mcp_server.py      # MCP tool definitions: search, read, list
-├── indexer.py         # in-memory full-text search index over the docs corpus
-├── corpus.py          # corpus loader + llms.txt generator
-├── requirements.txt   # fastapi, uvicorn, mcp, pydantic
-└── render.yaml.example  # Render Blueprint template (not auto-deployed)
+├── README.md             # this file
+├── pyproject.toml        # package metadata + dependencies + entry point
+└── docs_mcp/
+    ├── __init__.py
+    ├── __main__.py       # stdio entry point — `python -m docs_mcp`
+    ├── corpus.py         # frontmatter parsing + llms.txt builder
+    ├── indexer.py        # token-frequency search index
+    └── mcp_server.py     # MCP tool definitions
 ```
 
 ## Run locally
 
 ```sh
 cd services/docs-mcp
-pip install -r requirements.txt
-DOCS_ROOT=../../apps/docs-site/src/content/docs uvicorn main:app --port 8002
+pip install -e .
+DOCS_ROOT=../../apps/docs-site/src/content/docs python -m docs_mcp
 ```
 
-Then visit:
+The process blocks on stdin/stdout waiting for an MCP client to connect via stdio. Manual testing is awkward — easier to point a real MCP client (Claude Code) at it via `.mcp.json` and exercise the tools from a chat session.
 
-- `http://localhost:8002/health` → `{"status": "ok"}`
-- `http://localhost:8002/llms.txt` → flattened corpus
-- `http://localhost:8002/.well-known/mcp.json` → discovery manifest
+## Why no hosted backend
 
-To call MCP tools, configure an MCP client (Claude Code, etc.) with `http://localhost:8002/mcp` as the URL.
+The Tapestry docs corpus is ~250 KB across ~30 markdown pages. Hosting a FastAPI service for content this small costs more (operationally and financially) than the static + stdio path. The static `/llms.txt` + `/raw/<slug>.md` artifacts ship with the existing Vercel docs deployment at zero extra cost; the MCP tools run locally inside each consuming client.
 
-## Deploy
+If the corpus ever outgrows in-memory search (thousands of pages, sub-second search latency requirements, multiple concurrent agents querying simultaneously), the upgrade path is:
 
-This service is NOT auto-deployed. The platform owner deploys it manually:
-
-1. Provision a Render Web Service from `render.yaml.example` (rename to `render.yaml` in your deployment branch).
-2. Set the `DOCS_ROOT` env var to the path the build sees (default in the blueprint: clones the tapestry repo, points to `apps/docs-site/src/content/docs/`).
-3. Note the deployed URL (e.g., `https://tapestry-docs-mcp.onrender.com`).
-4. Update `apps/docs-site/src/content/docs/systems/docs-mcp.md` to remove the caution banner and replace placeholders with the real URL.
-5. Add the MCP server entry to `integrations/claude-code/tapestry-discipline/.claude-plugin/plugin.json` so every consuming project auto-discovers it.
-6. Publish `/llms.txt` + `/.well-known/mcp.json` at the docs site root (Vercel rewrite from `apps/docs-site/vercel.json` to the Render service, OR static-build the corpus at the docs site directly — see indexer-vs-static decision in [the docs MCP page](../../apps/docs-site/src/content/docs/systems/docs-mcp.md)).
-
-## Env vars
-
-| Var | Default | Purpose |
-|---|---|---|
-| `DOCS_ROOT` | `../../apps/docs-site/src/content/docs` | Path to the docs corpus root |
-| `SITE_BASE_URL` | `https://tapestry-khaki.vercel.app` | Used in `/llms.txt` and `/.well-known/mcp.json` to construct absolute URLs |
-| `MCP_PUBLIC_URL` | unset | The URL clients should connect to (e.g., `https://tapestry-docs-mcp.onrender.com/mcp`); appears in `/.well-known/mcp.json` |
-
-## Why no auth
-
-The Tapestry docs are public. Any auth would be friction without benefit. Compare with `the-loom/services/agent-context/` which gates writes per tenant — docs MCP only reads, and reads are public.
-
-## Tests
-
-Deferred to a follow-on PR. The skeleton compiles and runs but does not have a test suite yet.
+1. Switch `indexer.py` from token-frequency to BM25 + persistent index.
+2. Optionally swap stdio transport for HTTP if many consumers share one large index — but only when the operational cost is justified.
 
 ## Related
 
-- [The docs MCP page (consumer-facing)](../../apps/docs-site/src/content/docs/systems/docs-mcp.md)
-- [`the-loom/services/agent-context/`](https://github.com/Lizo-RoadTown/the-loom/tree/main/services/agent-context) — the template this followed
-- [LangChain docs MCP pattern](https://llmstxt.org/) — the public reference implementation
-- [MCP spec — HTTP transport](https://spec.modelcontextprotocol.io/specification/server/transports/)
+- [Docs MCP system page](../../apps/docs-site/src/content/docs/systems/docs-mcp.md) — the consumer-facing explanation
+- [`apps/docs-site/scripts/generate-static-docs.mjs`](../../apps/docs-site/scripts/generate-static-docs.mjs) — the static-side generator (llms.txt + per-page raw markdown)
+- [`apps/docs-site/src/components/PageActions.astro`](../../apps/docs-site/src/components/PageActions.astro) — the "Copy page" dropdown that consumes those static artifacts
+- [MCP spec — stdio transport](https://spec.modelcontextprotocol.io/specification/server/transports/)
+- [llmstxt.org](https://llmstxt.org/) — the static-corpus convention

@@ -1,0 +1,208 @@
+---
+// PageActions.astro
+//
+// Override of Starlight's default PageTitle component. Renders the page's
+// <h1> plus a dropdown of actions for grabbing the page as markdown.
+//
+// Three actions, all backed by static features we actually ship:
+//   1. Copy page as Markdown — clipboard write of /raw/<slug>.md
+//   2. View as Markdown — link to /raw/<slug>.md
+//   3. llms.txt — link to /llms.txt (the flattened corpus)
+//
+// Generated artifacts come from scripts/generate-static-docs.mjs, which
+// runs as a prebuild step. No external services, no deep links, no MCP
+// install URLs — only what's actually verifiable.
+import { PAGE_TITLE_ID } from "@astrojs/starlight/constants";
+
+const { entry } = Astro.locals.starlightRoute;
+const slug = entry.id.replace(/\.(md|mdx)$/, "");
+const rawHref = `/raw/${slug}.md`;
+const llmsHref = "/llms.txt";
+---
+
+<div class="page-title-row">
+  <h1 id={PAGE_TITLE_ID}>{entry.data.title}</h1>
+
+  <details class="page-actions">
+    <summary aria-label="Page actions" title="Page actions">
+      <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"
+        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+        stroke-linejoin="round">
+        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+      </svg>
+      <span>Copy page</span>
+      <svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true"
+        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+        stroke-linejoin="round">
+        <polyline points="6 9 12 15 18 9"></polyline>
+      </svg>
+    </summary>
+
+    <ul role="menu">
+      <li role="none">
+        <button type="button" role="menuitem" data-action="copy-page" data-raw-href={rawHref}>
+          <span class="label">Copy page</span>
+          <span class="hint">Copy page as Markdown for LLMs</span>
+        </button>
+      </li>
+      <li role="none">
+        <a role="menuitem" href={rawHref} target="_blank" rel="noopener">
+          <span class="label">View as Markdown</span>
+          <span class="hint">View this page as plain text</span>
+        </a>
+      </li>
+      <li role="none">
+        <a role="menuitem" href={llmsHref} target="_blank" rel="noopener">
+          <span class="label">llms.txt</span>
+          <span class="hint">Open llms.txt for this site</span>
+        </a>
+      </li>
+    </ul>
+  </details>
+</div>
+
+<script>
+  // Wire the Copy page button. Fetches the raw markdown for the current page
+  // and writes it to the clipboard. Falls back to a textarea + execCommand
+  // for browsers without the async Clipboard API (rare, but cheap to support).
+  for (const btn of document.querySelectorAll<HTMLButtonElement>("[data-action='copy-page']")) {
+    btn.addEventListener("click", async () => {
+      const href = btn.getAttribute("data-raw-href");
+      if (!href) return;
+      const labelEl = btn.querySelector(".label");
+      const original = labelEl?.textContent ?? "Copy page";
+      try {
+        const res = await fetch(href);
+        if (!res.ok) throw new Error(`fetch failed: ${res.status}`);
+        const text = await res.text();
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(text);
+        } else {
+          const ta = document.createElement("textarea");
+          ta.value = text;
+          ta.style.position = "fixed";
+          ta.style.opacity = "0";
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand("copy");
+          document.body.removeChild(ta);
+        }
+        if (labelEl) labelEl.textContent = "Copied!";
+        setTimeout(() => {
+          if (labelEl) labelEl.textContent = original;
+        }, 1500);
+      } catch (err) {
+        if (labelEl) labelEl.textContent = "Copy failed";
+        setTimeout(() => {
+          if (labelEl) labelEl.textContent = original;
+        }, 1500);
+        console.error("[PageActions] copy-page failed", err);
+      }
+      // Close the dropdown after the action.
+      const details = btn.closest("details");
+      if (details) details.open = false;
+    });
+  }
+
+  // Close the dropdown when clicking outside it (Astro Starlight ships
+  // <details>-based menus elsewhere with the same UX).
+  document.addEventListener("click", (e) => {
+    for (const d of document.querySelectorAll<HTMLDetailsElement>("details.page-actions[open]")) {
+      if (!d.contains(e.target as Node)) d.open = false;
+    }
+  });
+</script>
+
+<style>
+  @layer starlight.core {
+    .page-title-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    h1 {
+      font-size: var(--sl-text-h1);
+      line-height: var(--sl-line-height-headings);
+      font-weight: 600;
+      color: var(--sl-color-white);
+      margin: 0;
+      flex: 1 1 auto;
+    }
+    .page-actions {
+      position: relative;
+      flex: 0 0 auto;
+    }
+    .page-actions > summary {
+      list-style: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4em;
+      padding: 0.45rem 0.75rem;
+      font-size: var(--sl-text-sm);
+      font-weight: 500;
+      color: var(--sl-color-white);
+      background: var(--sl-color-gray-6, var(--sl-color-bg-nav));
+      border: 1px solid var(--sl-color-gray-5, var(--sl-color-hairline));
+      border-radius: 6px;
+      user-select: none;
+    }
+    .page-actions > summary::-webkit-details-marker { display: none; }
+    .page-actions > summary:hover {
+      background: var(--sl-color-gray-5, var(--sl-color-hairline));
+    }
+    .page-actions[open] > summary {
+      background: var(--sl-color-gray-5, var(--sl-color-hairline));
+    }
+    .page-actions ul {
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      min-width: 18rem;
+      margin: 0;
+      padding: 0.35rem;
+      list-style: none;
+      background: var(--sl-color-bg-nav, var(--sl-color-gray-6));
+      border: 1px solid var(--sl-color-gray-5, var(--sl-color-hairline));
+      border-radius: 8px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+      z-index: 10;
+    }
+    .page-actions li { margin: 0; }
+    .page-actions a,
+    .page-actions button {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      width: 100%;
+      gap: 0.15rem;
+      padding: 0.5rem 0.65rem;
+      background: transparent;
+      border: 0;
+      border-radius: 4px;
+      color: var(--sl-color-white);
+      text-align: left;
+      text-decoration: none;
+      cursor: pointer;
+      font: inherit;
+    }
+    .page-actions a:hover,
+    .page-actions button:hover {
+      background: var(--sl-color-gray-5, var(--sl-color-hairline));
+    }
+    .page-actions .label {
+      font-weight: 500;
+      font-size: var(--sl-text-sm);
+    }
+    .page-actions .hint {
+      font-size: 0.75rem;
+      color: var(--sl-color-gray-3, var(--sl-color-text-accent));
+    }
+    @media (max-width: 50rem) {
+      .page-actions ul { min-width: 14rem; }
+    }
+  }
+</style>

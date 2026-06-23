@@ -1,4 +1,4 @@
-"""Top-level CLI dispatcher for `loom`.
+"""Top-level CLI dispatcher for `tapestry`.
 
 Subcommands:
   tapestry onboard     — `init` + writes .claude/settings.json with tapestry plugins
@@ -37,7 +37,7 @@ SUBCOMMANDS: dict[str, dict] = {
         "run": observatory_cmd.run,
     },
     "init": {
-        "help": "Onboard the current directory as a loom consuming project (no settings.json).",
+        "help": "Onboard the current directory as a Tapestry consuming project (no settings.json).",
         "add_arguments": init_cmd.add_arguments,
         "run": init_cmd.run,
     },
@@ -54,7 +54,7 @@ def _print_version() -> int:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="tapestry",
-        description="the-loom command-line interface",
+        description="Tapestry command-line interface — onboard projects, inspect state, open the Observatory.",
     )
     subs = parser.add_subparsers(dest="command", metavar="<command>")
     subs.add_parser("version", help="Print version and platform info.")

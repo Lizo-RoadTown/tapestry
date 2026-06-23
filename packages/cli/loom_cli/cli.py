@@ -1,7 +1,10 @@
 """Top-level CLI dispatcher for `loom`.
 
 Subcommands:
-  loom init      — onboard the current directory as a loom consuming project
+  loom onboard   — `init` + writes .claude/settings.json with tapestry plugins
+                   enabled (the 4-step quickstart path)
+  loom init      — register the project, write .env / .mcp.json / .project-intelligence/
+                   (the granular path — does NOT touch .claude/settings.json)
   loom version   — print version + diagnostic info
 
 Add a new subcommand by:
@@ -13,12 +16,17 @@ from __future__ import annotations
 import argparse
 import sys
 
-from loom_cli import __version__, init as init_cmd
+from loom_cli import __version__, init as init_cmd, onboard as onboard_cmd
 
 
 SUBCOMMANDS: dict[str, dict] = {
+    "onboard": {
+        "help": "Onboard the current directory + write .claude/settings.json (recommended).",
+        "add_arguments": onboard_cmd.add_arguments,
+        "run": onboard_cmd.run,
+    },
     "init": {
-        "help": "Onboard the current directory as a loom consuming project.",
+        "help": "Onboard the current directory as a loom consuming project (no settings.json).",
         "add_arguments": init_cmd.add_arguments,
         "run": init_cmd.run,
     },

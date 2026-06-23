@@ -12,7 +12,13 @@
 // Generated artifacts come from scripts/generate-static-docs.mjs, which
 // runs as a prebuild step. No external services, no deep links, no MCP
 // install URLs — only what's actually verifiable.
-import { PAGE_TITLE_ID } from "@astrojs/starlight/constants";
+//
+// `_top` is Starlight's documented PAGE_TITLE_ID constant. Hard-coded
+// here because `@astrojs/starlight/constants` isn't a public export
+// subpath in 0.36 (the package's exports map doesn't list it); importing
+// it breaks the Vercel build. Verified against
+// node_modules/@astrojs/starlight/constants.ts:1 — `PAGE_TITLE_ID = '_top'`.
+const PAGE_TITLE_ID = "_top";
 
 const { entry } = Astro.locals.starlightRoute;
 const slug = entry.id.replace(/\.(md|mdx)$/, "");

@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 import { buildEpisodes, summarize, type HookEvent, type Episode } from "../../lib/episodes";
 import { shapeTimeline, observerFeed, shapeMap, frictionTrend, type ShapeMovement } from "../../lib/observatory";
+import { buildVariables } from "../../lib/cockpit";
 import sample from "../../data/events-sample.json";
 import shapeMovementRaw from "../../data/shape-movement.json";
 
@@ -57,9 +58,12 @@ export const GET: APIRoute = async () => {
   const { events, source } = await loadEvents();
   const episodes = buildEpisodes(events);
   const summary = summarize(episodes);
+  const cockpit = buildVariables(shapeMovement, episodes);
   const body = {
     source,
     summary,
+    // cockpit: telemetry as selectable variables over time
+    cockpit,
     // the meaning objects — the observatory's real content
     timeline: shapeTimeline(shapeMovement),
     observer: observerFeed(shapeMovement, episodes),

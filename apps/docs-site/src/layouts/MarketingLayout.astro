@@ -16,7 +16,7 @@ const { title, description, activeNav } = Astro.props as {
 };
 
 const GITHUB = "https://github.com/Lizo-RoadTown/tapestry";
-const DOCS = "/";
+const DOCS = "/docs/";
 const OBSERVATORY = "/observatory";
 const SETUP = "/how-to/set-up-a-new-project/";
 
@@ -63,7 +63,7 @@ const LEARN_MENU = [
   <body>
     <header class="nav">
       <div class="nav-in">
-        <a class="wordmark" href="/home">Tapestry</a>
+        <a class="wordmark" href="/">Tapestry</a>
         <nav class="links" aria-label="Primary">
           <div class="menu" data-menu>
             <button class="menu-trigger" aria-haspopup="true" aria-expanded="false">Platform <span class="caret" aria-hidden="true">▾</span></button>
@@ -101,7 +101,7 @@ const LEARN_MENU = [
         </button>
       </div>
       <div class="mobile-nav" id="mobile-nav" data-mobile-nav>
-        <a class="mobile-home" href="/home">Home</a>
+        <a class="mobile-home" href="/">Home</a>
         <p class="mobile-h mono">Platform</p>
         {PLATFORM_MENU.flatMap((g) => g.items).map((it) => (<a class="mobile-link" href={it.href}>{it.title}</a>))}
         <p class="mobile-h mono">Learn</p>

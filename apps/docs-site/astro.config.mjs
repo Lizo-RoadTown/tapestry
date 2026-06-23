@@ -13,6 +13,12 @@ export default defineConfig({
   // Adapter enables on-demand routes (the Observatory console + /api/episodes.json)
   // while all doc pages stay static (prerendered by default).
   adapter: vercel(),
+  // Front-door move: the marketing page now lives at / (src/pages/index.astro);
+  // the docs landing moved to /docs/ (src/content/docs/docs.mdx). /home is kept
+  // as a redirect to / so older links and bookmarks still resolve.
+  redirects: {
+    "/home": "/",
+  },
   integrations: [
     // astro-mermaid must precede starlight so ```mermaid blocks render as diagrams.
     mermaid({ theme: "dark" }),
@@ -90,7 +96,7 @@ export default defineConfig({
         {
           label: "Docs",
           items: [
-            { label: "Overview", slug: "index" },
+            { label: "Overview", slug: "docs" },
             { label: "Quickstart — VS Code", slug: "how-to/quickstart-vscode" },
             { label: "Your first project", slug: "start/your-first-project" },
             { label: "Verify it worked", slug: "start/verify-it-worked" },

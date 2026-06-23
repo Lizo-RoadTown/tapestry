@@ -1,7 +1,10 @@
 import type { APIRoute } from "astro";
 import { buildEpisodes, summarize, type HookEvent, type Episode } from "../../lib/episodes";
+import { shapeTimeline, observerFeed, shapeMap, frictionTrend, type ShapeMovement } from "../../lib/observatory";
 import sample from "../../data/events-sample.json";
-import shapeMovement from "../../data/shape-movement.json";
+import shapeMovementRaw from "../../data/shape-movement.json";
+
+const shapeMovement = shapeMovementRaw as unknown as ShapeMovement[];
 
 export const prerender = false;
 
@@ -54,7 +57,18 @@ export const GET: APIRoute = async () => {
   const { events, source } = await loadEvents();
   const episodes = buildEpisodes(events);
   const summary = summarize(episodes);
-  const body = { source, summary, shapeMovement, trends: trends(episodes), episodes };
+  const body = {
+    source,
+    summary,
+    // the meaning objects — the observatory's real content
+    timeline: shapeTimeline(shapeMovement),
+    observer: observerFeed(shapeMovement, episodes),
+    shapeMap: shapeMap(shapeMovement, episodes),
+    friction: frictionTrend(),
+    // supporting evidence (demoted)
+    trends: trends(episodes),
+    episodes,
+  };
   return new Response(JSON.stringify(body, null, 0), {
     headers: { "content-type": "application/json", "cache-control": "no-store" },
   });

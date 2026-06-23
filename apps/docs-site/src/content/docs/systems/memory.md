@@ -103,6 +103,6 @@ See [Platform dependencies](/reference/platform-dependencies/) for the full Rend
 
 - [The memory MCP (explanation)](/explanation/memory-mcp/) — the conceptual page
 - [Sharing intelligence across projects](/explanation/sharing-intelligence-across-projects/) — the multi-agent memory model
-- [Load-bearing files](/reference/load-bearing-files/#mcp) — the `.mcp.json` contract
+- [Load-bearing files](/reference/load-bearing-files/) — the `.mcp.json` contract is documented there
 - [Observer](/systems/observer/), [Observatory](/systems/observatory/) — the components that read Memory most heavily
-- [CORE DIRECTIVE 1](https://github.com/Lizo-RoadTown/tapestry/blob/main/docs/CORE_DIRECTIVES.md) — why Memory access is mandatory, not optional
+- [CORE DIRECTIVE 1](https://github.com/Lizo-RoadTown/the-loom/blob/main/docs/CORE_DIRECTIVES.md) — why Memory access is mandatory, not optional (the directive's canonical home is currently `the-loom/docs/CORE_DIRECTIVES.md`; it migrates into `tapestry/docs/` once the platform-mode boundaries firm up)

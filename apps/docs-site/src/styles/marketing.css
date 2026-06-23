@@ -66,6 +66,20 @@ a { color: inherit; text-decoration: none; }
 .links .gh { display: inline-flex; color: var(--faint); padding: 8px 10px; transition: color 0.15s; }
 .links .gh:hover { color: var(--ink); }
 
+/* mobile menu — hidden on desktop, the only nav affordance on small screens */
+.nav-toggle { display: none; align-items: center; justify-content: center; width: 40px; height: 40px; margin-left: 4px; border: 1px solid var(--edge); border-radius: 10px; background: transparent; color: var(--ink); cursor: pointer; }
+.nav-toggle .ic-close { display: none; }
+.nav-toggle.is-open .ic-open { display: none; }
+.nav-toggle.is-open .ic-close { display: block; }
+.mobile-nav { display: none; }
+.mobile-nav.open { display: flex; flex-direction: column; position: fixed; top: 61px; left: 0; right: 0; bottom: 0; z-index: 49; overflow-y: auto; padding: 14px 20px 32px; background: #0a0d0ef7; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+.mobile-nav .mobile-home { font-family: var(--font-d); font-size: 22px; color: var(--ink); padding: 10px 6px 14px; }
+.mobile-nav .mobile-h { font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint); margin: 18px 6px 6px; }
+.mobile-nav .mobile-link { font-size: 17px; color: var(--dim); padding: 12px 6px; border-bottom: 1px solid var(--edge-soft); }
+.mobile-nav .mobile-link:active { color: var(--brand); }
+.mobile-nav .mobile-cta { margin-top: 22px; justify-content: center; font-size: 15px; padding: 13px 24px; }
+body.nav-locked { overflow: hidden; }
+
 /* mega-menu */
 .menu { position: relative; }
 .menu-trigger { display: inline-flex; align-items: center; gap: 5px; font: 500 14px var(--font-s); color: var(--faint); background: none; border: 0; padding: 8px 10px; cursor: pointer; transition: color 0.15s; }
@@ -109,8 +123,12 @@ a { color: inherit; text-decoration: none; }
 .foot-fine { max-width: var(--maxw); margin: 40px auto 0; font-size: 11.5px; color: var(--faint); border-top: 1px solid var(--edge-soft); padding-top: 22px; }
 
 @media (max-width: 620px) {
-  .links .menu, .navlink { display: none; }
-  .nav-in { gap: 14px; }
+  .links, .nav-cta { display: none; }
+  .nav-toggle { display: inline-flex; }
+  .nav-in { gap: 12px; }
+}
+@media (min-width: 621px) {
+  .mobile-nav.open { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .reveal { opacity: 1; transform: none; transition: none; }

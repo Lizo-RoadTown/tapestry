@@ -63,7 +63,8 @@ export default defineConfig({
         {
           label: "Use it",
           items: [
-            { label: "Set up a new project", slug: "how-to/set-up-a-new-project" },
+            { label: "Quickstart — VS Code", slug: "how-to/quickstart-vscode" },
+            { label: "Set up a new project (comprehensive)", slug: "how-to/set-up-a-new-project" },
             { label: "Recover from common failures", slug: "how-to/recover-from-common-failures" },
           ],
         },

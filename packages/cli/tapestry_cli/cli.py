@@ -1,8 +1,9 @@
 """Top-level CLI dispatcher for `loom`.
 
 Subcommands:
-  tapestry onboard   — `init` + writes .claude/settings.json with tapestry plugins
+  tapestry onboard     — `init` + writes .claude/settings.json with tapestry plugins
                    enabled (the 4-step quickstart path)
+  tapestry observatory — open the Observatory console in a browser
   tapestry init      — register the project, write .env / .mcp.json / .project-intelligence/
                    (the granular path — does NOT touch .claude/settings.json)
   tapestry version   — print version + diagnostic info
@@ -16,7 +17,12 @@ from __future__ import annotations
 import argparse
 import sys
 
-from tapestry_cli import __version__, init as init_cmd, onboard as onboard_cmd
+from tapestry_cli import (
+    __version__,
+    init as init_cmd,
+    observatory as observatory_cmd,
+    onboard as onboard_cmd,
+)
 
 
 SUBCOMMANDS: dict[str, dict] = {
@@ -24,6 +30,11 @@ SUBCOMMANDS: dict[str, dict] = {
         "help": "Onboard the current directory + write .claude/settings.json (recommended).",
         "add_arguments": onboard_cmd.add_arguments,
         "run": onboard_cmd.run,
+    },
+    "observatory": {
+        "help": "Open the Observatory console in a browser.",
+        "add_arguments": observatory_cmd.add_arguments,
+        "run": observatory_cmd.run,
     },
     "init": {
         "help": "Onboard the current directory as a loom consuming project (no settings.json).",

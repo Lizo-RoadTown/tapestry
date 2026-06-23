@@ -50,8 +50,11 @@ export default defineConfig({
           label: "How it works",
           items: [
             { label: "The signal hierarchy", slug: "explanation/signal-hierarchy" },
+            { label: "Signal → Interpretation → Pattern", slug: "explanation/signal-interpretation-pattern" },
             { label: "The observer", slug: "explanation/the-observer" },
             { label: "Observer-derived intent", slug: "explanation/observer-derived-intent" },
+            { label: "Project Intelligence vs Observatory", slug: "explanation/project-intelligence-vs-observatory" },
+            { label: "Observatory lenses", slug: "explanation/observatory-lenses" },
             { label: "How the platform upskills itself", slug: "explanation/upskilling" },
             { label: "Sharing intelligence across projects", slug: "explanation/sharing-intelligence-across-projects" },
             { label: "The memory MCP", slug: "explanation/memory-mcp" },

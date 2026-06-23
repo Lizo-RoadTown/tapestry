@@ -1,0 +1,111 @@
+---
+/**
+ * Marketing page — Open Source. Speaks directly to builders (operator copy,
+ * 2026-06-23). Adds a real install block — tapestry-cli is published to PyPI,
+ * the plugins install from the marketplace.
+ */
+import MarketingLayout from "../layouts/MarketingLayout.astro";
+
+const GITHUB = "https://github.com/Lizo-RoadTown/tapestry";
+
+const INCLUDED = [
+  "Project intelligence",
+  "Observer",
+  "Memory integration",
+  "Observatory",
+  "Documentation",
+  "Community discussions",
+];
+---
+
+<MarketingLayout title="Open source — Tapestry" description="Tapestry is being developed in the open — for builders, researchers, engineers, and teams exploring how AI-assisted work evolves over time. View the code, contribute, or use it in your own projects." activeNav="platform">
+  <section class="os-hero">
+    <div class="os-glow" aria-hidden="true"></div>
+    <div class="os-hero-in reveal">
+      <p class="kicker mono">Open source</p>
+      <h1 class="display">Built in the <span class="accent">open.</span></h1>
+      <p class="os-sub">Tapestry is designed for builders, researchers, engineers, and teams exploring how AI-assisted work evolves over time.</p>
+      <div class="cta-row">
+        <a class="btn btn-lg" href={GITHUB}>View on GitHub →</a>
+        <a class="btn btn-ghost btn-lg" href="#start">Start building →</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="os-included">
+    <header class="sec-head">
+      <p class="kicker mono">What's included</p>
+      <h2 class="display sec-title">The foundations, open.</h2>
+      <p class="sec-sub">Everything you need to observe and understand how work changes over time.</p>
+    </header>
+    <ul class="os-grid reveal">
+      {INCLUDED.map((it) => (<li class="os-item"><span class="os-dot" aria-hidden="true"></span>{it}</li>))}
+    </ul>
+    <p class="os-body reveal">Whether you're experimenting with agent workflows, building internal tools, or exploring project intelligence, the open-source platform provides the foundations needed to observe and understand how work changes over time.</p>
+  </section>
+
+  <section class="os-start" id="start">
+    <div class="os-start-in">
+      <div class="os-start-copy reveal">
+        <p class="kicker mono">Start building</p>
+        <h2 class="display sec-title">Install one piece. Keep your stack.</h2>
+        <p class="sec-sub">Adopt the components one at a time, in any project — by reference, not copy. The CLI is on PyPI; the plugins install from the marketplace.</p>
+      </div>
+      <div class="terminal reveal">
+        <div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="frame-title mono">bash</span></div>
+        <pre class="term-body mono"><code><span class="c">{"# the CLI — onboard a project, open the console"}</span>
+<span class="p">$</span> pipx install tapestry-cli
+<span class="p">$</span> tapestry onboard
+
+<span class="c">{"# the discipline + patterns plugins"}</span>
+<span class="p">$</span> /plugin marketplace add Lizo-RoadTown/tapestry
+<span class="p">$</span> /plugin install tapestry-discipline@tapestry</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="os-cta">
+    <div class="os-cta-glow" aria-hidden="true"></div>
+    <div class="reveal">
+      <h2 class="display os-cta-title">View the code. Contribute.<br /><span class="accent">Use it in your own projects.</span></h2>
+      <div class="cta-row center"><a class="btn btn-lg" href={GITHUB}>View on GitHub →</a><a class="btn btn-ghost btn-lg" href="/how-to/set-up-a-new-project/">Read the setup guide →</a></div>
+    </div>
+  </section>
+</MarketingLayout>
+
+<style>
+  .os-hero { position: relative; overflow: hidden; padding: clamp(72px, 12vw, 140px) 24px clamp(48px, 8vw, 80px); text-align: center; }
+  .os-glow { position: absolute; inset: -20% 0 auto 0; height: 660px; background: radial-gradient(58% 65% at 50% 0%, #5fd3da26 0, #5fd3da0d 38%, transparent 70%); pointer-events: none; }
+  .os-hero-in { position: relative; max-width: 800px; margin: 0 auto; }
+  .os-hero h1 { font-size: clamp(48px, 8.4vw, 90px); line-height: 1.02; margin: 0 0 20px; letter-spacing: -0.01em; }
+  .os-sub { font-size: clamp(17px, 2.1vw, 21px); line-height: 1.55; color: var(--dim); max-width: 56ch; margin: 0 auto; }
+  .cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 30px; }
+  .cta-row.center { justify-content: center; }
+
+  .os-included { border-top: 1px solid var(--edge-soft); padding: clamp(56px, 9vw, 104px) 24px; }
+  .os-grid { list-style: none; padding: 0; margin: 44px auto 0; max-width: 720px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .os-item { display: flex; align-items: center; gap: 12px; padding: 18px 20px; border: 1px solid var(--edge); border-radius: 12px; background: var(--surface-2); font-size: 15px; color: var(--ink); }
+  .os-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--brand); flex: none; box-shadow: 0 0 10px #5fd3da88; }
+  .os-body { max-width: 720px; margin: 32px auto 0; font-size: clamp(16px, 1.9vw, 19px); line-height: 1.6; color: var(--dim); text-align: center; }
+
+  .os-start { border-top: 1px solid var(--edge-soft); padding: clamp(56px, 9vw, 104px) 24px; }
+  .os-start-in { max-width: var(--maxw); margin: 0 auto; display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 56px; align-items: center; }
+  .os-start-copy .sec-title { text-align: left; }
+  .terminal { border: 1px solid var(--edge); border-radius: 14px; overflow: hidden; background: #0b0f10; box-shadow: 0 40px 80px -44px #000; }
+  .frame-bar { display: flex; align-items: center; gap: 7px; padding: 11px 14px; border-bottom: 1px solid var(--edge-soft); background: #0c1012; }
+  .frame-bar .dot { width: 11px; height: 11px; border-radius: 50%; background: #2a3133; }
+  .frame-title { margin-left: 10px; font-size: 11.5px; color: var(--faint); }
+  .term-body { margin: 0; padding: 20px 22px; font-size: 13.5px; line-height: 1.85; color: var(--dim); overflow-x: auto; }
+  .term-body .p { color: var(--brand); user-select: none; margin-right: 8px; }
+  .term-body .c { color: var(--faint); }
+
+  .os-cta { position: relative; overflow: hidden; text-align: center; padding: clamp(80px, 13vw, 150px) 24px; border-top: 1px solid var(--edge-soft); }
+  .os-cta-glow { position: absolute; inset: auto 0 -40% 0; height: 540px; background: radial-gradient(55% 70% at 50% 100%, #5fd3da22 0, transparent 70%); pointer-events: none; }
+  .os-cta-title { position: relative; font-size: clamp(30px, 5vw, 56px); line-height: 1.1; margin: 0 0 34px; }
+
+  @media (max-width: 900px) {
+    .os-grid { grid-template-columns: repeat(2, 1fr); }
+    .os-start-in { grid-template-columns: 1fr; gap: 32px; }
+  }
+  @media (max-width: 560px) { .os-grid { grid-template-columns: 1fr; } }
+</style>

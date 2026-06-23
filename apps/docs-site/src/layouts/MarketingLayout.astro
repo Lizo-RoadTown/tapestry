@@ -20,21 +20,23 @@ const DOCS = "/";
 const OBSERVATORY = "/observatory";
 const SETUP = "/how-to/set-up-a-new-project/";
 
+// Lead with outcomes; mechanisms are the second column (supporting evidence).
 const PLATFORM_MENU = [
   {
-    heading: "Observe & understand",
+    heading: "Platform",
     items: [
-      { title: "Observatory", desc: "The live pattern console", href: OBSERVATORY, icon: `<circle cx="12" cy="12" r="3"/><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/>` },
-      { title: "Observer", desc: "Patterns surfaced from what happens", href: "/systems/observer/", icon: `<path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="12" r="3"/>` },
-      { title: "Telemetry", desc: "Sessions become coordination episodes", href: "/systems/telemetry/", icon: `<path d="M3 12h4l3 8 4-16 3 8h4"/>` },
+      { title: "Project intelligence", desc: "Accumulate capability instead of rebuilding context", href: "/project-intelligence", icon: `<path d="M12 2a9 9 0 1 0 9 9"/><path d="M12 7v5l3 2"/><path d="M16 3l5 2-2 5"/>` },
+      { title: "How it works", desc: "Activity becomes durable intelligence", href: "/how-it-works", icon: `<path d="M12 3 2 8l10 5 10-5-10-5Z"/><path d="M2 14l10 5 10-5"/>` },
+      { title: "Project shape", desc: "Why some projects get easier over time", href: "/project-shape", icon: `<path d="M3 12h4l3 8 4-16 3 8h4"/>` },
     ],
   },
   {
-    heading: "Accumulate & reuse",
+    heading: "Mechanisms",
     items: [
+      { title: "Observatory", desc: "The live pattern console", href: OBSERVATORY, icon: `<circle cx="12" cy="12" r="3"/><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/>` },
+      { title: "Observer", desc: "Patterns surfaced from what happens", href: "/systems/observer/", icon: `<path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="12" r="3"/>` },
       { title: "Memory", desc: "Knowledge that carries across projects", href: "/systems/memory/", icon: `<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/>` },
       { title: "Upskilling", desc: "Repeated work becomes reusable skills", href: "/explanation/upskilling/", icon: `<path d="M12 3 2 8l10 5 10-5-10-5Z"/><path d="M2 14l10 5 10-5"/>` },
-      { title: "Registry", desc: "Durable project structure", href: "/systems/registry/", icon: `<path d="M21 8 12 3 3 8v8l9 5 9-5V8Z"/><path d="m3 8 9 5 9-5"/><path d="M12 13v8"/>` },
     ],
   },
 ];
@@ -85,6 +87,8 @@ const LEARN_MENU = [
               {LEARN_MENU.map((it) => (<a class="list-item" role="menuitem" href={it.href}>{it.title}</a>))}
             </div>
           </div>
+          <a class="navlink" href="/use-cases">Use cases</a>
+          <a class="navlink" href="/open-source">Open source</a>
           <a class="navlink" href={DOCS} aria-current={activeNav === "docs" ? "page" : undefined}>Docs</a>
           <a href={GITHUB} class="gh" aria-label="GitHub repository">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M12 .5A12 12 0 0 0 8.2 23.9c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.3-1.7-1.3-1.7-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2 0-.4-.5-1.6.2-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17 4.6 18 4.9 18 4.9c.7 1.6.2 2.8.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .5Z"/></svg>
@@ -105,9 +109,9 @@ const LEARN_MENU = [
           <p class="foot-tag">Project intelligence for AI-native teams. Accumulate capability instead of rebuilding context.</p>
         </div>
         <div class="foot-cols">
-          <div class="foot-col"><p class="foot-h mono">Platform</p><a href="/home#what">What it does</a><a href={OBSERVATORY}>Observatory</a><a href="/project-shape">Project shape</a></div>
-          <div class="foot-col"><p class="foot-h mono">Learn</p><a href="/explanation/project-intelligence-vs-observatory/">Concepts</a><a href="/reference/otel-coordination-contract/">Reference</a><a href="/start/what-tapestry-is-not/">What it is not</a></div>
-          <div class="foot-col"><p class="foot-h mono">Docs</p><a href={DOCS}>Documentation</a><a href={SETUP}>Quickstart</a><a href="/how-to/recover-from-common-failures/">Recover from drift</a></div>
+          <div class="foot-col"><p class="foot-h mono">Platform</p><a href="/project-intelligence">Project intelligence</a><a href="/how-it-works">How it works</a><a href="/project-shape">Project shape</a><a href={OBSERVATORY}>Observatory</a></div>
+          <div class="foot-col"><p class="foot-h mono">Explore</p><a href="/use-cases">Use cases</a><a href="/open-source">Open source</a><a href="/enterprise">Enterprise</a></div>
+          <div class="foot-col"><p class="foot-h mono">Docs</p><a href={DOCS}>Documentation</a><a href={SETUP}>Quickstart</a><a href="/explanation/project-intelligence-vs-observatory/">Concepts</a></div>
           <div class="foot-col"><p class="foot-h mono">Community</p><a href={GITHUB}>GitHub</a><a href="/explanation/discipline-stack/">Discipline stack</a></div>
         </div>
       </div>

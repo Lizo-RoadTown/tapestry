@@ -1,0 +1,73 @@
+---
+/**
+ * Marketing page — Enterprise. Kept deliberately light (operator copy,
+ * 2026-06-23): honest about being early — "exploring", "early adopters" —
+ * not a finished SKU. The two-mode (self-host / hosted) commitment is
+ * forward-looking per CLAUDE.md, so this page does not claim a shipping
+ * multi-tenant product.
+ *
+ * NOTE: "Contact" points at GitHub for now — no public contact address has
+ * been provided. Swap for a real email/form when the operator gives one.
+ */
+import MarketingLayout from "../layouts/MarketingLayout.astro";
+
+const CONTACT = "https://github.com/Lizo-RoadTown/tapestry";
+
+const CHALLENGES = [
+  "knowledge fragmentation",
+  "workflow drift",
+  "project complexity",
+  "coordination across people and agents",
+];
+---
+
+<MarketingLayout title="Enterprise — Tapestry" description="As AI adoption expands, organizations face knowledge fragmentation, workflow drift, and coordination across people and agents. Tapestry is exploring how project intelligence can help organizations preserve knowledge and accumulate capability over time.">
+  <section class="en-hero">
+    <div class="en-glow" aria-hidden="true"></div>
+    <div class="en-hero-in reveal">
+      <p class="kicker mono">Enterprise</p>
+      <h1 class="display">Some organizations need<br />more than tools.<br />They need <span class="accent">continuity.</span></h1>
+    </div>
+  </section>
+
+  <section class="en-body">
+    <div class="en-body-in">
+      <p class="en-lead reveal">As AI adoption expands, teams face new challenges:</p>
+      <ul class="en-challenges reveal">
+        {CHALLENGES.map((c) => (<li><span class="tick" aria-hidden="true">→</span>{c}</li>))}
+      </ul>
+      <p class="en-para reveal">Tapestry is exploring how project intelligence can help organizations preserve knowledge, understand project evolution, and accumulate capability over time.</p>
+      <p class="en-para en-muted reveal">We're currently working with early adopters to understand how these systems perform in real-world environments.</p>
+    </div>
+  </section>
+
+  <section class="en-cta">
+    <div class="en-cta-glow" aria-hidden="true"></div>
+    <div class="reveal">
+      <h2 class="display en-cta-title">Interested in exploring Tapestry<br /><span class="accent">within your organization?</span></h2>
+      <div class="cta-row center"><a class="btn btn-lg" href={CONTACT}>Start a conversation →</a></div>
+    </div>
+  </section>
+</MarketingLayout>
+
+<style>
+  .en-hero { position: relative; overflow: hidden; padding: clamp(80px, 13vw, 150px) 24px clamp(40px, 7vw, 72px); text-align: center; }
+  .en-glow { position: absolute; inset: -20% 0 auto 0; height: 700px; background: radial-gradient(58% 65% at 50% 0%, #5fd3da26 0, #5fd3da0d 38%, transparent 70%); pointer-events: none; }
+  .en-hero-in { position: relative; max-width: 880px; margin: 0 auto; }
+  .en-hero h1 { font-size: clamp(40px, 7vw, 76px); line-height: 1.05; margin: 0; letter-spacing: -0.01em; }
+
+  .en-body { border-top: 1px solid var(--edge-soft); padding: clamp(56px, 9vw, 96px) 24px; }
+  .en-body-in { max-width: 680px; margin: 0 auto; }
+  .en-lead { font-size: clamp(18px, 2.2vw, 22px); color: var(--dim); margin: 0 0 22px; }
+  .en-challenges { list-style: none; padding: 0; margin: 0 0 30px; display: flex; flex-direction: column; gap: 13px; }
+  .en-challenges li { display: flex; gap: 12px; align-items: baseline; font-size: 17px; color: var(--ink); }
+  .tick { color: var(--brand); font-family: var(--font-m); flex: none; }
+  .en-para { font-size: clamp(17px, 2vw, 20px); line-height: 1.6; color: var(--dim); margin: 0 0 18px; }
+  .en-muted { color: var(--faint); font-size: clamp(15px, 1.8vw, 17px); }
+
+  .en-cta { position: relative; overflow: hidden; text-align: center; padding: clamp(80px, 13vw, 150px) 24px; border-top: 1px solid var(--edge-soft); }
+  .en-cta-glow { position: absolute; inset: auto 0 -40% 0; height: 540px; background: radial-gradient(55% 70% at 50% 100%, #5fd3da22 0, transparent 70%); pointer-events: none; }
+  .en-cta-title { position: relative; font-size: clamp(30px, 5vw, 56px); line-height: 1.1; margin: 0 0 34px; }
+  .cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .cta-row.center { justify-content: center; }
+</style>

@@ -39,6 +39,12 @@ export default defineConfig({
           label: "Start here",
           items: [
             { label: "Overview", slug: "index" },
+            // Workflow: do this first, then read the conceptual foundations below.
+            { label: "Quickstart", slug: "how-to/quickstart-vscode" },
+            { label: "Your first project", slug: "start/your-first-project" },
+            { label: "Verify it worked", slug: "start/verify-it-worked" },
+            { label: "First Observatory visit", slug: "start/first-observatory-visit" },
+            // Conceptual foundations.
             { label: "User-agent interface", slug: "start/user-agent-interface" },
             { label: "Project shape", slug: "start/project-shape" },
             { label: "What Tapestry is not", slug: "start/what-tapestry-is-not" },

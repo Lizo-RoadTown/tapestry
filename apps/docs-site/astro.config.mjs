@@ -69,14 +69,23 @@ export default defineConfig({
           ],
         },
         {
+          label: "The Observatory",
+          items: [
+            { label: "What it is", slug: "observatory/about" },
+            { label: "Reading the Observatory", slug: "observatory/reading-it" },
+            { label: "Run the Observatory", slug: "observatory/run-it" },
+            { label: "The Observatory feed", slug: "observatory/feed" },
+            // The live console is a custom Astro page (src/pages/observatory.astro),
+            // not a Starlight content doc, so it's a manual link.
+            { label: "Open the console", link: "/observatory" },
+          ],
+        },
+        {
           label: "Reference",
           items: [
             { label: "Load-bearing files", slug: "reference/load-bearing-files" },
             { label: "OTel coordination contract", slug: "reference/otel-coordination-contract" },
             { label: "Platform dependencies", slug: "reference/platform-dependencies" },
-            // Observatory console lives at src/pages/observatory.astro (custom Astro page,
-            // not a Starlight content doc), so it's wired as a manual link, not a slug.
-            { label: "Observatory console", link: "/observatory" },
           ],
         },
       ],

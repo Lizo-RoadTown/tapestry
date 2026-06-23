@@ -3,8 +3,8 @@ title: Docs MCP
 description: PLANNED — not yet built. An MCP server that exposes Tapestry's documentation as MCP tools (search, read, list) so any agent in any project can query the docs directly. Modeled on the LangChain / Mintlify docs-as-MCP pattern.
 ---
 
-:::caution[Planned service — not yet deployed]
-The Docs MCP service does not exist yet. This page is the forward-looking specification. Nothing in the `consuming the existing deployment` section will work today. Tracked in the [PR 1+2+3 docs reorganization plan](https://github.com/Lizo-RoadTown/tapestry/pull/59) as a follow-on.
+:::caution[Skeleton built — not yet deployed]
+The service skeleton lives at [`services/docs-mcp/`](https://github.com/Lizo-RoadTown/tapestry/tree/main/services/docs-mcp). It runs locally; deployment to Render is the next step (operator-gated). Until deployment lands, the `consuming the existing deployment` section below describes the intended interface but the URLs are placeholders.
 :::
 
 ## What it will be
@@ -85,14 +85,15 @@ The `tapestry-discipline` plugin will declare this server in its `plugin.json` s
 
 | Step | Status |
 |---|---|
-| Service skeleton (FastAPI + mcp_http + tool defs) | Not started |
-| Corpus indexing + search implementation | Not started |
-| `.well-known/mcp.json` published from docs site | Not started |
-| `/llms.txt` published from docs site | Not started |
-| Render deployment | Not started |
-| `plugin.json` wiring for `tapestry-discipline` | Not started |
+| Service skeleton (FastAPI + mcp_http + tool defs) | Done — `services/docs-mcp/{main,mcp_http,mcp_server}.py` |
+| Corpus indexing + search implementation | Done — `services/docs-mcp/{corpus,indexer}.py` (in-memory token-frequency index) |
+| `/llms.txt` generation | Done — served by the service at `/llms.txt`; Vercel rewrite from docs site root is the publish step |
+| `/.well-known/mcp.json` generation | Done — served by the service at `/.well-known/mcp.json`; same publish step |
+| Render deployment | Pending — `services/docs-mcp/render.yaml.example` is the blueprint; operator deploys from Render dashboard |
+| `plugin.json` wiring for `tapestry-discipline` | Pending — depends on the deployed URL |
+| Test suite | Pending — follow-on PR |
 
-When build completes, this page updates to remove the caution banner and the "Build status" table; current placeholders become real.
+When deployment lands, this page updates to remove the caution banner and the "Build status" table; URL placeholders become real.
 
 ## Related
 

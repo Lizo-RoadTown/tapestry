@@ -1,30 +1,19 @@
 import type { APIRoute } from "astro";
-import { buildEpisodes, summarize, type HookEvent } from "../../lib/episodes";
+import { buildEpisodes, summarize, type HookEvent, type Episode } from "../../lib/episodes";
 import sample from "../../data/events-sample.json";
+import shapeMovement from "../../data/shape-movement.json";
 
 export const prerender = false;
 
-/**
- * Coordination episodes feed.
- *
- * Data source, in priority order — the central live feed is the goal; the
- * bundled real snapshot is the fallback so the console is never empty:
- *   1. COORDINATION_EVENTS_URL  — the central store the hooks wire into (live)
- *   2. local .claude/logs/hooks.jsonl  — when running on a dev machine
- *   3. bundled events-sample.json  — a real snapshot, sanitized (deployable)
- */
+/** Raw hook events — central live store if wired, else dev hooks, else snapshot. */
 async function loadEvents(): Promise<{ events: HookEvent[]; source: string }> {
-  // 1. central live store (set this env once the hooks POST to it)
   const url = import.meta.env.COORDINATION_EVENTS_URL || process.env.COORDINATION_EVENTS_URL;
   if (url) {
     try {
       const r = await fetch(url, { headers: { accept: "application/json" } });
       if (r.ok) return { events: (await r.json()) as HookEvent[], source: "live:central-store" };
-    } catch {
-      /* fall through */
-    }
+    } catch {}
   }
-  // 2. local hook log (dev only — node fs, not present on Vercel)
   try {
     const fs = await import("node:fs");
     const os = await import("node:os");
@@ -35,27 +24,38 @@ async function loadEvents(): Promise<{ events: HookEvent[]; source: string }> {
       for (const ln of fs.readFileSync(p, "utf-8").split("\n")) {
         const s = ln.trim();
         if (!s) continue;
-        try {
-          const e = JSON.parse(s);
-          if (e.phase === "end") evs.push(e);
-        } catch {
-          /* skip */
-        }
+        try { const e = JSON.parse(s); if (e.phase === "end") evs.push(e); } catch {}
       }
       if (evs.length) return { events: evs.slice(-1500), source: "dev:hooks.jsonl" };
     }
-  } catch {
-    /* fall through */
-  }
-  // 3. bundled real snapshot
+  } catch {}
   return { events: sample as HookEvent[], source: "snapshot:events-sample" };
+}
+
+// Trends over time. Real where derivable; the meaning trends (friction,
+// correction, memory) are blind until the observer/contract land — labeled, not faked.
+function trends(eps: Episode[]) {
+  const byDay = new Map<string, { episodes: number; durable: number }>();
+  for (const e of eps) {
+    const day = (e.start || "").slice(0, 10) || "—";
+    const r = byDay.get(day) || { episodes: 0, durable: 0 };
+    r.episodes += 1;
+    r.durable += e.durableCandidates;
+    byDay.set(day, r);
+  }
+  const series = [...byDay.entries()].sort().map(([day, v]) => ({ day, ...v }));
+  return {
+    series, // real: episodes + durable candidates per day
+    blind: ["friction recurrence", "correction frequency", "memory misses"], // not instrumented
+  };
 }
 
 export const GET: APIRoute = async () => {
   const { events, source } = await loadEvents();
   const episodes = buildEpisodes(events);
   const summary = summarize(episodes);
-  return new Response(JSON.stringify({ source, summary, episodes }, null, 0), {
+  const body = { source, summary, shapeMovement, trends: trends(episodes), episodes };
+  return new Response(JSON.stringify(body, null, 0), {
     headers: { "content-type": "application/json", "cache-control": "no-store" },
   });
 };

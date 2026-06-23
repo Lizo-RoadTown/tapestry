@@ -1,16 +1,12 @@
 ---
 export const prerender = false;
 /**
- * The Observatory — the coordination console.
- *
- * Reads the live episode feed (/api/episodes.json) and renders coordination
- * EPISODES — one operator-agent working cycle each — not raw event counts.
- * Per docs/reference/coordination-episode-model.md + the canon.
- *
- * The feed is wired to the hooks (central store when set, else this machine's
- * hooks.jsonl in dev, else a real bundled snapshot). The interpretation runs
- * server-side; this page renders it. Honest: intent is uncertain and
- * memory/friction are blind until the observer/contract land — shown, not faked.
+ * The Observatory — coordination over time. NOT a raw event console (that's the
+ * Debug tab, /observatory/raw). Rolls events into meaning and movement:
+ *   project-shape movement · coordination episodes · trends · verdicts.
+ * Per docs/reference/coordination-episode-model.md + the canon. Honest: the
+ * meaning trends (friction/correction/memory) are blind until the observer +
+ * contract land — shown blind, never faked.
  */
 const CANON = "https://github.com/Lizo-RoadTown/tapestry/blob/main/docs/canon/user-agent-coordination-reinforcement.md";
 ---
@@ -28,118 +24,129 @@ const CANON = "https://github.com/Lizo-RoadTown/tapestry/blob/main/docs/canon/us
   <body>
     <header class="topbar">
       <a class="wordmark" href="/">Tapestry</a>
-      <nav class="topnav"><a href="/">Docs</a><a class="here" href="/observatory">Observatory</a></nav>
+      <nav class="topnav"><a href="/">Docs</a><a class="here" href="/observatory">Observatory</a><a href="/observatory/raw">Raw events</a></nav>
     </header>
 
     <main>
       <section class="hero">
-        <p class="eyebrow mono" id="src">coordination console · loading…</p>
+        <p class="eyebrow mono" id="src">coordination over time · loading…</p>
         <h1 class="display">The <span class="ac">Observatory</span></h1>
-        <p class="lede">Each line is a <strong>working episode</strong> — one cycle of you and an agent working together. Not event counts.</p>
+        <p class="lede">How coordination between you and your agents is <strong>moving over time</strong> — what the project's shape did, what working episodes happened, and whether things are strengthening or weakening.</p>
       </section>
 
-      <section class="summary" id="summary" aria-live="polite"></section>
-
-      <section class="meaning-note" id="meaning">
-        <span class="g mono">○</span>
-        <p>Intent is <strong>not yet observer-derived</strong> (shown as the coarse prompt category, marked uncertain). <strong>Memory</strong> and <strong>friction</strong> are blind until instrumented. These get real as the observer + contract land — they are shown here, never faked.</p>
+      <!-- #3 Project-shape movement — the most meaningful real signal today -->
+      <section>
+        <div class="sh"><h2 class="display sec">Project-shape movement</h2><p class="hint">Architecture changes over time — what actually moved, not filenames.</p></div>
+        <div id="shape" class="timeline"><p class="loading mono">loading…</p></div>
       </section>
 
-      <section><h2 class="display sec">Working episodes</h2><div id="episodes" class="episodes"><p class="loading mono">loading episodes…</p></div></section>
+      <!-- #1 Coordination episodes over time -->
+      <section>
+        <div class="sh"><h2 class="display sec">Coordination episodes</h2><p class="hint">Each working cycle: intent → what the agent did → friction → memory → shape → outcome. <span class="warn">Intent uncertain, memory + friction blind until instrumented.</span></p></div>
+        <div id="episodes" class="eplist"><p class="loading mono">loading…</p></div>
+      </section>
 
-      <footer class="foot"><p class="mono">Episodes built from real hook telemetry via the coordination episode model. Canon: <a href={CANON}>user-agent-coordination-reinforcement</a>.</p></footer>
+      <!-- #2 Trends over time -->
+      <section>
+        <div class="sh"><h2 class="display sec">Trends</h2><p class="hint">Movement over time. Real where instrumented; blind where not — never green by default.</p></div>
+        <div id="trends" class="trends"><p class="loading mono">loading…</p></div>
+      </section>
+
+      <footer class="foot"><p class="mono">Raw hook events live under <a href="/observatory/raw">Raw events (debug)</a>, not here. Canon: <a href={CANON}>user-agent-coordination-reinforcement</a>.</p></footer>
     </main>
 
     <script>
-      type Ep = {
-        session: string; project: string; start: string | null; end: string | null;
-        durationMs: number | null; intent: string; intentCertain: boolean;
-        tools: { name: string; count: number }[]; toolCalls: number;
-        snapshot: string | null; durableCandidates: number; verdict: string;
-      };
-      const esc = (s: string) => s.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]!));
-      const ago = (iso: string | null) => {
-        if (!iso) return "";
-        const s = Math.floor((Date.now() - Date.parse(iso)) / 1000);
-        if (s < 60) return s + "s ago";
-        if (s < 3600) return Math.floor(s / 60) + "m ago";
-        if (s < 86400) return Math.floor(s / 3600) + "h ago";
-        return Math.floor(s / 86400) + "d ago";
-      };
-      const dur = (ms: number | null) => (ms == null ? "" : ms < 1000 ? ms + "ms" : Math.round(ms / 1000) + "s");
+      const esc = (s: string) => String(s).replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]!));
+      const fmt = (iso: string | null) => (iso ? new Date(iso).toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "");
+      const catColor: Record<string, string> = { python: "py", node: "nd", render: "rn", mcp: "mc", auth: "au", shape: "sh", inventory: "iv" };
 
       async function load() {
-        const r = await fetch("/api/episodes.json", { cache: "no-store" });
-        const d = await r.json();
-        const srcLabel: Record<string, string> = {
-          "live:central-store": "live · central store",
-          "dev:hooks.jsonl": "live · this machine's hooks",
-          "snapshot:events-sample": "real snapshot (wire the hooks for live)",
-        };
-        (document.getElementById("src") as HTMLElement).textContent = "coordination console · " + (srcLabel[d.source] || d.source);
+        const d = await (await fetch("/api/episodes.json", { cache: "no-store" })).json();
+        const srcLabel: Record<string, string> = { "live:central-store": "live · central store", "dev:hooks.jsonl": "live · this machine", "snapshot:events-sample": "real snapshot (wire the hooks for live)" };
+        (document.getElementById("src") as HTMLElement).textContent = "coordination over time · " + (srcLabel[d.source] || d.source);
 
-        const s = d.summary;
-        (document.getElementById("summary") as HTMLElement).innerHTML = [
-          ["episodes", s.episodes], ["sessions", s.sessions], ["projects", s.projects],
-          ["produced durable structure", s.withDurable], ["tool calls", s.toolCalls],
-        ].map(([k, v]) => `<div class="stat"><span class="num mono">${v}</span><span class="lab">${k}</span></div>`).join("")
-          + `<div class="stat blind"><span class="num mono">${s.episodes}</span><span class="lab">intent uncertain · memory + friction blind</span></div>`;
-
-        const eps: Ep[] = d.episodes;
-        const host = document.getElementById("episodes") as HTMLElement;
-        if (!eps.length) { host.innerHTML = '<p class="loading mono">no episodes yet</p>'; return; }
-        host.innerHTML = eps.slice(0, 60).map((e) => {
-          const tools = e.tools.length ? e.tools.map((t) => `${esc(t.name)}${t.count > 1 ? "·" + t.count : ""}`).join("  ") : "—";
-          const verdict = e.verdict === "strengthened"
-            ? '<span class="v ok">● strengthened</span>'
-            : '<span class="v unk">○ can\'t assess yet</span>';
-          const meta = [
-            e.snapshot ? `shape: snapshot` : "",
-            e.durableCandidates ? `${e.durableCandidates} durable candidate${e.durableCandidates > 1 ? "s" : ""}` : "",
-          ].filter(Boolean).join("  ·  ");
-          return `<article class="ep">
-            <div class="ep-top">
-              <span class="intent">${esc(e.intent)} <span class="unc" title="not observer-derived yet">intent unclear</span></span>
-              <span class="when mono">${ago(e.start)}${e.durationMs != null ? " · " + dur(e.durationMs) : ""}</span>
+        // shape movement
+        const sm = d.shapeMovement.filter((m: any) => m.changes.length).reverse();
+        const shost = document.getElementById("shape") as HTMLElement;
+        shost.innerHTML = sm.length ? sm.map((m: any) => `
+          <div class="tl">
+            <div class="tl-dot"></div>
+            <div class="tl-body">
+              <div class="tl-when mono">${esc(fmt(m.ts))} <span class="sha">${esc(m.sha)}</span></div>
+              <ul class="changes">${m.changes.map((c: any) => `<li class="ch ${catColor[c.cat] || ""}"><span class="cat mono">${esc(c.cat)}</span> ${esc(c.text)}</li>`).join("")}</ul>
             </div>
-            <div class="did"><span class="k">agent did</span> <span class="mono">${tools}</span> <span class="tc mono">${e.toolCalls} call${e.toolCalls === 1 ? "" : "s"}</span></div>
-            ${meta ? `<div class="extra mono">${meta}</div>` : ""}
-            <div class="ep-foot"><span class="proj mono">${esc(e.project)} · ${esc(e.session)}</span><span class="blindset mono">memory ⊘ · friction ⊘</span>${verdict}</div>
+          </div>`).join("")
+          : '<p class="loading mono">no shape changes in the captured window — architecture has been stable</p>';
+
+        // episodes
+        const eps = d.episodes;
+        const ehost = document.getElementById("episodes") as HTMLElement;
+        ehost.innerHTML = eps.slice(0, 40).map((e: any) => {
+          const tools = e.tools.length ? e.tools.map((t: any) => esc(t.name) + (t.count > 1 ? "·" + t.count : "")).join("  ") : "—";
+          const v = e.verdict === "strengthened" ? '<span class="v ok">● strengthened</span>' : '<span class="v unk">○ can\'t assess</span>';
+          return `<article class="ep">
+            <div class="flow">
+              <span class="step"><span class="lab">intent</span> ${esc(e.intent)} <span class="unc">unclear</span></span>
+              <span class="arr">→</span><span class="step"><span class="lab">agent did</span> <span class="mono">${tools}</span></span>
+              <span class="arr">→</span><span class="step blind"><span class="lab">friction</span> ⊘</span>
+              <span class="arr">→</span><span class="step blind"><span class="lab">memory</span> ⊘</span>
+              ${e.snapshot ? '<span class="arr">→</span><span class="step"><span class="lab">shape</span> snapshot</span>' : ""}
+              ${e.durableCandidates ? `<span class="arr">→</span><span class="step"><span class="lab">durable</span> ${e.durableCandidates}</span>` : ""}
+            </div>
+            <div class="ep-foot"><span class="when mono">${esc(fmt(e.start))}</span><span class="proj mono">${esc(e.project)}</span>${v}</div>
           </article>`;
         }).join("");
+
+        // trends
+        const t = d.trends; const thost = document.getElementById("trends") as HTMLElement;
+        const max = Math.max(1, ...t.series.map((s: any) => s.episodes));
+        const bars = t.series.map((s: any) => `<div class="bar"><div class="fill" style="height:${Math.round((s.episodes / max) * 60) + 4}px" title="${s.episodes} episodes${s.durable ? ", " + s.durable + " durable" : ""}"></div><span class="bx mono">${esc(s.day.slice(5))}</span></div>`).join("");
+        thost.innerHTML = `
+          <div class="trend-real"><div class="tt">episodes per day <span class="rl">real</span></div><div class="bars">${bars || '<span class="loading mono">—</span>'}</div></div>
+          <div class="trend-blind"><div class="tt">not instrumented yet</div><ul>${t.blind.map((b: string) => `<li class="mono">⊘ ${esc(b)}</li>`).join("")}<li class="mono">⊘ observer detections · durable-structure (sparse)</li></ul></div>`;
       }
-      load().catch((e) => { (document.getElementById("episodes") as HTMLElement).innerHTML = '<p class="loading mono">feed error: ' + esc(String(e)) + "</p>"; });
+      load().catch((e) => { (document.getElementById("shape") as HTMLElement).innerHTML = '<p class="loading mono">feed error: ' + esc(e) + "</p>"; });
     </script>
 
     <style is:global>
-      :root{color-scheme:dark;--surface:#0a0d0e;--raised:#16191b;--edge:#2a2f31;--ink:#f3f5f4;--dim:#c4ccca;--faint:#8b9492;--brand:#5fd3da;--ok:#8fa99b;--warn:#d8b06a;--font-d:"Instrument Serif",Georgia,serif;--font-s:"Inter",system-ui,sans-serif;--font-m:"JetBrains Mono",ui-monospace,Consolas,monospace}
+      :root{color-scheme:dark;--surface:#0a0d0e;--raised:#16191b;--edge:#2a2f31;--ink:#f3f5f4;--dim:#c4ccca;--faint:#8b9492;--brand:#5fd3da;--ok:#8fa99b;--warn:#d8b06a;--py:#9d92c4;--nd:#8fa99b;--rn:#6fa8ac;--mc:#5fd3da;--au:#cf7f8a;--font-d:"Instrument Serif",Georgia,serif;--font-s:"Inter",system-ui,sans-serif;--font-m:"JetBrains Mono",ui-monospace,Consolas,monospace}
       *{box-sizing:border-box}html,body{height:100%}
       body{margin:0;font:16px/1.55 var(--font-s);color:var(--ink);background:radial-gradient(120% 80% at 50% 120%,#5fd3da12 0,transparent 60%),var(--surface);background-attachment:fixed;-webkit-font-smoothing:antialiased}
       a{color:inherit}.mono{font-family:var(--font-m);font-variant-numeric:tabular-nums}.display{font-family:var(--font-d);font-weight:400}.ac{font-family:var(--font-d);font-style:italic;color:var(--brand)}
       .topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid var(--edge);position:sticky;top:0;z-index:10;background:#0a0d0ecc;backdrop-filter:blur(8px)}
       .wordmark{font-family:var(--font-d);font-size:20px;text-decoration:none}.topnav{display:flex;gap:18px;font-size:14px}.topnav a{color:var(--faint);text-decoration:none}.topnav a:hover{color:var(--ink)}.topnav .here{color:var(--ink);border-bottom:2px solid var(--brand)}
-      main{max-width:920px;margin:0 auto;padding:40px 24px 90px}
+      main{max-width:920px;margin:0 auto;padding:40px 24px 90px}section{margin-bottom:46px}
       .eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin:0 0 6px}
-      .hero h1{font-size:clamp(40px,7vw,64px);margin:0 0 10px;line-height:1.03}.lede{font-size:18px;color:var(--dim);max-width:60ch;margin:0}.lede strong{color:var(--ink);font-weight:500}
-      .summary{display:flex;flex-wrap:wrap;gap:10px;margin:28px 0}
-      .stat{flex:1 1 120px;border:1px solid var(--edge);border-radius:12px;padding:12px 14px;background:color-mix(in srgb,var(--raised) 55%,transparent);display:flex;flex-direction:column;gap:3px}
-      .stat .num{font-size:24px;font-weight:600}.stat .lab{font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:.05em}
-      .stat.blind{flex-basis:100%;border-style:dashed}.stat.blind .num{color:var(--faint)}
-      .meaning-note{display:flex;gap:12px;align-items:flex-start;margin:0 0 32px;padding:13px 15px;border:1px solid var(--edge);border-radius:13px;background:var(--raised)}
-      .meaning-note .g{color:var(--faint);font-size:16px}.meaning-note p{margin:0;font-size:13.5px;color:var(--dim)}.meaning-note strong{color:var(--ink)}
-      .sec{font-size:24px;margin:0 0 14px}
-      .episodes{display:grid;gap:10px}.loading{color:var(--faint);font-size:13px}
-      .ep{border:1px solid var(--edge);border-radius:13px;padding:14px 16px;background:color-mix(in srgb,var(--raised) 50%,transparent)}
-      .ep-top{display:flex;justify-content:space-between;gap:12px;align-items:baseline}
-      .intent{font-size:15px;font-weight:500}.unc{font-size:10px;color:var(--warn);border:1px solid #d8b06a40;border-radius:6px;padding:1px 5px;margin-left:6px;font-weight:400}
-      .when{font-size:12px;color:var(--faint);white-space:nowrap}
-      .did{margin-top:8px;font-size:13px;color:var(--dim)}.did .k{color:var(--faint);font-size:11px;text-transform:uppercase;letter-spacing:.05em;margin-right:6px}.did .tc{color:var(--faint);font-size:11px;margin-left:6px}
-      .extra{margin-top:6px;font-size:12px;color:var(--faint)}
-      .ep-foot{margin-top:11px;padding-top:10px;border-top:1px solid var(--edge);display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-size:11px}
-      .proj{color:var(--faint)}.blindset{color:var(--faint);margin-left:auto}
-      .v{font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--edge)}.v.ok{color:var(--ok);border-color:#8fa99b40}.v.unk{color:var(--faint)}
-      .foot{margin-top:30px}.foot p{font-size:12px;color:var(--faint)}.foot a{color:var(--dim)}
-      @media(max-width:680px){.blindset{margin-left:0}}
+      .hero h1{font-size:clamp(40px,7vw,62px);margin:0 0 10px;line-height:1.03}.lede{font-size:18px;color:var(--dim);max-width:62ch;margin:0 0 6px}.lede strong{color:var(--ink);font-weight:500}
+      .sh{margin:0 0 16px}.sec{font-size:26px;margin:0}.hint{font-size:13.5px;color:var(--faint);margin:4px 0 0;max-width:78ch}.warn{color:var(--warn)}
+      .loading{color:var(--faint);font-size:13px}
+      .timeline{position:relative;padding-left:8px}
+      .tl{display:flex;gap:14px;padding:0 0 18px;position:relative}
+      .tl::before{content:"";position:absolute;left:5px;top:14px;bottom:-4px;width:1px;background:var(--edge)}
+      .tl:last-child::before{display:none}
+      .tl-dot{width:11px;height:11px;border-radius:50%;background:var(--brand);margin-top:4px;flex:none;box-shadow:0 0 0 3px #5fd3da22}
+      .tl-body{flex:1}.tl-when{font-size:12px;color:var(--dim);margin-bottom:6px}.sha{color:var(--faint)}
+      .changes{list-style:none;margin:0;padding:0;display:grid;gap:5px}
+      .ch{font-size:13px;color:var(--dim);border-left:2px solid var(--edge);padding:3px 0 3px 10px}
+      .ch .cat{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--faint);margin-right:6px}
+      .ch.py{border-left-color:var(--py)}.ch.nd{border-left-color:var(--nd)}.ch.rn{border-left-color:var(--rn)}.ch.mc{border-left-color:var(--mc)}.ch.au{border-left-color:var(--au)}
+      .eplist{display:grid;gap:9px}
+      .ep{border:1px solid var(--edge);border-radius:12px;padding:12px 14px;background:color-mix(in srgb,var(--raised) 50%,transparent)}
+      .flow{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 8px;font-size:13px}
+      .step{color:var(--dim)}.step .lab{font-size:9px;text-transform:uppercase;letter-spacing:.05em;color:var(--faint);margin-right:4px}
+      .step.blind{color:var(--faint)}.arr{color:var(--faint);font-size:12px}
+      .unc{font-size:10px;color:var(--warn);border:1px solid #d8b06a40;border-radius:5px;padding:0 4px;margin-left:3px}
+      .ep-foot{margin-top:9px;padding-top:8px;border-top:1px solid var(--edge);display:flex;gap:10px;align-items:center;font-size:11px}
+      .when,.proj{color:var(--faint)}.v{margin-left:auto;font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--edge)}.v.ok{color:var(--ok);border-color:#8fa99b40}.v.unk{color:var(--faint)}
+      .trends{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+      .trend-real,.trend-blind{border:1px solid var(--edge);border-radius:13px;padding:15px;background:color-mix(in srgb,var(--raised) 50%,transparent)}
+      .trend-blind{border-style:dashed}.tt{font-size:12px;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px}.rl{color:var(--ok);border:1px solid #8fa99b40;border-radius:5px;padding:0 5px;font-size:10px;margin-left:6px}
+      .bars{display:flex;align-items:flex-end;gap:6px;height:74px}
+      .bar{display:flex;flex-direction:column;align-items:center;gap:5px;justify-content:flex-end}
+      .fill{width:18px;background:linear-gradient(var(--brand),#5fd3da55);border-radius:3px 3px 0 0}.bx{font-size:9px;color:var(--faint)}
+      .trend-blind ul{list-style:none;margin:0;padding:0;display:grid;gap:7px}.trend-blind li{font-size:12px;color:var(--faint)}
+      .foot{margin-top:24px}.foot p{font-size:12px;color:var(--faint)}.foot a{color:var(--dim)}
+      @media(max-width:680px){.trends{grid-template-columns:1fr}}
     </style>
   </body>
 </html>

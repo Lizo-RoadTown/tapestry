@@ -49,53 +49,49 @@ export default defineConfig({
           href: "https://github.com/Lizo-RoadTown/tapestry",
         },
       ],
-      // Explicit sidebar. The full v1 scope is visible.
-      // Ordering reflects the recommended reading sequence: primary object
-      // (user-agent interface) before substrate (project shape) before
-      // anti-frame (what Tapestry is not) before the loop's mechanics
-      // (signal hierarchy + the observer) before specifics (plugins, memory,
-      // discipline stack, architecture snapshots).
+      // Sidebar grouped by reader intent per Tapestry-agent's IA decision
+      // (tapestry-docs-ia-split-by-reader-intent-2026-06-23 in shared loom-memory).
+      //   Learn:        helps the reader understand the model
+      //   Docs:         helps the reader perform an action
+      //   Components:   how the platform is built
+      //   Reference:    what each contract / file does exactly
+      //   Background:   transitional — pages reclassified as marketing.
+      //                 Stay sidebar-visible until Tapestry-agent memos
+      //                 that each one's marketing version has shipped on
+      //                 the marketing website (apps/docs-site/src/pages/),
+      //                 at which point they're either slimmed to
+      //                 concept-only or removed.
       sidebar: [
         {
-          label: "Start here",
+          label: "Learn",
           items: [
-            { label: "Overview", slug: "index" },
-            // Workflow: do this first, then read the conceptual foundations below.
-            { label: "Quickstart", slug: "how-to/quickstart-vscode" },
-            { label: "Your first project", slug: "start/your-first-project" },
-            { label: "Verify it worked", slug: "start/verify-it-worked" },
-            { label: "First Observatory visit", slug: "start/first-observatory-visit" },
-            // Conceptual foundations.
             { label: "User-agent interface", slug: "start/user-agent-interface" },
-            { label: "Project shape", slug: "start/project-shape" },
-            { label: "What Tapestry is not", slug: "start/what-tapestry-is-not" },
-            { label: "Names you'll see in these docs", slug: "start/names-you-will-see" },
-            { label: "What keeps a project on track", slug: "start/what-stays-on-track" },
-          ],
-        },
-        {
-          label: "How it works",
-          items: [
             { label: "The signal hierarchy", slug: "explanation/signal-hierarchy" },
             { label: "Signal → Interpretation → Pattern", slug: "explanation/signal-interpretation-pattern" },
             { label: "The observer", slug: "explanation/the-observer" },
             { label: "Observer-derived intent", slug: "explanation/observer-derived-intent" },
-            { label: "Project Intelligence vs Observatory", slug: "explanation/project-intelligence-vs-observatory" },
             { label: "Observatory lenses", slug: "explanation/observatory-lenses" },
-            { label: "How the platform upskills itself", slug: "explanation/upskilling" },
-            { label: "Sharing intelligence across projects", slug: "explanation/sharing-intelligence-across-projects" },
-            { label: "The memory MCP", slug: "explanation/memory-mcp" },
-            { label: "The plugins", slug: "explanation/plugins" },
-            { label: "The discipline stack (orientation)", slug: "explanation/discipline-stack" },
-            { label: "Architecture snapshots", slug: "explanation/architecture-snapshots" },
+            { label: "Names you'll see in these docs", slug: "start/names-you-will-see" },
           ],
         },
         {
-          label: "Use it",
+          label: "Docs",
           items: [
+            { label: "Overview", slug: "index" },
             { label: "Quickstart — VS Code", slug: "how-to/quickstart-vscode" },
+            { label: "Your first project", slug: "start/your-first-project" },
+            { label: "Verify it worked", slug: "start/verify-it-worked" },
+            { label: "First Observatory visit", slug: "start/first-observatory-visit" },
             { label: "Set up a new project (comprehensive)", slug: "how-to/set-up-a-new-project" },
             { label: "Recover from common failures", slug: "how-to/recover-from-common-failures" },
+            // The Observatory's own usage pages — operational, not architectural.
+            { label: "About the Observatory", slug: "observatory/about" },
+            { label: "Reading the Observatory", slug: "observatory/reading-it" },
+            { label: "Run the Observatory", slug: "observatory/run-it" },
+            { label: "The Observatory feed", slug: "observatory/feed" },
+            // The live console is a custom Astro page (src/pages/observatory.astro),
+            // not a Starlight content doc, so it's a manual link.
+            { label: "Open the console", link: "/observatory" },
             // Platform-owner provisioning walkthroughs — not needed by consuming projects.
             { label: "Set up Render (platform owner)", slug: "how-to/set-up-render" },
             { label: "Set up Vercel (platform owner)", slug: "how-to/set-up-vercel" },
@@ -103,7 +99,7 @@ export default defineConfig({
           ],
         },
         {
-          label: "Systems",
+          label: "Components",
           items: [
             { label: "Observer", slug: "systems/observer" },
             { label: "Memory", slug: "systems/memory" },
@@ -111,26 +107,34 @@ export default defineConfig({
             { label: "Registry", slug: "systems/registry" },
             { label: "Observatory", slug: "systems/observatory" },
             { label: "Docs MCP (planned)", slug: "systems/docs-mcp" },
-          ],
-        },
-        {
-          label: "The Observatory",
-          items: [
-            { label: "What it is", slug: "observatory/about" },
-            { label: "Reading the Observatory", slug: "observatory/reading-it" },
-            { label: "Run the Observatory", slug: "observatory/run-it" },
-            { label: "The Observatory feed", slug: "observatory/feed" },
-            // The live console is a custom Astro page (src/pages/observatory.astro),
-            // not a Starlight content doc, so it's a manual link.
-            { label: "Open the console", link: "/observatory" },
+            { label: "The plugins", slug: "explanation/plugins" },
+            { label: "The memory MCP", slug: "explanation/memory-mcp" },
+            { label: "The discipline stack (orientation)", slug: "explanation/discipline-stack" },
+            { label: "Architecture snapshots", slug: "explanation/architecture-snapshots" },
           ],
         },
         {
           label: "Reference",
           items: [
-            { label: "Load-bearing files", slug: "reference/load-bearing-files" },
             { label: "OTel coordination contract", slug: "reference/otel-coordination-contract" },
             { label: "Platform dependencies", slug: "reference/platform-dependencies" },
+            { label: "Load-bearing files", slug: "reference/load-bearing-files" },
+          ],
+        },
+        {
+          // Transitional. Pages reclassified as marketing in Tapestry-agent's
+          // IA memo; staying sidebar-visible until each one's marketing version
+          // ships on the marketing website. Tapestry-agent will memo as each
+          // page's marketing version lands; then these get slimmed to
+          // concept-only or removed.
+          label: "Background (migrating to marketing site)",
+          items: [
+            { label: "Project shape", slug: "start/project-shape" },
+            { label: "What Tapestry is not", slug: "start/what-tapestry-is-not" },
+            { label: "What keeps a project on track", slug: "start/what-stays-on-track" },
+            { label: "Project Intelligence vs Observatory", slug: "explanation/project-intelligence-vs-observatory" },
+            { label: "How the platform upskills itself", slug: "explanation/upskilling" },
+            { label: "Sharing intelligence across projects", slug: "explanation/sharing-intelligence-across-projects" },
           ],
         },
       ],

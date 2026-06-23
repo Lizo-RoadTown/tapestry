@@ -27,3 +27,10 @@ Repository = "https://github.com/Lizo-RoadTown/tapestry"
 
 [tool.setuptools.packages.find]
 include = ["docs_mcp*"]
+
+[tool.setuptools.package-data]
+# Bundle the Tapestry docs corpus snapshot so `python -m docs_mcp` works
+# after `pip install tapestry-docs-mcp` with no DOCS_ROOT env var needed.
+# Populated by services/docs-mcp/scripts/bundle-corpus.py — run before
+# building the wheel.
+docs_mcp = ["_corpus/**/*.md", "_corpus/**/*.mdx"]

@@ -7,11 +7,11 @@ The Tapestry documentation ships in three forms aimed at agents and LLM clients,
 
 ## What's available
 
-| Form | URL or invocation | Best for |
+| Form | Where | Best for |
 |---|---|---|
-| **Static `llms.txt`** | [`https://tapestry-khaki.vercel.app/llms.txt`](/llms.txt) | A whole-corpus index. Fits the [llmstxt.org](https://llmstxt.org/) convention. |
-| **Per-page raw Markdown** | `https://tapestry-khaki.vercel.app/raw/<slug>.md` (e.g., [`/raw/systems/observer.md`](/raw/systems/observer.md)) | Grabbing a single page as plain markdown — pasteable into an LLM or another document. |
-| **Stdio MCP server** | `python -m docs_mcp` (after install) | A Claude Code (or other MCP client) session that wants structured `search` / `read` / `list` tool calls instead of fetching markdown blobs. |
+| **Static `llms.txt`** | [`/llms.txt`](/llms.txt) | Whole-corpus index. Follows the [llmstxt.org](https://llmstxt.org/) convention. |
+| **Per-page raw Markdown** | [`/raw/<slug>.md`](/raw/systems/observer.md) | Grabbing a single page as plain markdown — pasteable into an LLM or another document. |
+| **Stdio MCP server** | `python -m docs_mcp` | Claude Code (or other MCP client) sessions that want structured `search` / `read` / `list` tool calls instead of fetching markdown blobs. |
 
 The dropdown at the top-right of every docs page exposes the first two via "Copy page", "View as Markdown", and "llms.txt".
 
@@ -40,13 +40,13 @@ Stdio transport means each MCP client spawns its own subprocess — no network, 
 
 ## Install the stdio MCP
 
+The package bundles a snapshot of the docs corpus at build time, so a fresh install Just Works with no env vars.
+
 1. Install the package (one-time per machine):
 
    ```sh
    pip install -e services/docs-mcp
    ```
-
-   (Or `pip install tapestry-docs-mcp` if the package has been published to PyPI; check the [pyproject.toml](https://github.com/Lizo-RoadTown/tapestry/blob/main/services/docs-mcp/pyproject.toml) for the current install target.)
 
 2. Add to your project's `.mcp.json`:
 
@@ -61,34 +61,18 @@ Stdio transport means each MCP client spawns its own subprocess — no network, 
    }
    ```
 
-3. Restart Claude Code (plugin/MCP loader binds at session start).
+   The `tapestry-discipline` plugin already declares this server in its [plugin.json](https://github.com/Lizo-RoadTown/tapestry/blob/main/integrations/claude-code/tapestry-discipline/.claude-plugin/plugin.json), so if you've installed the plugin you only need the `pip install` step.
 
-The package reads `DOCS_ROOT` env var if set; otherwise it falls back to a bundled corpus snapshot at install time. Future enhancement: fetch `/llms.txt` from the deployed docs site on startup so the corpus stays current without reinstalling.
+3. Restart Claude Code so the MCP loader binds the new server.
 
-## Why no hosted backend
-
-The Tapestry docs corpus is ~250 KB across ~30 markdown pages. Hosting a FastAPI service for content this small would cost (operationally and financially) more than the static + stdio path. The static side ships with the existing Vercel docs deployment at zero additional cost; the stdio MCP runs locally inside each consuming client.
-
-If the corpus ever outgrows in-memory search (~thousands of pages), the upgrade path is documented in the service's [README](https://github.com/Lizo-RoadTown/tapestry/blob/main/services/docs-mcp/README.md).
+To override the bundled snapshot — e.g., to point at a tapestry clone with newer docs than the installed package — set `DOCS_ROOT` to the absolute path of `apps/docs-site/src/content/docs/`.
 
 ## Verify
 
-- Open [`/llms.txt`](/llms.txt) — should return a markdown listing of every docs page.
-- Open [`/raw/index.md`](/raw/index.md) — should return the homepage's raw markdown.
-- Click the "Copy page" dropdown at the top of any docs page — should expose the three actions.
-- After installing the stdio MCP: from a Claude Code session, invoke `tapestry_docs_search "observer"` — should return ranked hits including `systems/observer` and `explanation/the-observer`.
-
-## Build status
-
-| Step | Status |
-|---|---|
-| Static `llms.txt` generator | Done — `apps/docs-site/scripts/generate-static-docs.mjs` |
-| Static `/raw/<slug>.md` generator | Done — same script |
-| "Copy page" dropdown component | Done — `apps/docs-site/src/components/PageActions.astro` (overrides Starlight `PageTitle`) |
-| Stdio MCP package | Done — `services/docs-mcp/docs_mcp/` |
-| PyPI publish | Pending — operator decision |
-| Bundled corpus snapshot vs runtime fetch | Pending — current package reads from `DOCS_ROOT`; bundling is a follow-up enhancement |
-| Test suite | Pending — follow-on PR |
+- Open [`/llms.txt`](/llms.txt) — returns a markdown listing of every docs page.
+- Open [`/raw/index.mdx`](/raw/index.mdx) — returns the homepage's raw markdown.
+- Click the "Copy page" dropdown at the top of any docs page — exposes the three actions.
+- After installing the stdio MCP: from a Claude Code session, call `tapestry_docs_search` with `query="observer"` — returns ranked hits with `explanation/the-observer` as the top result.
 
 ## Related
 

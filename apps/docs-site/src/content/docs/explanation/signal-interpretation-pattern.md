@@ -27,24 +27,6 @@ Each arrow is doing work. Each arrow can fail independently.
 | **Pattern** | An interpretation that has recurred or been corroborated. Stored, named, queryable by lens. | Architecture Registry, Candidate Registry | Pattern without exposure → operator can't act on it. |
 | **Action** | What the operator (or platform) does because of the pattern. | Plugin hook, candidate-promotion flow, dashboard card | Action without trace back to pattern → invisible governance. |
 
-## Why this matters
-
-Most observability stacks collapse the pipeline. They go:
-
-```
-Signal → Dashboard
-```
-
-That works when the question is *state* — "is the API up right now?" It breaks when the question is *trajectory* — "is this project getting healthier? are we coordinating better? is something stabilizing into a pattern worth codifying?"
-
-Trajectory questions need interpretation as a real layer with its own runtime. Without it:
-
-- **OTel feels like enough.** It isn't. OTel produces signals. Signals aren't patterns.
-- **Grafana cards feel empty.** They will, until something is interpreting the signals into named, time-extended findings.
-- **Operators rebuild status dashboards** when they should be wiring observers and lenses. The dashboard is the wrong primitive for trajectory questions.
-
-The Tapestry answer is to keep the layers separate: emit cleanly, interpret deliberately, expose patterns through lenses, and trace every action back to the pattern that motivated it.
-
 ## One concrete instance: intent
 
 [Observer-derived intent](/explanation/observer-derived-intent/) is one example of this pipeline. The signal is "tool call happened." The interpretation is "the operator was probably trying to X, with confidence Y, based on evidence Z." The pattern is "this operator keeps trying to X under conditions C." The action is "surface a skill candidate for X."

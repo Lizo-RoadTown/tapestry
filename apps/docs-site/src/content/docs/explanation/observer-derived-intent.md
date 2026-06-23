@@ -98,10 +98,6 @@ Without intent, telemetry can only describe what happened. It cannot describe wh
 
 The dashboard does not display raw intent fields. It displays observer-generated intent hypotheses and their supporting evidence.
 
-## What this rules out
-
-Adding `intent` attributes to the OTel event payload. That conflates interpretation with emission — every event would carry a guess made at the moment of action, fixed in place, with no ability to revise as more signals arrive.
-
 The [OTel coordination contract](/reference/otel-coordination-contract/) defines what gets emitted (the typed attributes). The observer reads those events + memory + transcripts + diffs and produces the intent hypothesis as a separate output layer.
 
 ## Canonical statement

@@ -209,14 +209,6 @@ The recurring failure mode: **silent absence.** The agent doesn't know what tool
 
 Use the [Set up a new project](/how-to/set-up-a-new-project/) checklist for a fresh project. For an existing project, run the [Load-bearing files audit script](/reference/load-bearing-files/#file-existence-audit-at-session-start) to check every piece is present.
 
-## Why this site exists
-
-In June 2026, a consuming project's agent had been running without the `tapestry-discipline` plugin enabled and without the memory MCP wired in its `.mcp.json` for about three weeks before anyone noticed. The project's `CLAUDE.md` told the agent to use the memory tools, but the tools were never actually available in the session. The agent silently did what it could — reading the `CLAUDE.md`, accepting the framing, and never confirming the tools actually existed.
-
-The fix was three lines of JSON. The reason it wasn't caught for three weeks is that absence is invisible: the agent had no negative-space awareness, the operator had no checklist to run, and nothing in the system loudly said "this is broken."
-
-This site exists so that the next time someone creates a project that plugs into Tapestry, they have an explicit reference for what every piece is and what its absence looks like.
-
 ## Read next
 
 - [The plugins](/explanation/plugins/) — deep dive on every plugin, lifecycle, maintenance

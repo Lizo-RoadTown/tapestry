@@ -1,41 +1,38 @@
 ---
 title: The Observatory
-description: The operator-facing console for watching coordination between you and your agents — a variable-overlay cockpit, not a dashboard of counters. It shows what the telemetry explains (project shape, friction, observer interpretation, coordination quality over time), with raw events demoted to drill-down.
+description: The console for watching coordination between the operator and agents across projects over time — how a project's shape is changing, what the observer sees, where friction appears, and how coordination is trending. It lives at /observatory.
 ---
 
-The Observatory is where you watch coordination between you and your agents — across projects, over time. It lives at [`/observatory`](/observatory).
+The Observatory is the console for watching coordination between you and your agents, across projects and over time. It lives at [`/observatory`](/observatory).
 
-It is deliberately **not** a dashboard of counters. "231 tool calls, 12 sessions" tells you nothing about whether coordination is working. The Observatory shows what the telemetry is supposed to *explain*:
+It shows:
 
-- how the project's shape is changing,
+- how a project's shape is changing,
 - what the observer sees,
 - where coordination friction appears,
 - whether memory is helping or failing,
-- whether things are getting better or worse.
+- how coordination is trending over time.
 
-## The model: variables, overlaid, interpreted
+## How it works
 
-The Observatory treats telemetry as **selectable variables over time**, not fixed cards. You pick a variable, overlay a second, choose a view, and the observer explains what the combination can expose.
+The Observatory models telemetry as variables over time. You pick a variable, add an overlay variable, and choose a view; the console plots them and interprets the combination.
 
 ```mermaid
 flowchart LR
-    DS[Data sources] --> DV[Derived variables]
-    DV --> SEL[Variable + overlay selector]
-    SEL --> VIZ[Visualization]
-    VIZ --> INT[Observer interpretation]
-    INT --> PAT[Patterns exposed]
+    DS[Data sources] --> DV[Variables over time]
+    DV --> SEL[Variable + overlay]
+    SEL --> VIZ[Chart]
+    VIZ --> INT[Interpretation]
 ```
 
-The intelligence is in the last steps: for any selected view, the console states *what you're looking at, why those variables matter together, what patterns it may expose, what the observer currently thinks,* and *what's blind or low-confidence.*
+For each view, the console states what you are looking at, why the variables relate, what patterns the view can expose, the observer's current reading, and which signals are not yet instrumented.
 
-## Honest by construction
+## Instrumentation
 
-Most coordination signal isn't instrumented yet. The Observatory never fakes it. A variable that isn't measured (friction recurrence, memory misses, corrections) is still **selectable**, but it's drawn as *not instrumented* and the interpretation says the relationship can't be measured. Absence is shown, never coloured green.
+Some variables are not yet instrumented — friction recurrence, memory misses, and corrections. They are selectable but have no data; the console shows them as *not instrumented*.
 
-As the [observer](/explanation/the-observer/) learns to derive those signals from transcripts and the [OTel coordination contract](/reference/otel-coordination-contract/) starts emitting them, the blind variables come alive — the console fills in without any UI change.
+## In this section
 
-## This section
-
-- **[Reading the Observatory](/observatory/reading-it/)** — the controls, the chart types, and the interpretation panel.
-- **[Run the Observatory](/observatory/run-it/)** — launch it locally or open the deployed console.
-- **[The Observatory feed](/observatory/feed/)** — the data contract: what the console reads, and how to wire a live source into it.
+- [Reading the Observatory](/observatory/reading-it/) — the controls, chart types, and interpretation.
+- [Run the Observatory](/observatory/run-it/) — open it or run it locally.
+- [The Observatory feed](/observatory/feed/) — the data the console reads, and how to supply it.

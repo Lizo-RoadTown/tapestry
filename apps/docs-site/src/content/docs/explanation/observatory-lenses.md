@@ -66,5 +66,5 @@ Composition is bounded: not every pair of lenses overlays meaningfully. The Obse
 The Observatory is the surface.
 Lenses are how you look at it.
 A lens picks one dimension; overlays compose dimensions.
-No single dashboard can do this — that's why we don't try.
+No single dashboard does this.
 ```

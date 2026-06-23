@@ -35,18 +35,6 @@ Notice that the observer **is not interested in events.** The observer is intere
 
 Notice that the policy layer **is not interested in patterns.** The policy layer is interested in *structure formation* — should this candidate become durable? Patterns flow through to candidates before policy sees them.
 
-## Why this ordering matters
-
-Most observability systems collapse everything into "telemetry" and let the dashboard owner sort it out. That works when the question is *state* ("what's happening right now?"). It breaks down when the question is *trajectory* ("what's becoming?").
-
-Trajectory questions need the stack:
-
-- You can't tell whether a project is drifting by looking at one event. You need *patterns* — recurring signals across time.
-- You can't tell whether a pattern deserves codification by looking at one pattern. You need *candidates* — patterns weighted by recurrence, durability, and operator approval.
-- You can't tell whether a candidate is ready for promotion by looking at one candidate. You need *policy* — judgment about risk, scope, and dependencies.
-
-Skipping a level forces the next level to do work it isn't designed for. The observer can't substitute for policy. Policy can't substitute for the skill compiler. The compiler can't substitute for architecture.
-
 ## What this means in practice
 
 When you're writing a Tapestry component, the first question is: *which level of the hierarchy does this component consume?*

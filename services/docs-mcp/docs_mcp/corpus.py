@@ -131,11 +131,27 @@ def build_llms_txt(docs: list[Doc], site_base_url: str) -> str:
 
 
 def default_docs_root() -> str:
-    """Resolve DOCS_ROOT env var, falling back to the in-repo path
-    relative to this file (`../../apps/docs-site/src/content/docs/`).
+    """Resolve the corpus location in this order:
+
+      1. DOCS_ROOT env var (operator override).
+      2. Bundled corpus next to the package (docs_mcp/_corpus/) — what
+         `pip install tapestry-docs-mcp` ships when scripts/bundle-corpus.py
+         has been run before the wheel build.
+      3. In-repo path (../../apps/docs-site/src/content/docs/) — the
+         dev path when running from a tapestry clone with no bundle.
+
+    The bundled-corpus tier is what makes plugin.json wiring portable:
+    a consumer who runs `pip install tapestry-docs-mcp` then
+    `python -m docs_mcp` gets a working server with no env var needed.
     """
     env = os.environ.get("DOCS_ROOT")
     if env:
         return env
+
     here = Path(__file__).resolve().parent
+
+    bundled = here / "_corpus"
+    if bundled.is_dir() and any(bundled.rglob("*.md")):
+        return str(bundled)
+
     return str((here / ".." / ".." / "apps" / "docs-site" / "src" / "content" / "docs").resolve())

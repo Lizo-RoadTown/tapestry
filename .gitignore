@@ -20,3 +20,8 @@ __pycache__/
 # kept as artifacts. The .gitkeep below preserves the directory.
 docs/architecture-snapshots/*
 !docs/architecture-snapshots/.gitkeep
+services/docs-mcp/docs_mcp/_corpus/
+services/docs-mcp/*.egg-info/
+services/docs-mcp/build/
+services/docs-mcp/dist/
+*.egg-info/

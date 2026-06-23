@@ -136,12 +136,3 @@ Before diagnosing, confirm what the agent CAN see:
 3. Cross-reference [Load-bearing files](/reference/load-bearing-files/) to confirm every load-bearing file is present and correct.
 4. If you've identified that something is missing but you don't know how to fix it, ping the operator (Liz) or the loom-agent. Diagnostic info that helps: the output of `/mcp`, `/plugin list`, `cat .mcp.json`, `cat .claude/settings.json`, `cat .env | grep LOOM_PROJECT_ID`.
 
-## Why these symptoms keep recurring
-
-The discipline stack has a high coupling-to-visibility ratio: it depends on many small files in many specific locations, but its absence is invisible unless you know to look. A new operator setting up their first project hits these symptoms FREQUENTLY because:
-
-1. Each piece is small and looks deletable when you're cleaning up.
-2. The platform's value is invisible until it's missing — you don't notice the SessionStart hook is running until it's NOT.
-3. There's no "the agent's discipline is correctly wired" status check anywhere in Claude Code.
-
-This site exists to make the wiring legible. Update this table as new failure modes get discovered.

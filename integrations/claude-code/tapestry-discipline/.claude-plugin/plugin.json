@@ -27,6 +27,10 @@
     "loom-memory": {
       "type": "http",
       "url": "https://loom-agent-context.onrender.com/mcp/memory/"
+    },
+    "tapestry-docs": {
+      "command": "python",
+      "args": ["-m", "docs_mcp"]
     }
   }
 }

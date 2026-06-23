@@ -44,10 +44,6 @@ The platform supports a two-mode commitment (every service has a `PLATFORM_MODE=
 
 If you're standing up a fully self-hosted Tapestry, you need accounts + deployments at all four services above. If you're a consuming project using the platform owner's hosted deployment, you only need the second table.
 
-## Why we list these explicitly
-
-A new operator should not be surprised by the runtime dependencies. Knowing in advance that telemetry requires Grafana Cloud, the docs site lives on Vercel, and the backend lives on Render means there's no hidden lock-in. Each piece is replaceable (Render → AWS/GCP, Vercel → Cloudflare Pages, Grafana Cloud → self-hosted LGTM stack, OTel → unchanged), but the substitution work is real.
-
 ## Related
 
 - [Load-bearing files — `OTEL_*`](/reference/load-bearing-files/#otel-otel-telemetry) — the env-var contract

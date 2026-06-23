@@ -129,12 +129,6 @@ A few quick checks:
 
 For each, see [Recover from common failures](/how-to/recover-from-common-failures/) for the symptom-to-fix table.
 
-## Why this is the platform's main value
-
-Without shared intelligence, each project's agent re-learns the same things every session, re-derives the same decisions, and rebuilds the same context from scratch. The platform's discipline mechanisms (PROBE rules, friction-as-memory, the observer) generate corrections and patterns; the cross-project memory channel is what lets those corrections and patterns COMPOUND across the entire portfolio of projects rather than dissipating into isolated sessions.
-
-Every other piece of the platform exists to support this compounding. The plugins enforce the discipline. The memory MCP stores what gets learned. The observer surfaces what recurs. The architecture snapshots situate it all in repo structure. All of it serves the headline value: **what one agent learns, all agents access.**
-
 ## Related
 
 - [The memory MCP](/explanation/memory-mcp/) — the underlying mechanism, with the full set of memory types and tagging detail

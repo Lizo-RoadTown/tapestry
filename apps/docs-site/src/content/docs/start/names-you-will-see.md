@@ -43,10 +43,6 @@ The platform's hosted services currently live at these URLs:
 
 These URLs all have `loom-` prefixes because they're hosted from the beta repo (`the-loom`). When services migrate into Tapestry, the URLs will change too — env-var overrides (`TAPESTRY_*_URL` precedence over `LOOM_*_URL`) are wired throughout the platform so consuming projects don't have to chase the rename.
 
-## Why the naming is in flux
-
-The platform was built in pieces across beta repos before it got a unified name. Each beta repo authored components, proved them in practice, and is now being migrated into the canonical `Tapestry` namespace one piece at a time. The transitional names persist in URLs, marketplace IDs, and code paths until each migration step completes.
-
 If a reference confuses you, the meaning is almost always one of:
 
 - A beta repo name → "where this currently lives during the transition"

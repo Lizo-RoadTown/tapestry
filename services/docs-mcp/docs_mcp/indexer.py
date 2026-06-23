@@ -13,7 +13,7 @@ import re
 from collections import Counter
 from dataclasses import dataclass
 
-from corpus import Doc
+from .corpus import Doc
 
 
 _WORD_RE = re.compile(r"[a-z0-9]+")

@@ -8,8 +8,8 @@ and produces:
   - a flattened llms.txt string per the llmstxt.org convention
 
 Frontmatter parsing is intentionally minimal (regex over the first `---`-fenced
-block, not a full YAML parser) so this service has no extra dependencies beyond
-fastapi + mcp + uvicorn + pydantic.
+block, not a full YAML parser) so this package has no extra dependencies beyond
+the `mcp` SDK itself.
 """
 from __future__ import annotations
 
@@ -19,9 +19,12 @@ from dataclasses import dataclass
 from pathlib import Path
 
 
-_FRONTMATTER_RE = re.compile(r"^---\n(.*?)\n---\n", re.DOTALL)
-_TITLE_RE = re.compile(r"^title:\s*(.+)$", re.MULTILINE)
-_DESC_RE = re.compile(r"^description:\s*(.+)$", re.MULTILINE)
+# Tolerate both LF and CRLF — Windows working trees get CRLF after Git checkout
+# with core.autocrlf=true. The non-greedy (.+?) + \r?$ pattern strips any
+# trailing \r without consuming it into the capture group.
+_FRONTMATTER_RE = re.compile(r"^---\r?\n(.*?)\r?\n---\r?\n", re.DOTALL)
+_TITLE_RE = re.compile(r"^title:\s*(.+?)\r?$", re.MULTILINE)
+_DESC_RE = re.compile(r"^description:\s*(.+?)\r?$", re.MULTILINE)
 
 
 @dataclass(frozen=True)

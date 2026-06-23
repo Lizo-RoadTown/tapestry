@@ -6,9 +6,9 @@ Three tools, all public read-only:
   tapestry_docs_read   — full body of a named doc
   tapestry_docs_list   — all slugs, optionally filtered to a section
 
-The Index instance is module-level (constructed at startup by main.py via
-build_server()). MCP HTTP transport routes each tool call to the handlers
-defined here.
+The Index instance is module-level (constructed at startup by `__main__.py`
+via set_index). The stdio transport runner in __main__.py loads the corpus
+and dispatches to the handlers defined here.
 """
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ from typing import Any
 from mcp.server import Server
 from mcp.types import TextContent, Tool
 
-from indexer import Index
+from .indexer import Index
 
 
 _index: Index | None = None

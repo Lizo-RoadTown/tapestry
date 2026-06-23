@@ -1,11 +1,11 @@
 """Top-level CLI dispatcher for `loom`.
 
 Subcommands:
-  loom onboard   — `init` + writes .claude/settings.json with tapestry plugins
+  tapestry onboard   — `init` + writes .claude/settings.json with tapestry plugins
                    enabled (the 4-step quickstart path)
-  loom init      — register the project, write .env / .mcp.json / .project-intelligence/
+  tapestry init      — register the project, write .env / .mcp.json / .project-intelligence/
                    (the granular path — does NOT touch .claude/settings.json)
-  loom version   — print version + diagnostic info
+  tapestry version   — print version + diagnostic info
 
 Add a new subcommand by:
   1. Creating loom_cli/<name>.py with add_arguments(parser) + run(args) -> int
@@ -16,7 +16,7 @@ from __future__ import annotations
 import argparse
 import sys
 
-from loom_cli import __version__, init as init_cmd, onboard as onboard_cmd
+from tapestry_cli import __version__, init as init_cmd, onboard as onboard_cmd
 
 
 SUBCOMMANDS: dict[str, dict] = {
@@ -35,14 +35,14 @@ SUBCOMMANDS: dict[str, dict] = {
 
 def _print_version() -> int:
     import platform
-    print(f"loom-cli {__version__}")
+    print(f"tapestry-cli {__version__}")
     print(f"  python: {platform.python_version()} ({platform.system()} {platform.release()})")
     return 0
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        prog="loom",
+        prog="tapestry",
         description="the-loom command-line interface",
     )
     subs = parser.add_subparsers(dest="command", metavar="<command>")

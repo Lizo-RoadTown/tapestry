@@ -16,7 +16,7 @@ import argparse
 import json
 from pathlib import Path
 
-from loom_cli import init as init_cmd
+from tapestry_cli import init as init_cmd
 
 
 # The two plugins the consolidated `tapestry` marketplace ships.

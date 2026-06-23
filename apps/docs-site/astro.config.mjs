@@ -21,7 +21,6 @@ export default defineConfig({
       description:
         "What keeps a project on track when it plugs into the Tapestry platform: the discipline stack of plugins, MCP wiring, hooks, and project intelligence — and how to recover when one piece goes missing.",
       customCss: ["./src/styles/custom.css"],
-<<<<<<< HEAD
       // Component overrides — Tapestry-specific.
       components: {
         // Adds a "Copy page" dropdown to the right of every page's <h1>.
@@ -30,7 +29,6 @@ export default defineConfig({
         // scripts/generate-static-docs.mjs as a prebuild step.
         PageTitle: "./src/components/PageActions.astro",
       },
-=======
       // Brand fonts, matching the marketing front page (/home):
       // Instrument Serif (display) / Inter (body) / JetBrains Mono (code).
       head: [
@@ -44,7 +42,6 @@ export default defineConfig({
           },
         },
       ],
->>>>>>> origin/main
       social: [
         {
           icon: "github",

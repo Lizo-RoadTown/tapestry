@@ -14,7 +14,7 @@ Root cause: `agentic-upskilling`, a skill in `docs-agent/skills/agentic-upskilli
 
 That description names the missing observer. But the implementation is a methodology doc, not a running service. There is no cron, no daemon, no scheduled job pointing at it. The capability has been described as "continuous" for weeks while no infrastructure runs it.
 
-The current discipline plugins (`loom-discipline`, `make-skills-discipline`) handle interactive guardrails correctly on UserPromptSubmit. They were the obvious place to file the observational work too. **That filing was wrong.** Per-response guardrails and continuous observation have different shapes; co-locating them looks ergonomic but produces silent failure.
+The current discipline plugins (`tapestry-discipline`, `make-skills-discipline`) handle interactive guardrails correctly on UserPromptSubmit. They were the obvious place to file the observational work too. **That filing was wrong.** Per-response guardrails and continuous observation have different shapes; co-locating them looks ergonomic but produces silent failure.
 
 ## The rule
 

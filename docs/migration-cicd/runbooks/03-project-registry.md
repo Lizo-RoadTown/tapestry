@@ -8,7 +8,7 @@
 
 ## Capability snapshot
 - `loom-project-registry` (Render, `plan: free`) — CRUD for `projects` / `repos` / `machines`; tenant-scoped (RLS). Reads `LOOM_DB_URL` (loom-postgres) + `LOOM_JWT_PUBLIC_KEY` (verify) via the `auth_bridge`→`loom_auth` shim. `/health`.
-- Consumers: `loom-cli`/`tapestry init`, self-observer (`project_id` lookups), dashboard.
+- Consumers: `tapestry-cli`/`tapestry init`, self-observer (`project_id` lookups), dashboard.
 - **NOT in this lift:** the net-new tenant **signup endpoint** (roadmap §5 Step 3) — deferred to a follow-up.
 
 ## Change plan

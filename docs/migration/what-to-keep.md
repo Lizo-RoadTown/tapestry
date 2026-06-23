@@ -35,7 +35,7 @@ Candidates for migration (per [`legacy-repo-inventory.md`](legacy-repo-inventory
 
 ## From `claude-skills-marketplace`
 
-- **The three plugins**: `loom-discipline`, `ai-agents-architect`, `onboarding-psychologist`
+- **The three plugins**: `tapestry-discipline`, `ai-agents-architect`, `onboarding-psychologist`
 - **The publishing workflow** — adapts to Tapestry distribution
 
 ## From `project-starter` + template repos

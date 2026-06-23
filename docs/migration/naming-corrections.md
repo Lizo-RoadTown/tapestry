@@ -20,11 +20,11 @@ Names that drifted during prototyping. When a piece imports to Tapestry, apply t
 
 **See:** loom-memory `feedback_prefer_descriptive_names_over_branded_for_internal_things`.
 
-### 3. `make-skills-discipline` → `loom-discipline`
+### 3. `make-skills-discipline` → `tapestry-discipline`
 
 **Where it appears:** `Lizo-RoadTown/claude-skills-marketplace/plugins/make-skills-discipline/`, various references to "make-skills-discipline plugin" in CLAUDE.md and docs.
 
-**On import:** rename to `loom-discipline` wherever the reference is the PLUGIN. The plugin folder, its `plugin.json` name field, its install command, its scope-check string — all rename.
+**On import:** rename to `tapestry-discipline` wherever the reference is the PLUGIN. The plugin folder, its `plugin.json` name field, its install command, its scope-check string — all rename.
 
 **Caveat:** the public marketplace may keep both names callable for a while during transition. Coordinate with operator before deleting the `make-skills-discipline` registration.
 

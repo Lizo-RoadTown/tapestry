@@ -25,7 +25,7 @@ Operator directive 2026-06-13: *"must be automated and not inside a repo or spec
 Reasons:
 - **Coverage**: a developer-session hook only fires when the user starts Claude Code. Weekends, vacation, focused-elsewhere days produce zero observation. A cloud cron runs regardless.
 - **Cost attribution**: a hook runs in the user's session context. A cloud service has its own budget tracked separately.
-- **Scope**: a hook inside `loom-discipline` only sees the active session's repo. A cloud observer queries GitHub for all platform-owned repos without being inside any of them.
+- **Scope**: a hook inside `tapestry-discipline` only sees the active session's repo. A cloud observer queries GitHub for all platform-owned repos without being inside any of them.
 
 Captured as a playbook chapter so future "should this be a hook or a service?" decisions skip the re-derivation.
 

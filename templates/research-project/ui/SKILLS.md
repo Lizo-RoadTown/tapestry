@@ -10,7 +10,7 @@ The `make-skills-discipline` plugin enforces PROBE-first behavior, `file:line` c
 
 ```text
 /plugin marketplace add Lizo-RoadTown/claude-skills-marketplace
-/plugin install make-skills-discipline@lizo-skills
+/plugin install make-skills-discipline@tapestry
 ```
 
 ---
@@ -19,13 +19,13 @@ The `make-skills-discipline` plugin enforces PROBE-first behavior, `file:line` c
 
 Skills that shape *how* Claude works in this repo regardless of the specific task.
 
-### `lizo-skills/onboarding-psychologist`
+### `tapestry/onboarding-psychologist`
 
 Liz Osborn's IDENTITY-TO-HABIT framework for first-time-user flows. Grounded in BJ Fogg's Tiny Habits + Fogg Behavior Model, Nir Eyal's Hook Model, James Clear's identity-based habits. Activates on signup, empty states, welcome screens, reactivation.
 
 ```text
 /plugin marketplace add Lizo-RoadTown/claude-skills-marketplace
-/plugin install onboarding-psychologist@lizo-skills
+/plugin install onboarding-psychologist@tapestry
 ```
 
 ### `superpowers:brainstorming`

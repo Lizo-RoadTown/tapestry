@@ -2,7 +2,7 @@
 
 Run from the plugin root:
 
-    python -m unittest adapters/claude-code/loom-discipline/tests/test_stop_audit_upskilling.py
+    python -m unittest integrations/claude-code/tapestry-discipline/tests/test_stop_audit_upskilling.py
 
 Cover the three components of the check:
 

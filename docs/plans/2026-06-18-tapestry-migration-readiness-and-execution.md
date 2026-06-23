@@ -514,7 +514,7 @@ For each step, in roadmap order.
 **Executor:** Tapestry-agent + loom-agent
 **Failure modes:**
 - Plugin hook contract changes during port (mitigation: port verbatim, change in v2)
-**Done criterion:** `claude --plugin install loom-discipline@lizo-loom` resolves to Tapestry source; hooks fire identically; URL points at Tapestry MCP
+**Done criterion:** `claude --plugin install tapestry-discipline@tapestry` resolves to Tapestry source; hooks fire identically; URL points at Tapestry MCP
 
 ---
 
@@ -894,7 +894,7 @@ The independent evaluator (`2026-06-18-tapestry-migration-readiness-and-executio
 
 **Missed items deferred** (substantive; each is a future plan addition, not a fix to existing text):
 - Drift-watcher pattern slotting in migration workflows
-- Marketplace cutover specifics for `loom-discipline` plugin
+- Marketplace cutover specifics for `tapestry-discipline` plugin
 - Render dual-stack topology during cutover window
 - Make_Skills-side PR-prep-2 equivalent
 - Tapestry GitHub Actions provisioning (the doc-01 workflows need actual `.github/workflows/*.yml` files committed)

@@ -31,8 +31,8 @@ The marketplace manifest lives at [`../../.claude-plugin/marketplace.json`](../.
 
 Both plugins consolidated into this monorepo 2026-06-22:
 
-- `loom-discipline` (formerly at `the-loom/adapters/claude-code/loom-discipline/`, marketplace `lizo-loom`) → `tapestry-discipline`
-- `liz-patterns` (formerly at `claude-skills-marketplace/plugins/liz-patterns/`, marketplace `lizo-skills`) → `tapestry-patterns`
+- `tapestry-discipline` (formerly at `the-loom/adapters/claude-code/loom-discipline/`, marketplace `lizo-loom`) → `tapestry-discipline`
+- `tapestry-patterns` (formerly at `claude-skills-marketplace/plugins/liz-patterns/`, marketplace `lizo-skills`) → `tapestry-patterns`
 
 The standalone source repos remain available during the transition; the canonical home is now this monorepo.
 

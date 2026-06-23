@@ -1,6 +1,6 @@
 # `templates/`
 
-Seed templates for new consuming projects. Each is a placeholder-driven scaffold (`{{PROJECT_NAME}}`, `{{FRONTEND}}`, …) that comes Tapestry-wired out of the box: loom-memory MCP (`.mcp.json`), file-protocol memory (`scripts/seed-memory.*`), and the `loom-discipline` plugin.
+Seed templates for new consuming projects. Each is a placeholder-driven scaffold (`{{PROJECT_NAME}}`, `{{FRONTEND}}`, …) that comes Tapestry-wired out of the box: loom-memory MCP (`.mcp.json`), file-protocol memory (`scripts/seed-memory.*`), and the `tapestry-discipline` plugin.
 
 ## Two-axis layout: domain × shape
 

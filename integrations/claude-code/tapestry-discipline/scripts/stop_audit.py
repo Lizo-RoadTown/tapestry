@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Stop hook for loom-discipline.
+Stop hook for tapestry-discipline (preserved runtime label: [loom-discipline]).
 
 Fires at the end of the agent's turn. Runs two audits + one observer:
 
@@ -261,7 +261,7 @@ def _warned_marker_path(session_id: str) -> Path:
 
 
 def _in_scope(cwd) -> bool:
-    """True if loom-discipline hooks should run for this repo.
+    """True if tapestry-discipline hooks should run for this repo.
 
     In scope if EITHER the working-directory path contains a known loom
     substring (Make_Skills / the-loom / project-starter / _common), OR

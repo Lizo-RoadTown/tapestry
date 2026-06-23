@@ -1,6 +1,6 @@
 ---
 name: architecture-analyst
-description: Reads architecture-snapshot.json + architecture-diff.json + recent git log + test-runs and produces a narrative report explaining what changed, why it matters, and what to do next. Spawned automatically on session start by the loom-discipline plugin or on demand via /architecture-report. Outputs to docs/architecture-snapshots/<timestamp>-narrative.md.
+description: Reads architecture-snapshot.json + architecture-diff.json + recent git log + test-runs and produces a narrative report explaining what changed, why it matters, and what to do next. Spawned automatically on session start by the tapestry-discipline plugin or on demand via /architecture-report. Outputs to docs/architecture-snapshots/<timestamp>-narrative.md.
 model: sonnet
 ---
 
@@ -93,7 +93,7 @@ No diagnosis, no recommendations, no padding. Don't manufacture findings.
 
 Triggered three ways:
 
-1. **Automatic** — SessionStart hook in the loom-discipline plugin runs the snapshot + diff scripts and invokes you with the resulting JSON paths.
+1. **Automatic** — SessionStart hook in the tapestry-discipline plugin runs the snapshot + diff scripts and invokes you with the resulting JSON paths.
 2. **Manual** — `/architecture-report` slash command produces a fresh report on demand.
 3. **CI** — GitHub Action on push-to-main runs the same pipeline and commits the narrative back to the repo (future).
 

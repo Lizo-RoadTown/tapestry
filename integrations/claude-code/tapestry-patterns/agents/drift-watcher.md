@@ -13,7 +13,7 @@ Validated in production twice:
 - **2026-06-13 cleanup**: caught the primary about to hand-edit 12 CLAUDE.md files individually when 3 of them shared identical stale text from a template source. Hand-editing would have perpetuated the very Pillar-1 violation being fixed. Forced primary to fix the template source FIRST.
 - **2026-06-14 loom-discipline reconciliation**: caught that the primary's file enumeration was 13 when actual was 15 (missed `ux-starter` + 2 template-source CLAUDE.mds). Also caught that the planned revert was reversing an explicitly-approved Phase 1; forced primary to cite operator's "A" choice as the new directive.
 
-Promotion-eligible per `liz-patterns:orchestration-cataloging` criteria: 3-5 same-shape applications observed across sessions = subagent.
+Promotion-eligible per `tapestry-patterns:orchestration-cataloging` criteria: 3-5 same-shape applications observed across sessions = subagent.
 
 ## Identity
 
@@ -186,9 +186,9 @@ Pattern observed:
 
 ## Related
 
-- `liz-patterns:agentic-upskilling` — the meta-skill this extends
-- `liz-patterns:lessons-learned` — adjacent (also captures friction-as-future-savings)
-- `liz-patterns:orchestration-cataloging` — the catalog that this agent is itself an instance of (promotion candidate that crossed the threshold)
+- `tapestry-patterns:agentic-upskilling` — the meta-skill this extends
+- `tapestry-patterns:lessons-learned` — adjacent (also captures friction-as-future-savings)
+- `tapestry-patterns:orchestration-cataloging` — the catalog that this agent is itself an instance of (promotion candidate that crossed the threshold)
 - `tapestry/MANIFESTO.md` Part 4.8 — discipline plugins (drift-watcher is discipline-plugin-shaped)
 - `feedback_drift_watcher_value_demonstrated_real_save_2026_06_14` — the validation record
 - `candidate_skill_drift_watcher_agent_pattern_2026_06_14` — the original promotion candidate

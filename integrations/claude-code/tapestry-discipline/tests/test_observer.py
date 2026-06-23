@@ -2,7 +2,7 @@
 
 Run from the plugin root:
 
-    python -m unittest adapters/claude-code/loom-discipline/tests/test_observer.py
+    python -m unittest integrations/claude-code/tapestry-discipline/tests/test_observer.py
 
 Cover the pure-logic surfaces (no HTTP, no FS writes against the live tree):
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-PreToolUse hook for loom-discipline.
+PreToolUse hook for tapestry-discipline (preserved runtime label: [loom-discipline]).
 
 Fires before Edit / Write / MultiEdit. Checks two conditions:
 
@@ -216,7 +216,7 @@ def emit_block(reason: str) -> None:
 
 
 def _in_scope(cwd) -> bool:
-    """True if loom-discipline hooks should run for this repo.
+    """True if tapestry-discipline hooks should run for this repo.
 
     In scope if EITHER the working-directory path contains a known loom
     substring (Make_Skills / the-loom / project-starter / _common), OR

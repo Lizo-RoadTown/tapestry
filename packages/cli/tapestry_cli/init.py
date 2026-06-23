@@ -22,7 +22,7 @@ What it does (mirrors `docs/howto/onboard-a-project.md` Part 1, steps 2-5):
 What it does NOT do:
   - Does NOT create a GitHub repo (use `gh repo create` or the
     PowerShell scaffolder for that).
-  - Does NOT install the loom-discipline Claude Code plugin.
+  - Does NOT install the tapestry-discipline Claude Code plugin.
   - Does NOT install skills (Phase 5 SDK install-path future work).
   - Does NOT touch .gitignore (warns if .env not gitignored).
 
@@ -224,7 +224,7 @@ def _write_mcp_config(project_dir: Path) -> None:
     its mcpServers block (preserves all existing servers). If it doesn't
     exist, creates a minimal one with just loom-memory.
 
-    The plugin's plugin.json (adapters/claude-code/loom-discipline/
+    The plugin's plugin.json (integrations/claude-code/tapestry-discipline/
     .claude-plugin/plugin.json v0.1.8+) ALSO registers loom-memory at the
     user level — Layer 3 of the concrete rule. Both layers exist so that
     if the plugin is disabled or fails, the project-level config still
@@ -438,7 +438,7 @@ def run(args: argparse.Namespace) -> int:
     print(f"    UUID: {project_uuid}")
     print()
     print(f"Next steps:")
-    print(f"  1. If you don't already have the loom-discipline plugin installed,")
+    print(f"  1. If you don't already have the tapestry-discipline plugin installed,")
     print(f"     see docs/howto/onboard-a-project.md Part 2.")
     print(f"  2. Start a Claude Code session in this directory. The SessionStart")
     print(f"     hook (v0.1.7+) will auto-recall relevant memories for this project.")

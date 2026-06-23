@@ -3,6 +3,10 @@ title: How the platform upskills itself
 description: How repeated work gets noticed, evaluated, and promoted into durable reusable structure — tools, subagents, skills, and agents — instead of being re-derived in every session.
 ---
 
+:::tip[On the marketing site]
+For the outcome framing — "repeated work compiles into named skills, available in every project" — see the **Reusable skills** layer in [Project intelligence](/project-intelligence/) and the flow in [How it works](/how-it-works/) on the marketing site. This page keeps the mechanism: how repeated work gets noticed, who decides, and what happens after.
+:::
+
 The platform's intelligence-spreading mechanism (memory across projects + cross-agent updates) keeps individual corrections from getting lost. But corrections alone don't add up to a richer platform. What does is **upskilling** — the loop that turns repeated work into reusable structure.
 
 When the same pattern shows up enough times across enough sessions, the platform notices and surfaces it as a candidate for codification. The operator decides what to make of it: a tool, a subagent, a skill, or an agent. Once promoted, the new structure is available by name to every project on the platform. That's how the reusable catalog grows.

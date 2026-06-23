@@ -55,22 +55,35 @@ export default defineConfig({
       //   Docs:         helps the reader perform an action
       //   Components:   how the platform is built
       //   Reference:    what each contract / file does exactly
-      //   Background:   transitional — pages reclassified as marketing.
-      //                 Stay sidebar-visible until Tapestry-agent memos
-      //                 that each one's marketing version has shipped on
-      //                 the marketing website (apps/docs-site/src/pages/),
-      //                 at which point they're either slimmed to
-      //                 concept-only or removed.
+      //
+      // The marketing-classified pages from the prior transitional Background
+      // group have moved into Learn now that their marketing versions are live
+      // on the marketing site (per tapestry-marketing-site-built-2026-06-23).
+      // Each carries a top-of-page banner pointing readers to its marketing
+      // equivalent, so the docs version reads as concept-only while the
+      // marketing site carries the outcome / positioning framing.
       sidebar: [
         {
           label: "Learn",
           items: [
+            // Primary object + substrate.
             { label: "User-agent interface", slug: "start/user-agent-interface" },
+            { label: "Project shape", slug: "start/project-shape" },
+            { label: "What keeps a project on track", slug: "start/what-stays-on-track" },
+            // Noun distinctions.
+            { label: "Project Intelligence vs Observatory", slug: "explanation/project-intelligence-vs-observatory" },
+            { label: "Observatory lenses", slug: "explanation/observatory-lenses" },
+            // The pipelines (materials + cognitive).
             { label: "The signal hierarchy", slug: "explanation/signal-hierarchy" },
             { label: "Signal → Interpretation → Pattern", slug: "explanation/signal-interpretation-pattern" },
+            // The observer + what it produces.
             { label: "The observer", slug: "explanation/the-observer" },
             { label: "Observer-derived intent", slug: "explanation/observer-derived-intent" },
-            { label: "Observatory lenses", slug: "explanation/observatory-lenses" },
+            // What the loop produces over time.
+            { label: "How the platform upskills itself", slug: "explanation/upskilling" },
+            { label: "Sharing intelligence across projects", slug: "explanation/sharing-intelligence-across-projects" },
+            // Boundaries + glossary.
+            { label: "What Tapestry is not", slug: "start/what-tapestry-is-not" },
             { label: "Names you'll see in these docs", slug: "start/names-you-will-see" },
           ],
         },
@@ -119,22 +132,6 @@ export default defineConfig({
             { label: "OTel coordination contract", slug: "reference/otel-coordination-contract" },
             { label: "Platform dependencies", slug: "reference/platform-dependencies" },
             { label: "Load-bearing files", slug: "reference/load-bearing-files" },
-          ],
-        },
-        {
-          // Transitional. Pages reclassified as marketing in Tapestry-agent's
-          // IA memo; staying sidebar-visible until each one's marketing version
-          // ships on the marketing website. Tapestry-agent will memo as each
-          // page's marketing version lands; then these get slimmed to
-          // concept-only or removed.
-          label: "Background (migrating to marketing site)",
-          items: [
-            { label: "Project shape", slug: "start/project-shape" },
-            { label: "What Tapestry is not", slug: "start/what-tapestry-is-not" },
-            { label: "What keeps a project on track", slug: "start/what-stays-on-track" },
-            { label: "Project Intelligence vs Observatory", slug: "explanation/project-intelligence-vs-observatory" },
-            { label: "How the platform upskills itself", slug: "explanation/upskilling" },
-            { label: "Sharing intelligence across projects", slug: "explanation/sharing-intelligence-across-projects" },
           ],
         },
       ],

@@ -1,5 +1,117 @@
 /* Tapestry docs site — custom styles */
 
+/* ───────────────────────────────────────────────────────────────────────
+ * Theme: match the marketing front page (/home).
+ * Same design language — warm near-black surface, one teal accent,
+ * Instrument Serif display / Inter body / JetBrains Mono. We retune
+ * Starlight's token ramp rather than fight its components. Fonts are
+ * loaded via the `head` links in astro.config.mjs.
+ * ─────────────────────────────────────────────────────────────────────── */
+
+:root {
+  --font-d: "Instrument Serif", Georgia, serif;
+  --sl-font: "Inter", system-ui, sans-serif;
+  --sl-font-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+  /* Tapestry brand */
+  --tap-brand: #5fd3da;
+  --tap-brand-bright: #9be8ec;
+  --tap-surface: #0a0d0e;
+  --tap-edge: #232a2c;
+}
+
+/* Dark theme — the primary match for the marketing page. Starlight's default
+ * `:root` carries the dark values, so we override them here. */
+:root,
+:root[data-theme="dark"] {
+  /* accent (links, active nav, badges) */
+  --sl-color-accent-low: #123639;
+  --sl-color-accent: #2aa7b0;
+  --sl-color-accent-high: #82e2e8;
+  --sl-color-text-accent: #5fd3da;
+
+  /* warm near-black gray ramp (1 = brightest text → 6 = darkest surface) */
+  --sl-color-white: #f3f5f4;
+  --sl-color-gray-1: #e7ecea;
+  --sl-color-gray-2: #c4ccca;
+  --sl-color-gray-3: #8b9492;
+  --sl-color-gray-4: #5a6466;
+  --sl-color-gray-5: #232a2c;
+  --sl-color-gray-6: #161b1d;
+  --sl-color-gray-7: #0e1314;
+  --sl-color-black: #0a0d0e;
+
+  /* surfaces */
+  --sl-color-bg: #0a0d0e;
+  --sl-color-bg-nav: #0a0d0ecc;
+  --sl-color-bg-sidebar: #0c1012;
+  --sl-color-bg-inline-code: #14191b;
+  --sl-color-hairline: #1a2022;
+  --sl-color-hairline-shade: #161b1d;
+  --sl-color-hairline-light: #232a2c;
+}
+
+/* Light theme — keep Starlight's light surfaces, adopt our teal accent + fonts
+ * so a toggled light view stays on-brand. */
+:root[data-theme="light"] {
+  --sl-color-accent-low: #c9eef0;
+  --sl-color-accent: #2aa7b0;
+  --sl-color-accent-high: #0c4a4f;
+  --sl-color-text-accent: #1f8f97;
+}
+
+/* Ambient teal glow behind the page, echoing the hero. Fixed + subtle. */
+:root[data-theme="dark"] body::before,
+:root body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background: radial-gradient(70% 45% at 50% -8%, #5fd3da14 0, transparent 60%);
+}
+:root[data-theme="light"] body::before { background: none; }
+
+/* Display serif: site title + the top two heading levels, like the marketing
+ * page. Smaller headings stay in Inter for hierarchy clarity. */
+.site-title {
+  font-family: var(--font-d);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  font-size: 1.4rem;
+}
+.sl-markdown-content h1,
+.sl-markdown-content h2,
+h1#_top,
+.content-panel h1 {
+  font-family: var(--font-d);
+  font-weight: 400;
+  letter-spacing: 0.005em;
+}
+.sl-markdown-content h1 { font-size: clamp(2rem, 4.5vw, 2.9rem); line-height: 1.1; }
+.sl-markdown-content h2 { font-size: clamp(1.5rem, 3vw, 2rem); }
+
+/* Glassy sticky header, matching the marketing nav. */
+.header {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--sl-color-hairline);
+}
+
+/* Sidebar current page: teal left accent. */
+.sidebar-content a[aria-current="page"] {
+  color: var(--tap-brand);
+  background: #5fd3da14;
+}
+
+/* Inline code: subtle teal-tinted token. */
+.sl-markdown-content :not(pre) > code {
+  border: 1px solid #5fd3da26;
+  color: #cfeef0;
+}
+
+/* Primary CTA-style links rendered by Starlight asides/buttons keep the brand
+ * teal hover from the accent ramp above; no extra rule needed. */
+
 /* Inline code inside table cells should not break mid-token.
  * Without this, narrow first-column cells split identifiers like
  * `skill_idea` across two lines as "skill_i / dea". The cell grows

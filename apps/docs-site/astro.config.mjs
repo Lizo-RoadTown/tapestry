@@ -96,6 +96,10 @@ export default defineConfig({
             { label: "Quickstart — VS Code", slug: "how-to/quickstart-vscode" },
             { label: "Set up a new project (comprehensive)", slug: "how-to/set-up-a-new-project" },
             { label: "Recover from common failures", slug: "how-to/recover-from-common-failures" },
+            // Platform-owner provisioning walkthroughs — not needed by consuming projects.
+            { label: "Set up Render (platform owner)", slug: "how-to/set-up-render" },
+            { label: "Set up Vercel (platform owner)", slug: "how-to/set-up-vercel" },
+            { label: "Set up Grafana Cloud + OTel", slug: "how-to/set-up-grafana-cloud" },
           ],
         },
         {

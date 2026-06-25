@@ -1,7 +1,7 @@
 /* Tapestry docs site — custom styles */
 
 /* ───────────────────────────────────────────────────────────────────────
- * Theme: match the marketing front page (/home).
+ * Theme: match the site front page (/).
  * Same design language — warm near-black surface, one teal accent,
  * Instrument Serif display / Inter body / JetBrains Mono. We retune
  * Starlight's token ramp rather than fight its components. Fonts are
@@ -19,7 +19,7 @@
   --tap-edge: #232a2c;
 }
 
-/* Dark theme — the primary match for the marketing page. Starlight's default
+/* Dark theme — the primary match for the front page. Starlight's default
  * `:root` carries the dark values, so we override them here. */
 :root,
 :root[data-theme="dark"] {
@@ -71,8 +71,8 @@
 }
 :root[data-theme="light"] body::before { background: none; }
 
-/* Display serif: site title + the top two heading levels, like the marketing
- * page. Smaller headings stay in Inter for hierarchy clarity. */
+/* Display serif: site title + the top two heading levels, like the front
+ * pages. Smaller headings stay in Inter for hierarchy clarity. */
 .site-title {
   font-family: var(--font-d);
   font-weight: 400;
@@ -90,7 +90,7 @@ h1#_top,
 .sl-markdown-content h1 { font-size: clamp(2rem, 4.5vw, 2.9rem); line-height: 1.1; }
 .sl-markdown-content h2 { font-size: clamp(1.5rem, 3vw, 2rem); }
 
-/* Glassy sticky header, matching the marketing nav. */
+/* Glassy sticky header, matching the site nav. */
 .header {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);

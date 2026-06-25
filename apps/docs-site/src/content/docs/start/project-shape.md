@@ -3,8 +3,8 @@ title: Project shape
 description: The observable structure of a project over time. Different shape creates different conditions for user/agent coordination. Tapestry tracks shape because shape change is one of the strongest signals about coordination change.
 ---
 
-:::tip[On the marketing site]
-For the public-facing introduction — what project shape feels like, why it matters, what the four motions look like — see **[Project shape](/project-shape)** on the marketing site. This page keeps the precise concept definition.
+:::tip[See also]
+For the public-facing introduction — what project shape feels like, why it matters, what the four motions look like — see **[Project shape](/project-shape)**. This page keeps the precise concept definition.
 :::
 
 Project shape is the observable structure of a project over time.

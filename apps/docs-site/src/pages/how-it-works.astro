@@ -1,13 +1,13 @@
 ---
 /**
- * Marketing page — How It Works.
+ * How It Works.
  *
- * Outcome-first per [[feedback-marketing-lead-with-pain-not-label]]: leads with
+ * Outcome-first (lead with the pain and outcome, not the label or mechanism): leads with
  * what Tapestry does (accumulate intelligence), not the architecture. Mechanisms
  * (observer, memory, observatory) appear as supporting evidence, after the
  * outcome. Copy follows the operator's draft (2026-06-23).
  */
-import MarketingLayout from "../layouts/MarketingLayout.astro";
+import SiteLayout from "../layouts/SiteLayout.astro";
 
 const SETUP = "/how-to/set-up-a-new-project/";
 const OBSERVATORY = "/observatory";
@@ -32,7 +32,7 @@ const FLOW = [
 ];
 ---
 
-<MarketingLayout title="How Tapestry works" description="Most AI tools help generate outputs. Tapestry helps projects accumulate intelligence — observing the patterns that emerge around your work and helping projects retain what they've learned." activeNav="platform">
+<SiteLayout title="How Tapestry works" description="Most AI tools help generate outputs. Tapestry helps projects accumulate intelligence — observing the patterns that emerge around your work and helping projects retain what they've learned." activeNav="platform">
   <!-- hero: outcome contrast -->
   <section class="hw-hero">
     <div class="hw-glow" aria-hidden="true"></div>
@@ -86,7 +86,7 @@ const FLOW = [
       </div>
     </div>
   </section>
-</MarketingLayout>
+</SiteLayout>
 
 <style>
   .hw-hero { position: relative; overflow: hidden; padding: clamp(72px, 12vw, 140px) 24px clamp(48px, 8vw, 80px); text-align: center; }

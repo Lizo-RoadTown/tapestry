@@ -3,8 +3,8 @@ title: Project Intelligence vs Observatory
 description: Project Intelligence produces signals from a single project. The Observer interprets signals. The Observatory is the operator-facing surface where patterns from many projects can be explored through lenses. Onboarding a project makes it observable; it does not install an observatory.
 ---
 
-:::tip[On the marketing site]
-For the outcome framing of Project Intelligence (what it accumulates, why it matters), see **[Project intelligence](/project-intelligence)** on the marketing site. This page keeps the precise three-noun distinction.
+:::tip[See also]
+For the outcome framing of Project Intelligence (what it accumulates, why it matters), see **[Project intelligence](/project-intelligence)**. This page keeps the precise three-noun distinction.
 :::
 
 Three different things often get collapsed into one word. Keeping them separate is the difference between "I have a dashboard" and "the platform is doing what it's supposed to do."

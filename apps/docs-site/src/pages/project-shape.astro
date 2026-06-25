@@ -1,14 +1,14 @@
 ---
 /**
- * Marketing page — Project Shape.
+ * Project Shape.
  *
  * Pulled onto the website per the reader-intent IA split. Copy leads with the
  * pain (some projects get easier, some harder; the things that decide it
- * happen outside the code) and introduces the label second — per
- * [[feedback-marketing-lead-with-pain-not-label]]. The docs concept page
+ * happen outside the code) and introduces the label second (lead with the
+ * pain and outcome, not the label). The docs concept page
  * (src/content/docs/start/project-shape.md) keeps the precise definition.
  */
-import MarketingLayout from "../layouts/MarketingLayout.astro";
+import SiteLayout from "../layouts/SiteLayout.astro";
 
 const CONCEPT = "/start/project-shape/";
 const OBSERVATORY = "/observatory";
@@ -41,7 +41,7 @@ const MOTIONS = [
 ];
 ---
 
-<MarketingLayout title="Project shape — Tapestry" description="Some projects become easier to work in over time; some become harder. The things that decide whether AI collaboration succeeds often happen outside the code. Tapestry tracks them — we call it project shape." activeNav="learn">
+<SiteLayout title="Project shape — Tapestry" description="Some projects become easier to work in over time; some become harder. The things that decide whether AI collaboration succeeds often happen outside the code. Tapestry tracks them — we call it project shape." activeNav="learn">
   <!-- hero: the pain, in plain language -->
   <section class="ps-hero">
     <div class="ps-glow" aria-hidden="true"></div>
@@ -111,7 +111,7 @@ const MOTIONS = [
       <div class="cta-row center"><a class="btn btn-lg" href="/how-to/set-up-a-new-project/">Set up a project</a><a class="btn btn-ghost btn-lg" href={OBSERVATORY}>Open the Observatory →</a></div>
     </div>
   </section>
-</MarketingLayout>
+</SiteLayout>
 
 <style>
   .ps-hero { position: relative; overflow: hidden; padding: clamp(72px, 12vw, 140px) 24px clamp(48px, 8vw, 80px); text-align: center; }

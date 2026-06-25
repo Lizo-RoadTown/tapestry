@@ -212,7 +212,7 @@ Per `canonical_patterns_home_landed_liz_patterns_plugin_2026_06_14`:
 
 Per `bridge_closed_end_to_end_2026_06_13` + `session_state_self_observer_loop_closed_input_side_2026_06_13`:
 - Bridge fires end-to-end for kind=skill
-- Self-observer cron live at `crn-d8n2q4ernols73d7upbg`
+- Self-observer cron live (Render cron, every 6h, starter plan)
 - INPUT + OUTPUT sides of the loop both green
 
 ### 2026-06-13 — Tapestry MANIFESTO

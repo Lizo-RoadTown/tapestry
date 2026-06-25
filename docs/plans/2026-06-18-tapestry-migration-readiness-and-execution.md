@@ -709,7 +709,7 @@ Sized for one operator + two AI agents (loom-agent + soon-to-be Tapestry-agent) 
 
 **Day 3-5 — Tenant_id audit (loom-agent + operator)**
 - Run `SELECT COUNT(*), tenant_id FROM records GROUP BY tenant_id; SELECT COUNT(*), tenant_id FROM candidates GROUP BY tenant_id; SELECT COUNT(*), tenant_id FROM policy_decisions GROUP BY tenant_id; SELECT COUNT(*), tenant_id FROM projects GROUP BY tenant_id;`
-- Confirm every row is under `SELF_HOST_TENANT_ID = 1d8ec1b3-d62a-5fab-9a52-eb6a3e09f1c8`
+- Confirm every row is under the deployment's `SELF_HOST_TENANT_ID` (set via env per `packages/auth/python/loom_auth/auth_bridge.py:97`)
 - If any leakage: investigate before migration
 - Document in `tapestry/docs/adr/0002-data-migration-cutover-strategy.md`
 - **Trigger to advance:** audit query results recorded in ADR

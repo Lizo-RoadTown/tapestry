@@ -5,7 +5,7 @@ capabilities: ["self-observation-doc", "cloud-service-reference"]
 
 > **Promoted from:** docs-agent/skills/agentic-upskilling/SKILL.md (2026-06-13)
 > **Implementation:** the-loom/services/self-observer/ → eventually tapestry/services/self-observer/
-> **Deployment:** Render cron `crn-d8n2q4ernols73d7upbg`, every 6h, plan: starter
+> **Deployment:** Render cron, every 6h, plan: starter
 
 # agentic-upskilling agent
 
@@ -66,7 +66,7 @@ Per the canonical-Tapestry framing (`feedback_tapestry_is_canonical_loom_and_mak
 
 - Source SKILL.md: `docs-agent/skills/agentic-upskilling/SKILL.md`
 - Implementation: `the-loom/services/self-observer/` (commits `60a97bf`, `8b06990`, `39e7ed8`, `ce8f183`)
-- Deployment: Render cron `crn-d8n2q4ernols73d7upbg`, every 6h, plan: starter
+- Deployment: Render cron, every 6h, plan: starter
 - Lesson: `lesson_self_observer_gap_revealed_by_skill_mislabel_audit_2026_06_13`
 - Plan: `tapestry/docs/proposals/2026-06-13-skill-vs-agent-conversion-and-self-observer.md` §E5 #8
 - Playbook chapter: `tapestry/docs/playbook/migration/05-cloud-observer-vs-developer-hook.md`

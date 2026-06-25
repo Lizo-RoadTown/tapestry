@@ -91,7 +91,7 @@ Parity cron stops when import-map row flips to `Archived` (source retired per `m
 
 ## Test data + fixtures
 
-- **Tenant fixtures:** `tests/fixtures/tenants.sql`. Two tenants minimum (`tenant_a`, `tenant_b`) plus `LOOM_SELF_HOST_TENANT_ID` / `DEFAULT_TENANT_ID` literal pair (from `verify_bridge_receiver.py:36-39`) — the Option B mapping pattern documented in `docs/playbook/migration/02-cross-fleet-uuid-mismatch.md`. **Fixture file pins the literal UUIDs; drift on these is a contract violation.**
+- **Tenant fixtures:** `tests/fixtures/tenants.sql`. Two tenants minimum (`tenant_a`, `tenant_b`) plus the `SELF_HOST_TENANT_ID` / `DEFAULT_TENANT_ID` mapping pair (from `verify_bridge_receiver.py:36-39`) — the Option B mapping pattern documented in `docs/playbook/migration/02-cross-fleet-uuid-mismatch.md`. The fixture file pins the deployment's chosen UUIDs (each fleet's `SELF_HOST_TENANT_ID` env value); drift on these is a contract violation. The deprecated `LOOM_SELF_HOST_TENANT_ID` env name still resolves for backward compatibility per `packages/auth/python/loom_auth/auth_bridge.py:97`.
 - **Skill fixtures:** `tests/fixtures/skills/*.skill.md`. Five canonical skills covering each `candidate_kind` value (per `test_candidate_kind_accepts_all_9_kinds` in `test_models_schema_invariants.py:93-109`).
 - **Candidate fixtures:** generated from skill fixtures via `tests/fixtures/build_candidates.py`. Reset on each test session via pytest fixture scope=session + transaction rollback per test.
 - **Seeding:** `make test-seed` — wraps `psql -f tenants.sql && python build_candidates.py`. Idempotent.

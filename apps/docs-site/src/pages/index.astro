@@ -1,6 +1,6 @@
 ---
 /**
- * Tapestry — front page. Uses the shared SiteLayout (nav /
+ * Tapestry â front page. Uses the shared SiteLayout (nav /
  * footer / design system); only the page-specific sections + styles live here.
  *
  * Message: lead with the OUTCOME (accumulated project intelligence /
@@ -17,10 +17,10 @@ const OBSERVATORY = "/observatory";
 const SETUP = `${DOCS}how-to/set-up-a-new-project/`;
 
 const CAPABILITIES = [
-  { outcome: "Observe project evolution", mech: "Telemetry · Observatory", body: "Watch how each project's shape changes over time. Raw sessions become coordination episodes — intent, action, friction, structure — so the work is legible, not just logged.", icon: `<circle cx="12" cy="12" r="3"/><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/>` },
+  { outcome: "Observe project evolution", mech: "Telemetry Â· Observatory", body: "Watch how each project's shape changes over time. Raw sessions become coordination episodes â intent, action, friction, structure â so the work is legible, not just logged.", icon: `<circle cx="12" cy="12" r="3"/><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/>` },
   { outcome: "Preserve knowledge", mech: "Memory", body: "Context, corrections, and the reasons behind decisions carry between sessions and across projects. The next session starts where the last one left off instead of from zero.", icon: `<ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/><path d="M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/>` },
-  { outcome: "Discover patterns", mech: "Observer", body: "The observer reads what's actually happening and surfaces the patterns — what worked, what keeps breaking, where the same correction gets made again. Findings, not raw counters.", icon: `<path d="M12 2a9 9 0 1 0 9 9"/><path d="M12 7v5l3 2"/><path d="M16 3l5 2-2 5"/>` },
-  { outcome: "Build durable structure", mech: "Upskilling · Templates", body: "Repeated work becomes named, reusable skills and templates — available in every project by reference, not copy. Capability compounds instead of being rebuilt each time.", icon: `<path d="M12 3 2 8l10 5 10-5-10-5Z"/><path d="M2 14l10 5 10-5"/><path d="M2 11l10 5 10-5"/>` },
+  { outcome: "Discover patterns", mech: "Observer", body: "The observer reads what's actually happening and surfaces the patterns â what worked, what keeps breaking, where the same correction gets made again. Findings, not raw counters.", icon: `<path d="M12 2a9 9 0 1 0 9 9"/><path d="M12 7v5l3 2"/><path d="M16 3l5 2-2 5"/>` },
+  { outcome: "Build durable structure", mech: "Upskilling Â· Templates", body: "Repeated work becomes named, reusable skills and templates â available in every project by reference, not copy. Capability compounds instead of being rebuilt each time.", icon: `<path d="M12 3 2 8l10 5 10-5-10-5Z"/><path d="M2 14l10 5 10-5"/><path d="M2 11l10 5 10-5"/>` },
 ];
 const PAINS = [
   "Every project starts from scratch.",
@@ -31,14 +31,14 @@ const PAINS = [
   "Teams can't see how their AI workflows are evolving.",
 ];
 const SEGMENTS = [
-  { who: "Solo builder", problem: "“I have ten projects, and I keep repeating myself.”", gives: ["Project intelligence", "Memory across repos", "Pattern discovery"] },
-  { who: "Research team", problem: "“Knowledge walks out the door. Nobody knows why decisions were made.”", gives: ["Knowledge continuity", "Project shape", "Historical reconstruction"] },
-  { who: "AI product team", problem: "“We have agents. We don't know if they're improving.”", gives: ["Coordination signals", "Observer interpretations", "The Observatory"] },
-  { who: "Enterprise innovation", problem: "“Dozens of experiments, no institutional memory.”", gives: ["Cross-project intelligence", "Skill formation", "Reusable structures"] },
+  { who: "Solo builder", problem: "âI have ten projects, and I keep repeating myself.â", gives: ["Project intelligence", "Memory across repos", "Pattern discovery"] },
+  { who: "Research team", problem: "âKnowledge walks out the door. Nobody knows why decisions were made.â", gives: ["Knowledge continuity", "Project shape", "Historical reconstruction"] },
+  { who: "AI product team", problem: "âWe have agents. We don't know if they're improving.â", gives: ["Coordination signals", "Observer interpretations", "The Observatory"] },
+  { who: "Enterprise innovation", problem: "âDozens of experiments, no institutional memory.â", gives: ["Cross-project intelligence", "Skill formation", "Reusable structures"] },
 ];
 ---
 
-<SiteLayout title="Tapestry — project intelligence for AI-native teams" description="Tapestry helps operators accumulate capability instead of rebuilding context. Observe project evolution, preserve knowledge, discover patterns, and turn repeated work into durable structure.">
+<SiteLayout title="Tapestry â project intelligence for AI-native teams" description="Tapestry helps operators accumulate capability instead of rebuilding context. Observe project evolution, preserve knowledge, discover patterns, and turn repeated work into durable structure.">
   <!-- hero -->
   <section class="hero">
     <div class="hero-glow" aria-hidden="true"></div>
@@ -46,14 +46,14 @@ const SEGMENTS = [
     <div class="hero-in reveal">
       <p class="kicker mono">Project intelligence platform</p>
       <h1 class="display">Project intelligence for<br /><span class="accent">AI-native teams.</span></h1>
-      <p class="lede">Tapestry helps operators accumulate capability instead of rebuilding context — observe project evolution, preserve knowledge, discover patterns, and turn repeated work into durable structure.</p>
+      <p class="lede">Tapestry helps operators accumulate capability instead of rebuilding context â observe project evolution, preserve knowledge, discover patterns, and turn repeated work into durable structure.</p>
       <div class="cta-row">
         <a class="btn btn-lg" href={SETUP}>Set up a project</a>
-        <a class="btn btn-ghost btn-lg" href="#what">See how it works →</a>
+        <a class="btn btn-ghost btn-lg" href="#what">See how it works â</a>
       </div>
     </div>
 
-    <figure class="viz reveal" aria-label="A recursive loop — work becomes observation, pattern, and structure, then feeds the next pass. The rings accumulate with each iteration.">
+    <figure class="viz reveal" aria-label="A recursive loop â work becomes observation, pattern, and structure, then feeds the next pass. The rings accumulate with each iteration.">
       <svg class="viz-svg" viewBox="0 0 640 480" role="img">
         <defs>
           <radialGradient id="core" cx="50%" cy="50%" r="50%">
@@ -82,21 +82,16 @@ const SEGMENTS = [
         <g class="vnode"><rect x="276" y="402" width="88" height="28" rx="14" /><text x="320" y="416">Discover</text></g>
         <g class="vnode"><rect x="118" y="236" width="72" height="28" rx="14" /><text x="154" y="250">Reuse</text></g>
       </svg>
-      <figcaption class="viz-cap mono">Each pass accumulates — work becomes observation, pattern, structure, then feeds the next.</figcaption>
+      <figcaption class="viz-cap mono">Each pass accumulates â work becomes observation, pattern, structure, then feeds the next.</figcaption>
     </figure>
   </section>
 
   <!-- problem -->
   <section class="problem">
     <div class="problem-in">
-      <p class="kicker mono">The problem</p>
+      <p class="kicker mono">Why it matters</p>
       <h2 class="display sec-title">Most AI tools solve generation.<br /><span class="accent">Tapestry solves continuity.</span></h2>
-      <p class="sec-sub">The model can write the code. What disappears is everything around it — the context, the reasons, the patterns that made the work good. That loss is where the cost is.</p>
-      <ul class="pains">
-        {PAINS.map((p, i) => (
-          <li class="pain reveal"><span class="pain-n mono">{String(i + 1).padStart(2, "0")}</span><span class="pain-t">{p}</span></li>
-        ))}
-      </ul>
+      <p class="sec-sub">The model can write the code. What disappears is everything around it â the context, the reasons, the patterns that made the work good. That loss is where the cost is.</p>
     </div>
   </section>
 
@@ -119,113 +114,9 @@ const SEGMENTS = [
     </div>
   </section>
 
-  <!-- open platform -->
-  <section class="oss">
-    <header class="sec-head">
-      <p class="kicker mono">Open platform</p>
-      <h2 class="display sec-title">Build on open pieces.</h2>
-      <p class="sec-sub">Tapestry runs on installable, open components. Adopt them one at a time, in any project — by reference, not copy.</p>
-    </header>
-    <div class="oss-grid">
-      <article class="osd reveal">
-        <div class="osd-viz" aria-hidden="true">
-          <svg viewBox="0 0 360 180">
-            <path class="dg-edge" d="M214 29 C260 36 300 52 305 77" />
-            <path class="dg-edge" d="M305 103 C300 128 250 146 212 151" />
-            <path class="dg-edge" d="M148 151 C110 146 60 128 56 103" />
-            <path class="dg-edge" d="M56 77 C60 52 100 36 146 29" />
-            <g class="dg-node"><rect x="146" y="16" width="68" height="26" rx="13" /><text x="180" y="29">session</text></g>
-            <g class="dg-node"><rect x="276" y="77" width="58" height="26" rx="13" /><text x="305" y="90">hooks</text></g>
-            <g class="dg-node"><rect x="148" y="138" width="64" height="26" rx="13" /><text x="180" y="151">memory</text></g>
-            <g class="dg-node"><rect x="28" y="77" width="56" height="26" rx="13" /><text x="56" y="90">rules</text></g>
-          </svg>
-        </div>
-        <div class="osd-head"><span class="osd-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg></span><span class="osd-name mono">tapestry-discipline</span></div>
-        <h3 class="osd-title display">Coordination discipline in every session</h3>
-        <p class="osd-sub">Hooks that make agents probe before asserting, cite sources, and write friction to memory at the moment of correction.</p>
-        <a class="pillar-link" href="/explanation/discipline-stack/">Explore the discipline stack →</a>
-      </article>
-
-      <article class="osd reveal">
-        <div class="osd-viz" aria-hidden="true">
-          <svg viewBox="0 0 360 180">
-            <path class="dg-edge" d="M142 84 C118 64 92 50 70 46" />
-            <path class="dg-edge" d="M218 84 C246 64 270 50 288 46" />
-            <path class="dg-edge" d="M146 99 C118 116 96 128 80 134" />
-            <path class="dg-edge" d="M216 99 C248 116 272 128 288 134" />
-            <g class="dg-node"><rect x="34" y="22" width="62" height="24" rx="12" /><text x="65" y="34">agents</text></g>
-            <g class="dg-node"><rect x="264" y="22" width="58" height="24" rx="12" /><text x="293" y="34">skills</text></g>
-            <g class="dg-node"><rect x="40" y="134" width="54" height="24" rx="12" /><text x="67" y="146">tools</text></g>
-            <g class="dg-node"><rect x="256" y="134" width="72" height="24" rx="12" /><text x="292" y="146">projects</text></g>
-            <g class="dg-node hub"><rect x="142" y="77" width="76" height="26" rx="13" /><text x="180" y="90">patterns</text></g>
-          </svg>
-        </div>
-        <div class="osd-head"><span class="osd-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><circle cx="5" cy="5" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="19" r="2"/><path d="m7 7 3 3m7-3-3 3m0 4 3 3M7 17l3-3"/></svg></span><span class="osd-name mono">tapestry-patterns</span></div>
-        <h3 class="osd-title display">Reusable agents and skills, by name</h3>
-        <p class="osd-sub">One canonical home for agents, skills, and tools — available in every project by reference, with one implementation.</p>
-        <a class="pillar-link" href="/explanation/plugins/">Explore the plugins →</a>
-      </article>
-
-      <article class="osd reveal">
-        <div class="osd-viz" aria-hidden="true">
-          <svg viewBox="0 0 360 180">
-            <defs><marker id="arw2" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M1 1 L8 5 L1 9" fill="none" stroke="#5fd3da" stroke-width="1.4"/></marker></defs>
-            <path class="dg-edge" d="M100 46 C124 56 134 66 144 78" />
-            <path class="dg-edge" d="M100 134 C124 124 134 114 144 102" />
-            <path class="dg-edge" d="M218 90 L258 90" marker-end="url(#arw2)" />
-            <g class="dg-node"><rect x="26" y="34" width="74" height="24" rx="12" /><text x="63" y="46">project A</text></g>
-            <g class="dg-node"><rect x="26" y="122" width="74" height="24" rx="12" /><text x="63" y="134">project B</text></g>
-            <g class="dg-node"><rect x="262" y="78" width="70" height="24" rx="12" /><text x="297" y="90">recall</text></g>
-            <g class="dg-node hub"><rect x="142" y="70" width="76" height="40" rx="10" /><text x="180" y="90">memory</text></g>
-          </svg>
-        </div>
-        <div class="osd-head"><span class="osd-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg></span><span class="osd-name mono">loom-memory</span></div>
-        <h3 class="osd-title display">Durable memory across projects</h3>
-        <p class="osd-sub">Read, write, and recall context, decisions, and corrections over time through one MCP endpoint.</p>
-        <a class="pillar-link" href="/explanation/memory-mcp/">Explore the memory MCP →</a>
-      </article>
-    </div>
-  </section>
-
-  <!-- who it's for -->
-  <section class="for" id="for">
-    <header class="sec-head">
-      <p class="kicker mono">Who it's for</p>
-      <h2 class="display sec-title">The AI-native operator.</h2>
-      <p class="sec-sub">Someone who runs multiple projects, works with agents daily, and watches useful context vanish between them.</p>
-    </header>
-    <div class="segs">
-      {SEGMENTS.map((s) => (
-        <article class="seg reveal">
-          <h3 class="seg-who">{s.who}</h3>
-          <p class="seg-problem">{s.problem}</p>
-          <ul class="seg-gives">{s.gives.map((g) => (<li><span class="tick" aria-hidden="true">→</span>{g}</li>))}</ul>
-        </article>
-      ))}
-    </div>
-  </section>
-
-  <!-- the evidence: observatory -->
-  <section class="evidence">
-    <div class="evidence-copy reveal">
-      <p class="kicker mono">The evidence</p>
-      <h2 class="display sec-title">See it accumulate.</h2>
-      <p class="sec-sub">The Observatory is how the intelligence becomes visible. Pick a variable, overlay another, and the observer explains what the view exposes — architecture churn against friction, working activity against durable structure. Signals that aren't instrumented yet are shown as blind, never faked.</p>
-      <a class="pillar-link" href={OBSERVATORY}>Open the Observatory →</a>
-    </div>
-    <div class="frame reveal" aria-hidden="true">
-      <div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="frame-title mono">observatory · pattern cockpit</span></div>
-      <div class="frame-body">
-        <div class="frame-controls mono"><span class="chip">Show <b>architecture changes</b></span><span class="chip">overlaid with <b>friction</b></span><span class="chip rec">↳ relationship</span></div>
-        <svg class="frame-chart" viewBox="0 0 560 200" preserveAspectRatio="none">
-          <line x1="28" y1="172" x2="540" y2="172" stroke="#2a2f31" /><line x1="28" y1="20" x2="28" y2="172" stroke="#2a2f31" />
-          <path d="M28 150 L120 120 L212 132 L304 78 L396 92 L488 44 L540 56" fill="none" stroke="#5fd3da" stroke-width="2.5" />
-          <path d="M28 160 L120 150 L212 110 L304 124 L396 70 L488 88 L540 60" fill="none" stroke="#d8b06a" stroke-width="2" stroke-dasharray="5 6" />
-          <circle cx="304" cy="78" r="3.5" fill="#5fd3da" /><circle cx="488" cy="44" r="3.5" fill="#5fd3da" />
-        </svg>
-        <div class="frame-legend mono"><span><i class="sw" style="background:#5fd3da"></i>architecture changes</span><span><i class="sw" style="background:#d8b06a"></i>friction <em>⊘ not instrumented</em></span></div>
-      </div>
-    </div>
+  <!-- go deeper -->
+  <section class="explore">
+    <p class="explore-text mono">Go deeper — <a href="/use-cases">use cases</a> · <a href="/open-source">open source</a> · <a href="/project-intelligence">project intelligence</a> · <a href="/observatory">the Observatory</a></p>
   </section>
 
   <!-- quickstart -->
@@ -234,7 +125,7 @@ const SEGMENTS = [
       <p class="kicker mono">Quickstart</p>
       <h2 class="display sec-title">Three commands in.</h2>
       <p class="sec-sub">Install the CLI, wire a project into the platform, and open the console. The agents pick up memory, telemetry, and the discipline rules from there.</p>
-      <a class="pillar-link" href={SETUP}>Full setup guide →</a>
+      <a class="pillar-link" href={SETUP}>Full setup guide â</a>
     </div>
     <div class="terminal reveal">
       <div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="frame-title mono">bash</span></div>
@@ -246,7 +137,7 @@ const SEGMENTS = [
 
 <span class="c">{"# open the live console"}</span>
 <span class="p">$</span> tapestry observatory
-<span class="o">{"→ opening https://tapestry-khaki.vercel.app/observatory"}</span></code></pre>
+<span class="o">{"â opening https://tapestry-khaki.vercel.app/observatory"}</span></code></pre>
     </div>
   </section>
 
@@ -255,7 +146,7 @@ const SEGMENTS = [
     <div class="cta-glow" aria-hidden="true"></div>
     <div class="reveal">
       <h2 class="display cta-title">Accumulate capability.<br /><span class="accent">Stop rebuilding context.</span></h2>
-      <div class="cta-row center"><a class="btn btn-lg" href={SETUP}>Set up a project</a><a class="btn btn-ghost btn-lg" href={GITHUB}>View on GitHub →</a></div>
+      <div class="cta-row center"><a class="btn btn-lg" href={SETUP}>Set up a project</a><a class="btn btn-ghost btn-lg" href={GITHUB}>View on GitHub â</a></div>
     </div>
   </section>
 </SiteLayout>
@@ -286,6 +177,10 @@ const SEGMENTS = [
 
   /* problem */
   .problem { border-top: 1px solid var(--edge-soft); padding: clamp(56px, 9vw, 104px) 24px; }
+  .explore { border-top: 1px solid var(--edge-soft); padding: clamp(40px, 6vw, 72px) 24px; text-align: center; }
+  .explore-text { font-size: 13.5px; color: var(--faint); letter-spacing: 0.02em; margin: 0; }
+  .explore-text a { color: var(--brand); }
+  .explore-text a:hover { color: #82e2e8; }
   .problem-in { max-width: 940px; margin: 0 auto; text-align: center; }
   .problem .sec-sub { margin: 0 auto; }
   .pains { list-style: none; padding: 0; margin: 44px auto 0; max-width: 880px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; text-align: left; }

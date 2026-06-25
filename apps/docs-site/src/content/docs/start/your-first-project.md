@@ -30,7 +30,7 @@ Open the chat panel and start a fresh session. Three things are now different fr
 
 ## What's NOT installed by onboarding
 
-Onboarding makes your project **observable**. It does not install the **Observatory** — the Observatory is a platform-level surface that already exists. Onboarding wires your project *into* it.
+Onboarding makes your project **observable**. It does not install a per-project **Observatory** — the Observatory is one surface in your platform deployment, shared across all your projects. Onboarding wires your project *into* it.
 
 See [Project Intelligence vs Observatory](/explanation/project-intelligence-vs-observatory/) for why the distinction matters.
 

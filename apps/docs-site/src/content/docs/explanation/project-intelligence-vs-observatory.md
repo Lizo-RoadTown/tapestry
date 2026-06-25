@@ -33,7 +33,7 @@ flowchart TB
 When an operator runs `tapestry onboard my-project`:
 
 - The project becomes **observable** — it emits signals via the discipline plugin's hooks + writes per-project intelligence files.
-- The project does **not** install an observatory. The observatory is a platform-level surface that already exists at `tapestry-khaki.vercel.app/observatory`. Onboarding wires the project *into* it.
+- The project does **not** install an observatory. The Observatory is one platform-level surface in your deployment, shared across your projects. Onboarding wires the project *into* it. (The public demo at `tapestry-khaki.vercel.app/observatory` shows what it looks like, on sample data.)
 - A project can produce intelligence without anyone watching. That's fine — signals accumulate, and the observer interprets them on its own schedule (currently a 6-hour cron in `the-loom`).
 
 ## Why operators keep collapsing them

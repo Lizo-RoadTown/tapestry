@@ -3,13 +3,13 @@ title: First Observatory visit
 description: Open the dashboard, learn what's normal for a brand-new project (empty inbox, sparse signals), and hand off to the Observatory section for deeper reading.
 ---
 
-The verification checks passed. Now look at what the platform sees about your project.
+The verification checks passed. Now look at what your platform sees about your project.
 
 ## Open the console
 
-Visit [tapestry-khaki.vercel.app/observatory](https://tapestry-khaki.vercel.app/observatory).
+Open the Observatory in your deployment — the `/observatory` route of your docs site or dashboard. It reads **your** registry + memory: the signals from every project wired into **your** platform. Nothing project-specific to set up; if your project's signals have reached your platform (which they have, if [Verify it worked](/start/verify-it-worked/) passed), they show up here.
 
-That's the Observatory cockpit — the platform-level surface that exposes patterns through lenses. Nothing project-specific to set up; if your project's signals have reached the platform (which they have, if [Verify it worked](/start/verify-it-worked/) passed), the cockpit reads from the shared registry + memory.
+Want to see what the console looks like before you stand up your own? The public demo at [tapestry-khaki.vercel.app/observatory](https://tapestry-khaki.vercel.app/observatory) runs on sample data — a read-only reference, not your data.
 
 ## What you'll see on a brand-new project
 

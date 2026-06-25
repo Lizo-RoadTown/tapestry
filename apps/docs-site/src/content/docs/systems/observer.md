@@ -43,7 +43,7 @@ The Observer reads from telemetry + memory and writes to the Architecture + Cand
 
 ## Setup
 
-The Observer is platform-level. Most operators consume its output; only the platform owner stands it up.
+The Observer is platform-level. You stand it up as part of your deployment; your projects consume its output.
 
 **Consuming the existing deployment (default):** nothing to install. The Observer is already running as the `self-observer` Render cron. Patterns it produces show up in the Architecture + Candidate registries and surface in the Observatory.
 

@@ -1,7 +1,7 @@
 {
   "name": "tapestry-patterns",
-  "description": "Tapestry's canonical patterns library — ONE home for reusable agents, skills, and tools that ship with the platform. Available in every Claude Code session in every Tapestry-consuming project, so the same pattern means the same thing wherever invoked. Includes the drift-watcher agent (read-only oversight for long multi-repo executions), infrastructure-mapping, next-actions-planning, lessons-learned, orchestration-cataloging, eval-deep-research, web-app-scaffold, agentic-upskilling agents; agentic-skill-design, deep-research-pattern, design-evaluation, documentation, document-parsing, layered-explanation, open-source-documentation, proposal-authoring skills. Renamed from liz-patterns 2026-06-22; lifted into the tapestry monorepo from claude-skills-marketplace.",
-  "version": "0.1.1",
+  "description": "Tapestry's canonical patterns library — ONE home for reusable agents, skills, and tools that ship with the platform. Available in every Claude Code session in every Tapestry-consuming project, so the same pattern means the same thing wherever invoked. Includes the drift-watcher agent (read-only oversight for long multi-repo executions), infrastructure-mapping, next-actions-planning, lessons-learned, orchestration-cataloging, eval-deep-research, web-app-scaffold, agentic-upskilling agents; agentic-skill-design, plugin-authoring, deep-research-pattern, design-evaluation, documentation, document-parsing, layered-explanation, open-source-documentation, proposal-authoring skills.",
+  "version": "0.1.2",
   "author": {
     "name": "Liz Osborn",
     "url": "https://github.com/Lizo-RoadTown"

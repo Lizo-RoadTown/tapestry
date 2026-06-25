@@ -1,14 +1,14 @@
 ---
 /**
- * Marketing page — Project Intelligence (the category page).
+ * Project Intelligence (the category page).
  *
- * Pain-first per [[feedback-marketing-lead-with-pain-not-label]]: open with
+ * Pain-first (lead with the pain and outcome, not the label or mechanism): open with
  * the forgetting/starting-over pain everyone recognizes, then name "project
  * intelligence" as the thing that accumulates when nothing gets thrown away.
  * Each layer is backed by a real mechanism (memory, observer, upskilling,
  * project shape) — no fabricated capability.
  */
-import MarketingLayout from "../layouts/MarketingLayout.astro";
+import SiteLayout from "../layouts/SiteLayout.astro";
 
 const SETUP = "/how-to/set-up-a-new-project/";
 const OBSERVATORY = "/observatory";
@@ -23,7 +23,7 @@ const LAYERS = [
 ];
 ---
 
-<MarketingLayout title="Project intelligence — Tapestry" description="Every session starts from zero. Project intelligence is everything a project accumulates that isn't the code — context, decisions, corrections, patterns, and skills — kept and made usable across sessions and projects." activeNav="platform">
+<SiteLayout title="Project intelligence — Tapestry" description="Every session starts from zero. Project intelligence is everything a project accumulates that isn't the code — context, decisions, corrections, patterns, and skills — kept and made usable across sessions and projects." activeNav="platform">
   <!-- hero: the pain -->
   <section class="pi-hero">
     <div class="pi-glow" aria-hidden="true"></div>
@@ -96,7 +96,7 @@ const LAYERS = [
       <div class="cta-row center"><a class="btn btn-lg" href={SETUP}>Set up a project</a><a class="btn btn-ghost btn-lg" href="/">Back to overview →</a></div>
     </div>
   </section>
-</MarketingLayout>
+</SiteLayout>
 
 <style>
   .pi-hero { position: relative; overflow: hidden; padding: clamp(72px, 12vw, 140px) 24px clamp(48px, 8vw, 80px); text-align: center; }

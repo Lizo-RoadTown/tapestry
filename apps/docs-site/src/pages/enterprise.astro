@@ -1,6 +1,6 @@
 ---
 /**
- * Marketing page — Enterprise. Kept deliberately light (operator copy,
+ * Enterprise. Kept deliberately light (operator copy,
  * 2026-06-23): honest about being early — "exploring", "early adopters" —
  * not a finished SKU. The two-mode (self-host / hosted) commitment is
  * forward-looking per CLAUDE.md, so this page does not claim a shipping
@@ -9,7 +9,7 @@
  * NOTE: "Contact" points at GitHub for now — no public contact address has
  * been provided. Swap for a real email/form when the operator gives one.
  */
-import MarketingLayout from "../layouts/MarketingLayout.astro";
+import SiteLayout from "../layouts/SiteLayout.astro";
 
 const CONTACT = "mailto:liz.osborn@humancensys.com?subject=Tapestry%20for%20our%20organization";
 
@@ -21,7 +21,7 @@ const CHALLENGES = [
 ];
 ---
 
-<MarketingLayout title="Enterprise — Tapestry" description="As AI adoption expands, organizations face knowledge fragmentation, workflow drift, and coordination across people and agents. Tapestry is exploring how project intelligence can help organizations preserve knowledge and accumulate capability over time.">
+<SiteLayout title="Enterprise — Tapestry" description="As AI adoption expands, organizations face knowledge fragmentation, workflow drift, and coordination across people and agents. Tapestry is exploring how project intelligence can help organizations preserve knowledge and accumulate capability over time.">
   <section class="en-hero">
     <div class="en-glow" aria-hidden="true"></div>
     <div class="en-hero-in reveal">
@@ -48,7 +48,7 @@ const CHALLENGES = [
       <div class="cta-row center"><a class="btn btn-lg" href={CONTACT}>Start a conversation →</a></div>
     </div>
   </section>
-</MarketingLayout>
+</SiteLayout>
 
 <style>
   .en-hero { position: relative; overflow: hidden; padding: clamp(80px, 13vw, 150px) 24px clamp(40px, 7vw, 72px); text-align: center; }

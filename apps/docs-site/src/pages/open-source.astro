@@ -1,10 +1,10 @@
 ---
 /**
- * Marketing page — Open Source. Speaks directly to builders (operator copy,
+ * Open Source. Speaks directly to builders (operator copy,
  * 2026-06-23). Adds a real install block — tapestry-cli is published to PyPI,
  * the plugins install from the marketplace.
  */
-import MarketingLayout from "../layouts/MarketingLayout.astro";
+import SiteLayout from "../layouts/SiteLayout.astro";
 
 const GITHUB = "https://github.com/Lizo-RoadTown/tapestry";
 
@@ -18,7 +18,7 @@ const INCLUDED = [
 ];
 ---
 
-<MarketingLayout title="Open source — Tapestry" description="Tapestry is being developed in the open — for builders, researchers, engineers, and teams exploring how AI-assisted work evolves over time. View the code, contribute, or use it in your own projects." activeNav="platform">
+<SiteLayout title="Open source — Tapestry" description="Tapestry is being developed in the open — for builders, researchers, engineers, and teams exploring how AI-assisted work evolves over time. View the code, contribute, or use it in your own projects." activeNav="platform">
   <section class="os-hero">
     <div class="os-glow" aria-hidden="true"></div>
     <div class="os-hero-in reveal">
@@ -71,7 +71,7 @@ const INCLUDED = [
       <div class="cta-row center"><a class="btn btn-lg" href={GITHUB}>View on GitHub →</a><a class="btn btn-ghost btn-lg" href="/how-to/set-up-a-new-project/">Read the setup guide →</a></div>
     </div>
   </section>
-</MarketingLayout>
+</SiteLayout>
 
 <style>
   .os-hero { position: relative; overflow: hidden; padding: clamp(72px, 12vw, 140px) 24px clamp(48px, 8vw, 80px); text-align: center; }

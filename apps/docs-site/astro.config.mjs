@@ -13,7 +13,7 @@ export default defineConfig({
   // Adapter enables on-demand routes (the Observatory console + /api/episodes.json)
   // while all doc pages stay static (prerendered by default).
   adapter: vercel(),
-  // Front-door move: the marketing page now lives at / (src/pages/index.astro);
+  // Front-door move: the front page now lives at / (src/pages/index.astro);
   // the docs landing moved to /docs/ (src/content/docs/docs.mdx). /home is kept
   // as a redirect to / so older links and bookmarks still resolve.
   redirects: {
@@ -35,7 +35,7 @@ export default defineConfig({
         // scripts/generate-static-docs.mjs as a prebuild step.
         PageTitle: "./src/components/PageActions.astro",
       },
-      // Brand fonts, matching the marketing front page (/home):
+      // Brand fonts, matching the site front page (/):
       // Instrument Serif (display) / Inter (body) / JetBrains Mono (code).
       head: [
         { tag: "link", attrs: { rel: "preconnect", href: "https://fonts.googleapis.com" } },
@@ -62,12 +62,11 @@ export default defineConfig({
       //   Components:   how the platform is built
       //   Reference:    what each contract / file does exactly
       //
-      // The marketing-classified pages from the prior transitional Background
-      // group have moved into Learn now that their marketing versions are live
-      // on the marketing site (per tapestry-marketing-site-built-2026-06-23).
-      // Each carries a top-of-page banner pointing readers to its marketing
-      // equivalent, so the docs version reads as concept-only while the
-      // marketing site carries the outcome / positioning framing.
+      // The outcome/positioning pages from the prior transitional Background
+      // group have moved into Learn now that their front-page versions are live
+      // on the site. Each carries a top-of-page banner pointing readers to its
+      // front-page version, so the docs page reads as concept-only while the
+      // front page carries the outcome / positioning framing.
       sidebar: [
         {
           label: "Learn",

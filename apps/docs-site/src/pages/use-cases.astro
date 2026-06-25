@@ -1,9 +1,9 @@
 ---
 /**
- * Marketing page — Use Cases. Organized by pain, not feature (operator copy,
+ * Use Cases. Organized by pain, not feature (operator copy,
  * 2026-06-23). Each case: the recognizable problem, then what Tapestry helps.
  */
-import MarketingLayout from "../layouts/MarketingLayout.astro";
+import SiteLayout from "../layouts/SiteLayout.astro";
 
 const SETUP = "/how-to/set-up-a-new-project/";
 
@@ -16,7 +16,7 @@ const CASES = [
 ];
 ---
 
-<MarketingLayout title="Use cases — Tapestry" description="Organized by the problem, not the feature. Where project intelligence helps — from fast AI prototyping to long-running projects, research teams, agent workflows, and organizational learning." activeNav="platform">
+<SiteLayout title="Use cases — Tapestry" description="Organized by the problem, not the feature. Where project intelligence helps — from fast AI prototyping to long-running projects, research teams, agent workflows, and organizational learning." activeNav="platform">
   <section class="uc-hero">
     <div class="uc-glow" aria-hidden="true"></div>
     <div class="uc-hero-in reveal">
@@ -46,7 +46,7 @@ const CASES = [
       <div class="cta-row center"><a class="btn btn-lg" href={SETUP}>Set up a project</a><a class="btn btn-ghost btn-lg" href="/project-intelligence">What is project intelligence? →</a></div>
     </div>
   </section>
-</MarketingLayout>
+</SiteLayout>
 
 <style>
   .uc-hero { position: relative; overflow: hidden; padding: clamp(72px, 12vw, 140px) 24px clamp(40px, 7vw, 72px); text-align: center; }

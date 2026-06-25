@@ -3,8 +3,8 @@ title: What keeps a project on track
 description: A project is what gets built when a user and an agent work together. Tapestry's mechanisms reinforce the interface between them so the project doesn't degrade as the interface frays.
 ---
 
-:::tip[On the marketing site]
-For the outcome framing — "projects accumulate intelligence instead of starting over each session" — see the **[home page](/home)** and **[How it works](/how-it-works)** on the marketing site. This page keeps the mechanism-level explanation.
+:::tip[See also]
+For the outcome framing — "projects accumulate intelligence instead of starting over each session" — see the **[home page](/home)** and **[How it works](/how-it-works)**. This page keeps the mechanism-level explanation.
 :::
 
 ## A project is what the interface produces

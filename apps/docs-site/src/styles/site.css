@@ -1,6 +1,6 @@
-/* Tapestry marketing — shared design system.
+/* Tapestry site — shared design system.
  *
- * Global (imported by MarketingLayout) so the layout's nav/footer AND each
+ * Global (imported by SiteLayout) so the layout's nav/footer AND each
  * page's slotted content share these classes. Page-specific styles (heroes,
  * diagrams, section layouts) stay in each page's own scoped <style>.
  *

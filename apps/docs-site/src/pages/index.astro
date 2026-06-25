@@ -1,6 +1,6 @@
 ---
 /**
- * Tapestry — marketing front page. Uses the shared MarketingLayout (nav /
+ * Tapestry — front page. Uses the shared SiteLayout (nav /
  * footer / design system); only the page-specific sections + styles live here.
  *
  * Message: lead with the OUTCOME (accumulated project intelligence /
@@ -9,7 +9,7 @@
  * (a loop that accumulates each pass), not a lifecycle. Serves at / (the site
  * front door); the docs landing lives at /docs/ and /home redirects here.
  */
-import MarketingLayout from "../layouts/MarketingLayout.astro";
+import SiteLayout from "../layouts/SiteLayout.astro";
 
 const GITHUB = "https://github.com/Lizo-RoadTown/tapestry";
 const DOCS = "/";
@@ -38,7 +38,7 @@ const SEGMENTS = [
 ];
 ---
 
-<MarketingLayout title="Tapestry — project intelligence for AI-native teams" description="Tapestry helps operators accumulate capability instead of rebuilding context. Observe project evolution, preserve knowledge, discover patterns, and turn repeated work into durable structure.">
+<SiteLayout title="Tapestry — project intelligence for AI-native teams" description="Tapestry helps operators accumulate capability instead of rebuilding context. Observe project evolution, preserve knowledge, discover patterns, and turn repeated work into durable structure.">
   <!-- hero -->
   <section class="hero">
     <div class="hero-glow" aria-hidden="true"></div>
@@ -258,7 +258,7 @@ const SEGMENTS = [
       <div class="cta-row center"><a class="btn btn-lg" href={SETUP}>Set up a project</a><a class="btn btn-ghost btn-lg" href={GITHUB}>View on GitHub →</a></div>
     </div>
   </section>
-</MarketingLayout>
+</SiteLayout>
 
 <style>
   /* hero */

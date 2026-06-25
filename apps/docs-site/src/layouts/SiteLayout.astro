@@ -1,13 +1,13 @@
 ---
 /**
- * Shared marketing chrome — head, fonts, nav mega-menu, footer, and the
+ * Shared site chrome — head, fonts, nav mega-menu, footer, and the
  * reveal/menu scripts. Pages provide their own <slot> content + page-scoped
- * <style>. The design system is imported globally from marketing.css so the
+ * <style>. The design system is imported globally from site.css so the
  * nav/footer here AND each page's slotted content share the same classes.
  *
  * Props: title, description, activeNav ("platform" | "learn" | "docs").
  */
-import "../styles/marketing.css";
+import "../styles/site.css";
 
 const { title, description, activeNav } = Astro.props as {
   title: string;
@@ -100,21 +100,26 @@ const LEARN_MENU = [
           <svg class="ic-close" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
         </button>
       </div>
-      <div class="mobile-nav" id="mobile-nav" data-mobile-nav>
-        <a class="mobile-home" href="/">Home</a>
-        <p class="mobile-h mono">Platform</p>
-        {PLATFORM_MENU.flatMap((g) => g.items).map((it) => (<a class="mobile-link" href={it.href}>{it.title}</a>))}
-        <p class="mobile-h mono">Learn</p>
-        {LEARN_MENU.map((it) => (<a class="mobile-link" href={it.href}>{it.title}</a>))}
-        <p class="mobile-h mono">More</p>
-        <a class="mobile-link" href="/use-cases">Use cases</a>
-        <a class="mobile-link" href="/open-source">Open source</a>
-        <a class="mobile-link" href="/enterprise">Enterprise</a>
-        <a class="mobile-link" href={DOCS}>Docs</a>
-        <a class="mobile-link" href={GITHUB}>GitHub</a>
-        <a class="btn mobile-cta" href={SETUP}>Get started</a>
-      </div>
     </header>
+
+    <!-- Mobile menu lives OUTSIDE <header>: the header's backdrop-filter would
+         otherwise make it the containing block for this position:fixed panel,
+         collapsing it to the header's height. As a body-level element it
+         resolves against the viewport and fills the screen. -->
+    <div class="mobile-nav" id="mobile-nav" data-mobile-nav>
+      <a class="mobile-home" href="/">Home</a>
+      <p class="mobile-h mono">Platform</p>
+      {PLATFORM_MENU.flatMap((g) => g.items).map((it) => (<a class="mobile-link" href={it.href}>{it.title}</a>))}
+      <p class="mobile-h mono">Learn</p>
+      {LEARN_MENU.map((it) => (<a class="mobile-link" href={it.href}>{it.title}</a>))}
+      <p class="mobile-h mono">More</p>
+      <a class="mobile-link" href="/use-cases">Use cases</a>
+      <a class="mobile-link" href="/open-source">Open source</a>
+      <a class="mobile-link" href="/enterprise">Enterprise</a>
+      <a class="mobile-link" href={DOCS}>Docs</a>
+      <a class="mobile-link" href={GITHUB}>GitHub</a>
+      <a class="btn mobile-cta" href={SETUP}>Get started</a>
+    </div>
 
     <main>
       <slot />

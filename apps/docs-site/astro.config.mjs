@@ -87,6 +87,7 @@ export default defineConfig({
           items: [
             { label: "Overview", slug: "docs" },
             { label: "Quickstart — VS Code", slug: "how-to/quickstart-vscode" },
+            { label: "Connect VS Code (without Claude Code)", slug: "how-to/connect-vscode-mcp" },
             { label: "Your first project", slug: "start/your-first-project" },
             { label: "Verify it worked", slug: "start/verify-it-worked" },
             { label: "First Observatory visit", slug: "start/first-observatory-visit" },

@@ -22,7 +22,7 @@ The change is a **re-source of ONE service**, not a parallel fleet cutover:
 ## Pre-flight checklist
 
 - [ ] Source code grep'd; all callers of the MCP enumerated (every `.mcp.json` in the fleet + the engine's `Make_Skills/.mcp.json:5`)
-- [ ] Source env vars enumerated + current Render values captured (`LOOM_JWT_PRIVATE_KEY`, `LOOM_JWT_PUBLIC_KEY`, `LOOM_DB_URL`, `LOOM_SELF_HOST_TENANT_ID` default, OTEL group)
+- [ ] Source env vars enumerated + current Render values captured (`LOOM_JWT_PRIVATE_KEY`, `LOOM_JWT_PUBLIC_KEY`, `LOOM_DB_URL`, `SELF_HOST_TENANT_ID` — or the deprecated alias `LOOM_SELF_HOST_TENANT_ID` if still set, OTEL group)
 - [ ] No source cron jobs (agent-context has none; the cron is self-observer = Step 7-adjacent)
 - [ ] Destination `tapestry/services/agent-context/` collision-checked (currently README-only)
 - [ ] No in-flight the-loom PR touching `services/agent-context/`

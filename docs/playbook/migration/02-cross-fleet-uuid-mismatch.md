@@ -9,7 +9,7 @@ This is the *verify-values-not-just-names* discipline rule made concrete.
 ## The story (Make_Skills vs the-loom, caught 2026-06-12)
 
 - **Make_Skills** `core/db/migrations.py:31`: `DEFAULT_TENANT_ID = "00000000-0000-0000-0000-000000000000"` (the all-zeros UUID, baked into existing rows since Pillar 0 migration)
-- **the-loom** (per bridge ratification adjustment #1): `SELF_HOST_TENANT_ID = "1d8ec1b3-d62a-5fab-9a52-eb6a3e09f1c8"` (the "6-fleet-locations constant")
+- **the-loom** (per bridge ratification adjustment #1): `SELF_HOST_TENANT_ID` — at the time of this incident the value was a hardcoded literal in `packages/auth/python/loom_auth/auth_bridge.py:97`; that constant has since been replaced with an env-var read (`SELF_HOST_TENANT_ID`, deprecated alias `LOOM_SELF_HOST_TENANT_ID`, all-zeros placeholder fallback). Each fleet's deployment now sets its own value via env.
 
 Two different self-host default UUIDs on opposite sides of the wire contract. Caught during PROBE-before-implementation for the bridge_receiver, not by a smoke test, which means we narrowly avoided shipping a feature that would silently orphan every skill the bridge ever wrote.
 

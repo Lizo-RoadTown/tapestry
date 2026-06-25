@@ -1,8 +1,8 @@
-# `integrations/vscode/`
+# Tapestry for VS Code
 
-The Tapestry VS Code extension. Registers Tapestry's MCP servers (memory + docs) with VS Code's Language Model API so they're available to Copilot Chat and other MCP-aware consumers in the editor.
+Give VS Code's AI chat your Tapestry memory and docs. This extension registers Tapestry's MCP servers with VS Code's Language Model API, so Copilot Chat — and any MCP-aware assistant in the editor — can recall past decisions from your memory and search Tapestry's documentation. No Claude Code required.
 
-This is **complementary to**, not a replacement for, the [Claude Code extension path](https://tapestry-khaki.vercel.app/how-to/quickstart-vscode/). If you use Claude Code in VS Code, the existing `tapestry-discipline` + `tapestry-patterns` plugins already wire the servers via Claude Code's own `.mcp.json`. This extension is for users who want the same servers available to VS Code's native MCP clients (e.g. Copilot Chat).
+Already using Claude Code in VS Code? You don't need this — the `tapestry-discipline` + `tapestry-patterns` plugins already wire these servers through Claude Code's own `.mcp.json`. This extension is for everyone else who wants the same servers in VS Code's native MCP clients (like Copilot Chat).
 
 ## What it registers
 

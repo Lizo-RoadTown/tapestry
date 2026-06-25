@@ -42,8 +42,6 @@ The two `tapestry-*` plugins were consolidated into the tapestry monorepo 2026-0
 /plugin install tapestry-discipline@tapestry
 ```
 
-The prior `/plugin install loom-discipline@lizo-loom` (sourced from the-loom) still works during the transition window.
-
 ## `tapestry-patterns@tapestry` — the canonical patterns
 
 **What it does:**
@@ -57,15 +55,13 @@ The prior `/plugin install loom-discipline@lizo-loom` (sourced from the-loom) st
 
 **Where it lives on disk:** `~/.claude/plugins/cache/tapestry/tapestry-patterns/<version>/`.
 
-**Source repo:** `Lizo-RoadTown/tapestry` (formerly `claude-skills-marketplace`).
+**Source repo:** `Lizo-RoadTown/tapestry`.
 
 **Install:**
 ```
 /plugin marketplace add Lizo-RoadTown/tapestry
 /plugin install tapestry-patterns@tapestry
 ```
-
-The prior `/plugin install liz-patterns@lizo-skills` (sourced from claude-skills-marketplace) still works during the transition window.
 
 ## Per-project guards (the `your-project-guard` pattern)
 

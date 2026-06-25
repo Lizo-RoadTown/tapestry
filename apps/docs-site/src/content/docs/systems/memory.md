@@ -18,9 +18,9 @@ An MCP server (HTTP transport) at `https://your-memory-host.example.com/mcp/memo
 | `memory_list` | List record names by tag |
 | `memory_delete` | Remove a record |
 
-Records are typed (`feedback`, `project`, `user`, `reference`, etc.), tagged with project scope (`["the-loom"]`, `["tapestry"]`, `["example-project"]`), attributed to an actor (`claude-code`, the operator, the Observer), and chained via provenance links.
+Records are typed (`feedback`, `project`, `user`, `reference`, etc.), tagged with project scope (`["my-app"]`, `["tapestry"]`, `["example-project"]`), attributed to an actor (`claude-code`, the operator, the Observer), and chained via provenance links.
 
-Currently lives at `the-loom/services/agent-context/` (Render service `memory-mcp`). Forward path: migrate into `tapestry/services/agent-context/` once boundaries firm up.
+Lives at `services/agent-context/` (Render service `memory-mcp`).
 
 ## Why it exists
 
@@ -66,13 +66,13 @@ The Memory MCP is read-write to plugins (auto-recall at SessionStart, friction w
 }
 ```
 
-That's it. `tapestry onboard` writes this block for you. Each operator gets a fallback tenant — no JWT needed (v0.1.8 wired self-host fallback per `the-loom/services/agent-context/mcp_self_host_middleware.py`).
+That's it. `tapestry onboard` writes this block for you. Each operator gets a fallback tenant — no JWT needed (v0.1.8 wired self-host fallback per `services/agent-context/mcp_self_host_middleware.py`).
 
 **Self-hosting Memory:**
 
-1. Copy `the-loom/services/agent-context/` into your Tapestry deployment.
+1. Copy `services/agent-context/` into your Tapestry deployment.
 2. Provision a Render Postgres instance for record storage.
-3. Deploy as a Render Web Service from `the-loom/infra/deploy/render.yaml` (search `memory-mcp`).
+3. Deploy as a Render Web Service from `render.yaml` (search `memory-mcp`).
 4. Required env vars:
    - `DATABASE_URL` — Render Postgres connection string
    - `PLATFORM_MODE=hosted` (multi-tenant) or `=self_host` (single-tenant, default)
@@ -104,4 +104,4 @@ See [Platform dependencies](/reference/platform-dependencies/) for the full Rend
 - [The memory MCP (explanation)](/explanation/memory-mcp/) — the conceptual page
 - [Load-bearing files](/reference/load-bearing-files/) — the `.mcp.json` contract is documented there
 - [Observer](/systems/observer/), [Observatory](/systems/observatory/) — the components that read Memory most heavily
-- CORE DIRECTIVE 1 — why Memory access is mandatory, not optional (the directive's canonical home is currently `the-loom/docs/CORE_DIRECTIVES.md`; it migrates into `tapestry/docs/` once the platform-mode boundaries firm up)
+- CORE DIRECTIVE 1 — why Memory access is mandatory, not optional (see `docs/CORE_DIRECTIVES.md`)

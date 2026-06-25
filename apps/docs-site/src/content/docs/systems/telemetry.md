@@ -83,8 +83,8 @@ See [Platform dependencies](/reference/platform-dependencies/) for the full Graf
 | Grafana shows old entries but nothing recent | Hook scripts crashing silently | Run a hook script directly: `python integrations/claude-code/tapestry-discipline/scripts/session_start.py` and check stderr |
 | `Authorization` header rejected | Token mismatch or quoting issue | Re-copy from Grafana Cloud → Access Policies; ensure `Basic%20` URL-encoding is preserved |
 | Local jsonl missing | `CLAUDE_PROJECT_DIR` set but log dir doesn't exist | `mkdir -p ${CLAUDE_PROJECT_DIR}/.claude/logs` or unset the var to fall back to `~/.claude/logs/` |
-| Signals reach Grafana but Observer doesn't see them | Observer's Grafana query path wrong | Check `the-loom/services/self-observer/telemetry_client.py` for the Loki query template |
-| Cross-machine signals fail | Operator hasn't been given OTel credentials | Platform owner shares from Grafana Cloud → Access Policies |
+| Signals reach Grafana but Observer doesn't see them | Observer's Grafana query path wrong | Check `services/self-observer/telemetry_client.py` for the Loki query template |
+| Cross-machine signals fail | Operator hasn't been given OTel credentials | Your deployment shares from Grafana Cloud → Access Policies |
 
 ## Related
 

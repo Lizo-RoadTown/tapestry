@@ -1,6 +1,6 @@
 ---
 title: Set up Render 
-description: Step-by-step walkthrough for provisioning Tapestry's backend services on Render — managed Postgres + the FastAPI services declared in the-loom's render.yaml Blueprint. You run this once for your own deployment.
+description: Step-by-step walkthrough for provisioning Tapestry's backend services on Render — managed Postgres + the FastAPI services declared in the platform's `render.yaml` Blueprint. You run this once for your own deployment.
 ---
 
 This walkthrough stands up Tapestry's backend on Render — the services your projects connect to via `.mcp.json`. In self-host you run this once for your own deployment. See [Platform dependencies](/reference/platform-dependencies/) for what's needed.
@@ -9,7 +9,7 @@ Estimated time: 20–40 minutes for first provisioning, mostly waiting on builds
 
 ## What you'll provision
 
-The Render side hosts five Python web services plus one Postgres instance plus one cron, declared in `the-loom/render.yaml` (the platform's Blueprint file). The Blueprint is the source of truth — Render reads it and provisions everything declaratively.
+The Render side hosts five Python web services plus one Postgres instance plus one cron, declared in `render.yaml` (the platform's Blueprint file). The Blueprint is the source of truth — Render reads it and provisions everything declaratively.
 
 | Resource | Purpose | Source |
 |---|---|---|
@@ -38,7 +38,7 @@ Render reads the Blueprint directly from a connected GitHub repo. You need to au
 1. In the dashboard, click your profile (top-right) → **Account Settings** → **GitHub** → **Configure**.
 2. Authorize Render against `Lizo-RoadTown` (your fork, or the upstream if you're the upstream owner).
 
-If you're standing up your own deployment, fork `the-loom` first and edit the `render.yaml` service names if you want a different namespace.
+If you're standing up your own deployment, fork the platform repo (`Lizo-RoadTown/tapestry`) first and edit the `render.yaml` service names if you want a different namespace.
 
 ## Step 3 — Validate the Blueprint locally (optional but recommended)
 
@@ -47,7 +47,7 @@ Render provides a CLI for Blueprint validation. Per the [Blueprint spec](https:/
 ```sh
 brew install render          # or: curl -fsSL https://render.com/download-cli/linux | sh
 render login
-render validate the-loom/render.yaml
+render validate render.yaml
 ```
 
 If the file is valid, the command exits 0. If not, it prints the schema errors so you can fix them before pushing.
@@ -63,7 +63,7 @@ Render builds each service in parallel. First builds take 3–8 minutes per serv
 
 ## Step 5 — Set the required env vars
 
-The Blueprint declares which env vars each service needs but does not set their values (secrets are operator-supplied). Per the-loom's render.yaml comments, you need to set these in the dashboard.
+The Blueprint declares which env vars each service needs but does not set their values (secrets are operator-supplied). Per the `render.yaml` comments, you need to set these in the dashboard.
 
 ### Shared across services — `loom-shared-secrets` env group
 
@@ -92,7 +92,7 @@ Set these per-service: open the service → **Environment** → **Add Environmen
 
 ## Step 6 — Verify deployment
 
-Each service must show **Live** in the dashboard. Then check the health endpoints (every Python service in `the-loom/services/*/main.py` exposes `/health`):
+Each service must show **Live** in the dashboard. Then check the health endpoints (every Python service in `services/*/main.py` exposes `/health`):
 
 ```sh
 curl https://your-memory-host.example.com/health

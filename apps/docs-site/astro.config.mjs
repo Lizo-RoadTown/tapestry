@@ -70,25 +70,28 @@ export default defineConfig({
       sidebar: [
         {
           label: "Learn",
+          // Foreground the essentials — how it works + why. The deeper theory
+          // is opt-in under "Going deeper" so the section reads "how + why"
+          // first instead of a wall of concepts.
           items: [
-            // Primary object + substrate.
-            { label: "User-agent interface", slug: "start/user-agent-interface" },
+            { label: "The observer", slug: "explanation/the-observer" },
+            { label: "The signal hierarchy", slug: "explanation/signal-hierarchy" },
             { label: "Project shape", slug: "start/project-shape" },
             { label: "What keeps a project on track", slug: "start/what-stays-on-track" },
-            // Noun distinctions.
-            { label: "Project Intelligence vs Observatory", slug: "explanation/project-intelligence-vs-observatory" },
-            { label: "Observatory lenses", slug: "explanation/observatory-lenses" },
-            // The pipelines (materials + cognitive).
-            { label: "The signal hierarchy", slug: "explanation/signal-hierarchy" },
-            { label: "Signal → Interpretation → Pattern", slug: "explanation/signal-interpretation-pattern" },
-            // The observer + what it produces.
-            { label: "The observer", slug: "explanation/the-observer" },
-            { label: "Observer-derived intent", slug: "explanation/observer-derived-intent" },
-            // What the loop produces over time.
-            { label: "How the platform upskills itself", slug: "explanation/upskilling" },
-            { label: "Sharing intelligence across projects", slug: "explanation/sharing-intelligence-across-projects" },
-            // Boundaries.
             { label: "What Tapestry is not", slug: "start/what-tapestry-is-not" },
+            {
+              label: "Going deeper",
+              collapsed: true,
+              items: [
+                { label: "User-agent interface", slug: "start/user-agent-interface" },
+                { label: "Project Intelligence vs Observatory", slug: "explanation/project-intelligence-vs-observatory" },
+                { label: "Signal → Interpretation → Pattern", slug: "explanation/signal-interpretation-pattern" },
+                { label: "Observer-derived intent", slug: "explanation/observer-derived-intent" },
+                { label: "Observatory lenses", slug: "explanation/observatory-lenses" },
+                { label: "How the platform upskills itself", slug: "explanation/upskilling" },
+                { label: "Sharing intelligence across projects", slug: "explanation/sharing-intelligence-across-projects" },
+              ],
+            },
           ],
         },
         {

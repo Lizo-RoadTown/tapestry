@@ -26,13 +26,13 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 def _candidates() -> list[Path]:
     """Where to look for the canonical scripts directory, in priority order."""
     out: list[Path] = []
-    if env := os.environ.get("LIZ_PATTERNS_SCRIPTS"):
+    env = os.environ.get("TAPESTRY_PATTERNS_SCRIPTS") or os.environ.get("LIZ_PATTERNS_SCRIPTS")
+    if env:
         out.append(Path(env))
     out.append(REPO_ROOT / "integrations" / "claude-code" / "tapestry-patterns" / "scripts")
     home = Path.home()
     out.extend([
         home / ".claude" / "plugins" / "cache" / "tapestry" / "tapestry-patterns" / "scripts",
-        Path("C:/Users/Liz/tapestry/integrations/claude-code/tapestry-patterns/scripts"),
         home / ".claude" / "plugins" / "marketplaces" / "tapestry" / "plugins" / "tapestry-patterns" / "scripts",
     ])
     return out
@@ -49,7 +49,7 @@ def main() -> int:
     sys.stderr.write(
         f"error: canonical {THIS_SCRIPT} not found.\n"
         f"Install: /plugin install tapestry-patterns@tapestry\n"
-        f"Or set LIZ_PATTERNS_SCRIPTS to the scripts directory.\n"
+        f"Or set TAPESTRY_PATTERNS_SCRIPTS to the scripts directory.\n"
     )
     return 127
 

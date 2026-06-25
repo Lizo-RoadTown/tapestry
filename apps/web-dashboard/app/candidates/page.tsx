@@ -5,9 +5,9 @@
  * row: Promote (advance status by one step) / Hold (pause) / Reject.
  *
  * Each action does TWO calls in sequence:
- *   1. POST loom-policy/decisions  — records the operator decision
+ *   1. POST policy-service/decisions  — records the operator decision
  *      (audit-immutable; this is the source-of-truth log)
- *   2. PATCH loom-architecture-registry/candidates/{id}/status — applies
+ *   2. PATCH architecture-registry/candidates/{id}/status — applies
  *      the status change (Hold does NOT do this; status stays put)
  *
  * If (1) fails, (2) is skipped. If (1) succeeds but (2) fails, the audit
@@ -31,10 +31,10 @@ import { revalidatePath } from "next/cache";
 
 const REGISTRY_URL =
   process.env.NEXT_PUBLIC_LOOM_ARCHITECTURE_REGISTRY_URL ??
-  "https://loom-architecture-registry.onrender.com";
+  "https://your-architecture-registry.example.com";
 
 const POLICY_URL =
-  process.env.NEXT_PUBLIC_LOOM_POLICY_URL ?? "https://loom-policy.onrender.com";
+  process.env.NEXT_PUBLIC_LOOM_POLICY_URL ?? "https://your-policy-service.example.com";
 
 type CandidateStatus =
   | "draft"
@@ -262,9 +262,9 @@ export default async function CandidatesPage() {
       <header>
         <h2 className="text-2xl font-semibold">Promotion candidates</h2>
         <p className="text-sm text-loom-500 mt-1">
-          Operator decisions are filed with <code>loom-policy</code>{" "}
+          Operator decisions are filed with <code>policy-service</code>{" "}
           (audit-immutable) and applied via{" "}
-          <code>loom-architecture-registry</code>. Hold records a pause
+          <code>architecture-registry</code>. Hold records a pause
           without changing status; Reject closes the candidate.
         </p>
       </header>

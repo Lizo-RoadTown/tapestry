@@ -22,10 +22,10 @@
 
 const REGISTRY_URL =
   process.env.NEXT_PUBLIC_LOOM_ARCHITECTURE_REGISTRY_URL ??
-  "https://loom-architecture-registry.onrender.com";
+  "https://your-architecture-registry.example.com";
 
 const POLICY_URL =
-  process.env.NEXT_PUBLIC_LOOM_POLICY_URL ?? "https://loom-policy.onrender.com";
+  process.env.NEXT_PUBLIC_LOOM_POLICY_URL ?? "https://your-policy-service.example.com";
 
 type CandidateStatus =
   | "draft"

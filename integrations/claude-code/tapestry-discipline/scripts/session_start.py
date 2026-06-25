@@ -76,15 +76,15 @@ else:
 
 # Env-override precedence (PR-prep-2b 2026-06-19):
 #   1. TAPESTRY_AGENT_CONTEXT_URL — Tapestry-aware deployments.
-#   2. LOOM_AGENT_CONTEXT_URL — pre-Tapestry the-loom deployments.
-#   3. Hardcoded default — Liz's current the-loom Render service.
+#   2. LOOM_AGENT_CONTEXT_URL — bare base host.
+#   3. Placeholder default — set one of the above to your own deployment host.
 # Same precedence pattern lives at the per-call overrides at _try_recall
 # (search) and the MCP-status probe below.
 _AGENT_CONTEXT_DEFAULT_URL = os.environ.get(
     "TAPESTRY_AGENT_CONTEXT_URL",
     os.environ.get(
         "LOOM_AGENT_CONTEXT_URL",
-        "https://loom-agent-context.onrender.com",
+        "https://your-memory-host.example.com",
     ),
 )
 _MCP_PATH = "/mcp/memory/"
@@ -147,7 +147,7 @@ def _mcp_status_block(base_url: str) -> list[str]:
         "",
         "Recovery (in order):",
         "  1. Wait 30-60s for Render cold-start, then restart Claude Code",
-        "  2. Check Render dashboard: https://dashboard.render.com -> loom-agent-context",
+        "  2. Check your hosting provider dashboard for the memory service",
         "  3. If service is down, check recent deploys / logs / Postgres health",
         "  4. Fallback: typed-file memory at ~/.claude/projects/<key>/memory/ still works "
         "for this session but does NOT persist to the cross-project store",
@@ -169,7 +169,7 @@ def _try_recall(cwd_lower: str, n: int = 5, timeout: float = 6.0) -> list[str]:
     time). project_tags scopes to the current project if LOOM_PROJECT_ID is
     set; otherwise omitted (cross-project recall).
 
-    Timeout 6s: covers MCP host warm cold-starts (loom-agent-context on
+    Timeout 6s: covers MCP host warm cold-starts (memory-service on
     starter tier = no spin-down; should respond in <1s typically). If we hit
     the timeout, silently skip — the architecture-snapshot context still
     emits. Auto-recall is best-effort.

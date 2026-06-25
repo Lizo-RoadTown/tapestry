@@ -13,7 +13,15 @@ This is **complementary to**, not a replacement for, the [Claude Code extension 
 
 ## Install
 
-Either install from the VS Code Marketplace (once published — pending the operator's publisher setup) or build + install locally from this directory:
+**From the VS Code Marketplace** (the normal path):
+
+```sh
+code --install-extension tapestry.tapestry
+```
+
+Or open VS Code → Extensions → search "Tapestry" → Install. Listing: <https://marketplace.visualstudio.com/items?itemName=tapestry.tapestry>
+
+**From source** (for local development against an unreleased version):
 
 ```sh
 cd integrations/vscode

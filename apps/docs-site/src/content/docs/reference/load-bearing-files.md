@@ -127,7 +127,7 @@ LOOM_PROJECT_ID=your-project-id
 
 **Gitignore status:** committed (they're code).
 
-**Reference:** [the wrapper-pattern PR in a real consuming project](https://github.com/Lizo-RoadTown/sde-extraction/commit/2325e67) (commit `2325e67`).
+**Reference:** the wrapper pattern as applied in a real consuming project.
 
 ### `.project-intelligence/<project-id>/workflow-candidates/`
 
@@ -177,7 +177,7 @@ LOOM_PROJECT_ID=your-project-id
 
 **If missing:** plugin enable in `.claude/settings.json` resolves to nothing; no hooks fire.
 
-**Install:** `/plugin marketplace add Lizo-RoadTown/tapestry`, then `/plugin install tapestry-discipline@tapestry`. (The prior `loom-discipline@lizo-loom` sourced from `Lizo-RoadTown/the-loom` still works during the transition.)
+**Install:** `/plugin marketplace add Lizo-RoadTown/tapestry`, then `/plugin install tapestry-discipline@tapestry`.
 
 **Current version:** check `~/.claude/plugins/cache/tapestry/tapestry-discipline/` for the latest cached version. v0.1.13+ honors `LOOM_PROJECT_ID` as the scope gate; v0.1.12+ added the explicit `mcpServers.loom-memory` declaration.
 
@@ -191,7 +191,7 @@ LOOM_PROJECT_ID=your-project-id
 
 **If missing:** consuming projects can still wrap their own architecture-snapshot scripts but lose access to the canonical agents and skills via the `tapestry-patterns:` namespace.
 
-**Install:** `/plugin marketplace add Lizo-RoadTown/tapestry`, then `/plugin install tapestry-patterns@tapestry`. (The prior `liz-patterns@lizo-skills` sourced from `Lizo-RoadTown/claude-skills-marketplace` still works during the transition.)
+**Install:** `/plugin marketplace add Lizo-RoadTown/tapestry`, then `/plugin install tapestry-patterns@tapestry`.
 
 ### The Path A observer (inside the `tapestry-discipline` plugin)
 
@@ -203,7 +203,7 @@ LOOM_PROJECT_ID=your-project-id
 
 ### The self-observer Render cron
 
-**Location:** hosted as Render cron `crn-d8n2q4ernols73d7upbg` (`self-observer`), starter plan, every 6h. Source at `services/self-observer/` (currently in `the-loom`; eventual destination `tapestry/services/self-observer/`).
+**Location:** runs as a scheduled job (every 6h). Source at `services/self-observer/`.
 
 **What it is:** the cross-repo drift scanner. Walks registered repos via GitHub API, applies signal rules (agent / tool / skill / orphan), emits drift candidates to the architecture-registry, writes a synthesis memo to the loom-memory MCP as `self_observer_synthesis_latest`. See [The observer](/explanation/the-observer/).
 
@@ -221,7 +221,7 @@ LOOM_PROJECT_ID=your-project-id
 
 **Why:** scope gate for the discipline plugin's hooks (v0.1.12+). Tag applied to memory writes. Foreign-key into `.project-intelligence/<project-id>/`.
 
-**Examples:** `sde-extraction-dev`, `summer-2026-hub`, `your-project-dev`.
+**Examples:** `your-project-dev`, `team-project-staging`.
 
 ### `OTEL_*` (OTel telemetry)
 
@@ -230,7 +230,7 @@ LOOM_PROJECT_ID=your-project-id
 **What:** OpenTelemetry credentials for telemetry export.
 
 ```
-OTEL_EXPORTER_OTLP_ENDPOINT=https://otlp-gateway-prod-us-west-0.grafana.net/otlp
+OTEL_EXPORTER_OTLP_ENDPOINT=https://<your-otlp-endpoint>/otlp
 OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
 OTEL_EXPORTER_OTLP_HEADERS=Authorization=Basic%20<base64-token>
 OTEL_RESOURCE_ATTRIBUTES=service.namespace=loom,deployment.environment=dev
@@ -266,15 +266,6 @@ OTEL_SERVICE_NAME=loom-discipline
 **Contents:** the `tapestry-discipline` plugin and the `tapestry-patterns` plugin.
 
 **Add to Claude Code:** `/plugin marketplace add Lizo-RoadTown/tapestry`.
-
-### Transitional marketplaces
-
-Two prior marketplaces remain available during the cutover window — the plugins they host were renamed + relocated into the `tapestry` marketplace on 2026-06-22 (PR #42).
-
-- `lizo-loom` — sourced from [`https://github.com/Lizo-RoadTown/the-loom`](https://github.com/Lizo-RoadTown/the-loom) — formerly hosted `tapestry-discipline` (now `tapestry-discipline`)
-- `lizo-skills` — sourced from `https://github.com/Lizo-RoadTown/claude-skills-marketplace` — formerly hosted `tapestry-patterns` (now `tapestry-patterns`) plus per-project guard plugins like `sde-extraction-guard`
-
-Existing projects with these marketplaces registered keep working. New projects should add the `tapestry` marketplace.
 
 ## File-existence audit at session start
 

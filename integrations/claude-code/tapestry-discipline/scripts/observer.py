@@ -14,7 +14,7 @@ mechanism — without it, candidates only land via manual operator POSTs.
       ↓ emits "Skills invoked this session: ... (N uses)" + memory_write
   This observer (v0.1.10, Phase 2)
       ↓ parses the report + counts explicit Skill tool calls
-      ↓ POSTs new candidates to loom-architecture-registry
+      ↓ POSTs new candidates to architecture-registry
       ↓ PATCHes status as sessions_seen crosses thresholds
   Architecture Registry candidate row
       ↓ available via GET /candidates for the future upskilling dashboard
@@ -82,16 +82,16 @@ from typing import Any, Optional
 
 # Registry endpoint. Env-override precedence (PR-prep-2b 2026-06-19):
 #   1. TAPESTRY_ARCHITECTURE_REGISTRY_URL — Tapestry-migration-aware deployments
-#      set this to their tapestry-*.onrender.com host.
-#   2. LOOM_ARCHITECTURE_REGISTRY_URL — pre-Tapestry the-loom deployments use this.
-#   3. Hardcoded default — Liz's current the-loom Render service.
+#      set this to their own deployment host.
+#   2. LOOM_ARCHITECTURE_REGISTRY_URL — bare base host.
+#   3. Placeholder default — set one of the above to your own deployment host.
 # Same precedence pattern lives at the per-call override below (search for
 # TAPESTRY_ARCHITECTURE_REGISTRY_URL).
 _REGISTRY_DEFAULT_URL = os.environ.get(
     "TAPESTRY_ARCHITECTURE_REGISTRY_URL",
     os.environ.get(
         "LOOM_ARCHITECTURE_REGISTRY_URL",
-        "https://loom-architecture-registry.onrender.com",
+        "https://your-architecture-registry.example.com",
     ),
 )
 _CANDIDATES_PATH = "/candidates"
@@ -103,7 +103,7 @@ _MEMORY_URL = os.environ.get(
     "TAPESTRY_MEMORY_MCP_URL",
     os.environ.get(
         "LOOM_MEMORY_MCP_URL",
-        f"{os.environ.get('TAPESTRY_MEMORY_URL', os.environ.get('LOOM_MEMORY_URL', 'https://loom-agent-context.onrender.com')).rstrip('/')}",
+        f"{os.environ.get('TAPESTRY_MEMORY_URL', os.environ.get('LOOM_MEMORY_URL', 'https://your-memory-host.example.com')).rstrip('/')}",
     ),
 ).rstrip("/").removesuffix("/mcp/memory")
 _MEMORY_WRITE_PATH = "/v1/write"

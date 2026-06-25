@@ -44,7 +44,7 @@ The proposal's §"Loom-agent's parallel call" attributes **D2/D3** to loom-agent
 Loom-agent's actual audit content at [`the-loom/docs/research/2026-06-17-platform-state-audit.md`](https://github.com/Lizo-RoadTown/the-loom/blob/main/docs/research/2026-06-17-platform-state-audit.md):
 
 - **D2 (line 422)** = "correct any keep-warm-dropped claim in render.yaml or memory" (housekeeping memory correction)
-- **D3 (line 423)** = "record the service-ID typo: `srv-d8aj2b3bc2fs7382snqg` is telemetry-ingestion, not agent-context" (housekeeping memory correction)
+- **D3 (line 423)** = "record the service-ID typo: the cited service ID is telemetry-ingestion, not agent-context" (housekeeping memory correction)
 - **A3 (line 405, verbatim)** = *"Close dispatch-promotion gap per `2026-06-16-candidate-lifecycle-verified.md` Option B (in-service auto-trigger at PATCH time)... ~1 hour code + tests"* — **FIX IN-PLACE in the-loom, NOT defer**
 
 The "Don't fix in the-loom; close in Tapestry from day one" framing the proposal attributed to D3 doesn't exist in the audit. §B (DON'T FIX in the-loom, lines 408-412) lists memory schema, dashboard redesign, project-observatory build-out, telemetry-ingestion query API — dispatch-promotion is explicitly NOT in that list.

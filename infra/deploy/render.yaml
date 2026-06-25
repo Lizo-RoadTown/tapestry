@@ -38,7 +38,7 @@ services:
   # STAGING — agent-context MCP. Distinct name (never collides with prod).
   # Points at a FRESH EMPTY staging Postgres (NOT a snapshot of loom-postgres;
   # prod reuses the real DB, so data-identity is a prod invariant).
-  # DEPLOYED + parity GREEN 2026-06-20 (srv-d8rfng37uimc73f5c7gg).
+  # DEPLOYED + parity GREEN 2026-06-20.
   # --------------------------------------------------------------------------
   - type: web
     name: tapestry-agent-context-staging

@@ -110,9 +110,17 @@ export default defineConfig({
             // The live console is a custom Astro page (src/pages/observatory.astro),
             // not a Starlight content doc, so it's a manual link.
             { label: "Open the console", link: "/observatory" },
-            // Platform-owner provisioning walkthroughs — not needed by consuming projects.
-            { label: "Set up Render (platform owner)", slug: "how-to/set-up-render" },
-            { label: "Set up Vercel (platform owner)", slug: "how-to/set-up-vercel" },
+          ],
+        },
+        {
+          // What you stand up before (or alongside) using Tapestry — in
+          // self-host, every operator runs their own backend + tooling.
+          label: "Prerequisites",
+          items: [
+            { label: "Set up Claude Code", slug: "how-to/set-up-claude-code" },
+            { label: "Set up GitHub", slug: "how-to/set-up-github" },
+            { label: "Set up Render", slug: "how-to/set-up-render" },
+            { label: "Set up Vercel", slug: "how-to/set-up-vercel" },
             { label: "Set up Grafana Cloud + OTel", slug: "how-to/set-up-grafana-cloud" },
           ],
         },

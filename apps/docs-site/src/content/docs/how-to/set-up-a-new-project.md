@@ -5,8 +5,6 @@ description: Step-by-step checklist to wire a new project so the agent in it get
 
 This is the procedural how-to for setting up a new project that plugs into the Tapestry platform. Follow it top to bottom in a fresh repo and you'll have the full discipline stack wired correctly from day one.
 
-If any of the names referenced below feel unfamiliar (`tapestry-discipline`, `lizo-loom`, etc.), see [Names you'll see in these docs](/start/names-you-will-see/) for one-line explanations.
-
 For the concepts behind these steps, read [The discipline stack](/explanation/discipline-stack/) first. For recovery from failures, see [Recover from common failures](/how-to/recover-from-common-failures/).
 
 ## Prerequisites
@@ -75,7 +73,7 @@ Create or extend `.mcp.json` at your project root:
   "mcpServers": {
     "loom-memory": {
       "type": "http",
-      "url": "https://loom-agent-context.onrender.com/mcp/memory/"
+      "url": "https://your-memory-host.example.com/mcp/memory/"
     }
   }
 }
@@ -173,7 +171,7 @@ See [an example consuming project's `CLAUDE.md`](https://github.com/Lizo-RoadTow
 
 The Tapestry platform includes a Project Registry service that tracks every consuming project. Registering means future cross-project queries (which projects are using skill X? which projects opted into observability lane Y?) can find your project.
 
-The registry endpoint is `https://loom-project-registry.onrender.com/projects` (currently hosted from the platform's beta repo; the URL will change when the service migrates into Tapestry — env-var overrides are wired so consuming projects won't have to chase the rename).
+The registry endpoint is `https://your-project-registry-host.example.com/projects` (currently hosted from the platform's beta repo; the URL will change when the service migrates into Tapestry — env-var overrides are wired so consuming projects won't have to chase the rename).
 
 When the registry has its public CLI (`tapestry init`), one command will do all of this. Until then, a `curl POST` to register is the manual step. See the Tapestry MASTER_CHECKLIST for current status.
 
@@ -197,4 +195,4 @@ If any of these don't appear, see [Recover from common failures](/how-to/recover
 - You don't need to set up your own memory store. The hosted `loom-memory` MCP serves all consuming projects.
 - You don't need to put architecture-snapshot CODE in your repo — just the thin wrapper scripts that dispatch to the canonical scripts in `tapestry-patterns`.
 
-The point of the platform is that the heavy infrastructure lives once (hosted; see [Names you'll see](/start/names-you-will-see/) for current host details), and consuming projects get the benefits with a small wiring layer per project.
+The point of the platform is that the heavy infrastructure is deployed once — your own backend — and consuming projects get the benefits with a small wiring layer per project.

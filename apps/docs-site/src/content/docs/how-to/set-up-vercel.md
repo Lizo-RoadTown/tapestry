@@ -93,8 +93,8 @@ Per [Vercel for GitHub docs](https://vercel.com/docs/git/vercel-for-github), eve
 The docs site is mostly static. The Observatory cockpit, however, reads from the Memory MCP + Registry. If you're self-hosting (not consuming the upstream tapestry-khaki deployment), set:
 
 ```
-MEMORY_BASE_URL=https://your-loom-agent-context.onrender.com
-REGISTRY_BASE_URL=https://your-loom-architecture-registry.onrender.com
+MEMORY_BASE_URL=https://your-memory-host.example.com
+REGISTRY_BASE_URL=https://your-registry-host.example.com
 ```
 
 Per [Vercel's environment variables docs](https://vercel.com/docs/environment-variables):
@@ -103,7 +103,7 @@ Per [Vercel's environment variables docs](https://vercel.com/docs/environment-va
 2. Scope to **Production** (and optionally **Preview** / **Development**).
 3. Redeploy to pick up changes — env vars are bound at build time for static pages, request time for SSR pages.
 
-For the upstream `tapestry-khaki.vercel.app` deployment, these vars are already set against the upstream `loom-agent-context` Render service.
+For the upstream `tapestry-khaki.vercel.app` deployment, these vars are already set against the upstream `memory-mcp` Render service.
 
 ## Step 6 — Set the custom domain (optional)
 

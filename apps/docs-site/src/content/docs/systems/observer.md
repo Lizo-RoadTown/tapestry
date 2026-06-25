@@ -12,7 +12,7 @@ A component with two runtime modes:
 - **Scheduled cron** — runs every 6 hours, scans platform-owned repos for category drift, writes synthesis memos + candidate findings.
 - **On-demand subagent** — invoked from a Claude Code session via `Agent({subagent_type: "liz-patterns:drift-watcher"})` or `liz-patterns:agentic-upskilling` to interpret a single project's recent activity.
 
-Currently lives at `the-loom/services/self-observer/` (Render cron `loom-self-observer`). Forward path: migrate into `tapestry/services/self-observer/` once the bounded-context boundaries firm up.
+Currently lives at `the-loom/services/self-observer/` (Render cron `self-observer`). Forward path: migrate into `tapestry/services/self-observer/` once the bounded-context boundaries firm up.
 
 ## Why it exists
 
@@ -25,7 +25,7 @@ The Observer is also why [intent is observer-derived rather than emitted as a te
 ```mermaid
 flowchart TB
     T[Telemetry pipeline<br/>OTLP/HTTP + hooks.jsonl]
-    M[Memory MCP<br/>loom-agent-context]
+    M[Memory MCP<br/>memory-mcp]
     O[Observer<br/>self-observer cron + subagent]
     A[Architecture Registry<br/>durable structural facts]
     C[Candidate Registry<br/>pre-promotion patterns]
@@ -45,12 +45,12 @@ The Observer reads from telemetry + memory and writes to the Architecture + Cand
 
 The Observer is platform-level. Most operators consume its output; only the platform owner stands it up.
 
-**Consuming the existing deployment (default):** nothing to install. The Observer is already running as the `loom-self-observer` Render cron. Patterns it produces show up in the Architecture + Candidate registries and surface in the Observatory.
+**Consuming the existing deployment (default):** nothing to install. The Observer is already running as the `self-observer` Render cron. Patterns it produces show up in the Architecture + Candidate registries and surface in the Observatory.
 
 **Self-hosting the Observer:**
 
 1. Copy `the-loom/services/self-observer/` into your Tapestry deployment.
-2. Deploy as a Render cron — schedule from `the-loom/infra/deploy/render.yaml` (search for `loom-self-observer`).
+2. Deploy as a Render cron — schedule from `the-loom/infra/deploy/render.yaml` (search for `self-observer`).
 3. Required env vars (see `the-loom/services/self-observer/config.py`):
    - `MEMORY_BASE_URL` — points to your Memory MCP
    - `CANDIDATE_REGISTRY_URL` — points to your Candidate Registry
@@ -63,8 +63,8 @@ See [Platform dependencies](/reference/platform-dependencies/) for the full Rend
 
 ## Verify
 
-- **The cron ran recently:** Render dashboard → `loom-self-observer` → Logs → look for a synthesis memo emission within the last 6h.
-- **The Observer is producing candidates:** query the Candidate Registry — `curl https://loom-architecture-registry.onrender.com/candidates?limit=5` should return recent entries with `derivation_method` set to `observer`.
+- **The cron ran recently:** Render dashboard → `self-observer` → Logs → look for a synthesis memo emission within the last 6h.
+- **The Observer is producing candidates:** query the Candidate Registry — `curl https://your-registry-host.example.com/candidates?limit=5` should return recent entries with `derivation_method` set to `observer`.
 - **Memory contains synthesis memos:** call `memory_recall` with the platform's standard observer tag (e.g., `["self-observer-synthesis"]`); recent memos should return.
 - **The Observatory surfaces Observer findings:** open the Observatory console; the Observer lens should show non-zero findings if the cron has run.
 
@@ -72,8 +72,8 @@ See [Platform dependencies](/reference/platform-dependencies/) for the full Rend
 
 | Symptom | Likely cause | Where to look |
 |---|---|---|
-| Observatory cards look empty | Cron hasn't run since the last reset, or no signals to interpret | Render logs for `loom-self-observer`; if cron is fine, check that telemetry is flowing (see [Telemetry](/systems/telemetry/)) |
-| Candidates not appearing in registry | Cron is running but registry POST is failing | Check the `loom-self-observer` cron's stdout for HTTP errors against `CANDIDATE_REGISTRY_URL` |
+| Observatory cards look empty | Cron hasn't run since the last reset, or no signals to interpret | Render logs for `self-observer`; if cron is fine, check that telemetry is flowing (see [Telemetry](/systems/telemetry/)) |
+| Candidates not appearing in registry | Cron is running but registry POST is failing | Check the `self-observer` cron's stdout for HTTP errors against `CANDIDATE_REGISTRY_URL` |
 | Synthesis memo missing | Memory MCP unreachable | See [Memory](/systems/memory/) troubleshoot table |
 | On-demand subagent never returns | `liz-patterns` or `tapestry-patterns` plugin not installed | `/plugin list` in Claude Code; reinstall if missing |
 | Cron firing but no findings | `signal_rules.py` thresholds too high for the project's signal volume | Lower the thresholds; re-run; check whether findings appear |

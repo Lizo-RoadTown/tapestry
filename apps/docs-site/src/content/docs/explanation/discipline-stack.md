@@ -161,7 +161,7 @@ They compose, they don't replace. All three are designed to coexist.
 
 ### 2. The memory MCP → [Read more](/explanation/memory-mcp/)
 
-`loom-memory` is the hosted HTTP MCP server (at `loom-agent-context.onrender.com/mcp/memory/`) exposing six tools: `memory_recall`, `memory_read`, `memory_write`, `memory_search`, `memory_list`, `memory_delete`. Every Tapestry-consuming project shares ONE instance; project scoping happens at the row level via `project_tags`. It's also the cross-agent channel by which the loom-agent, Tapestry-agent, MS-agent, and your project's agent coordinate.
+`loom-memory` is the hosted HTTP MCP server (at `your-memory-host.example.com/mcp/memory/`) exposing six tools: `memory_recall`, `memory_read`, `memory_write`, `memory_search`, `memory_list`, `memory_delete`. Every Tapestry-consuming project shares ONE instance; project scoping happens at the row level via `project_tags`. It's also the cross-agent channel by which the loom-agent, Tapestry-agent, MS-agent, and your project's agent coordinate.
 
 ### 3. The architecture-snapshot automation → [Read more](/explanation/architecture-snapshots/)
 

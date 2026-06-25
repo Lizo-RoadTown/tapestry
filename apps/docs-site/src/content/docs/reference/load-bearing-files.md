@@ -22,7 +22,7 @@ For how the pieces fit together conceptually, see [The discipline stack](/explan
   "mcpServers": {
     "loom-memory": {
       "type": "http",
-      "url": "https://loom-agent-context.onrender.com/mcp/memory/"
+      "url": "https://your-memory-host.example.com/mcp/memory/"
     }
   }
 }
@@ -157,7 +157,7 @@ LOOM_PROJECT_ID=your-project-id
 
 ### The `loom-memory` MCP server
 
-**Location:** `https://loom-agent-context.onrender.com/mcp/memory/` (hosted on Render).
+**Location:** `https://your-memory-host.example.com/mcp/memory/` (hosted on Render).
 
 **What it is:** HTTP-transport MCP server exposing six memory tools (`memory_recall`, `memory_read`, `memory_write`, `memory_search`, `memory_list`, `memory_delete`).
 
@@ -165,7 +165,7 @@ LOOM_PROJECT_ID=your-project-id
 
 **If down:** all memory operations fail. CORE DIRECTIVE 1 says the agent should HALT and report when the MCP is unavailable. In practice, sessions can still PROCEED but the operator should know they're degraded.
 
-**Health check:** `curl https://loom-agent-context.onrender.com/health` returns `{"status":"ok","service":"loom-agent-context"}`.
+**Health check:** `curl https://your-memory-host.example.com/health` returns `{"status":"ok","service":"memory-mcp"}`.
 
 ### The `tapestry-discipline` plugin (cached locally per machine)
 
@@ -203,11 +203,11 @@ LOOM_PROJECT_ID=your-project-id
 
 ### The self-observer Render cron
 
-**Location:** hosted as Render cron `crn-d8n2q4ernols73d7upbg` (`loom-self-observer`), starter plan, every 6h. Source at `services/self-observer/` (currently in `the-loom`; eventual destination `tapestry/services/self-observer/`).
+**Location:** hosted as Render cron `crn-d8n2q4ernols73d7upbg` (`self-observer`), starter plan, every 6h. Source at `services/self-observer/` (currently in `the-loom`; eventual destination `tapestry/services/self-observer/`).
 
 **What it is:** the cross-repo drift scanner. Walks registered repos via GitHub API, applies signal rules (agent / tool / skill / orphan), emits drift candidates to the architecture-registry, writes a synthesis memo to the loom-memory MCP as `self_observer_synthesis_latest`. See [The observer](/explanation/the-observer/).
 
-**Health check:** read `self_observer_synthesis_latest` from the MCP. Should be within the last 6 hours. If older, check the Render dashboard for the `loom-self-observer` service.
+**Health check:** read `self_observer_synthesis_latest` from the MCP. Should be within the last 6 hours. If older, check the Render dashboard for the `self-observer` service.
 
 **If down:** Pillar-1 violations (duplicates of canonical patterns in non-canonical homes) and cross-repo drift accumulate undetected.
 
@@ -255,7 +255,7 @@ OTEL_SERVICE_NAME=loom-discipline
 
 **Why:** lets consuming projects point at alternate deployments (staging, alternate region, future Tapestry-hosted services) without code changes.
 
-**If unset:** defaults apply (the live `loom-*.onrender.com` services).
+**If unset:** the deployment's configured default hosts apply.
 
 ## Marketplaces
 

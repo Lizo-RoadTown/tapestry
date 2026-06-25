@@ -44,4 +44,3 @@ See [Project Intelligence vs Observatory](/explanation/project-intelligence-vs-o
 
 - [Quickstart — VS Code](/how-to/quickstart-vscode/) — the 4-step setup that got you here
 - [Set up a new project (comprehensive)](/how-to/set-up-a-new-project/) — what to do beyond onboarding for projects that want CLAUDE.md, snapshot scripts, custom hooks
-- [Names you'll see in these docs](/start/names-you-will-see/) — `tapestry-discipline`, `tapestry-patterns`, `loom-memory`, `loom-agent-context`, etc.

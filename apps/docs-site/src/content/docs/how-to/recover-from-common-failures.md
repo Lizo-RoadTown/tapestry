@@ -103,7 +103,7 @@ Before diagnosing, confirm what the agent CAN see:
 
 **Fix:**
 
-1. Check the agent-context service status: `curl https://loom-agent-context.onrender.com/health` should return `{"status":"ok","service":"loom-agent-context"}`.
+1. Check the agent-context service status: `curl https://your-memory-host.example.com/health` should return `{"status":"ok","service":"memory-mcp"}`.
 2. If it's down, the issue is on the platform side, not your project. The Tapestry-agent or loom-agent operator needs to look. Report it.
 3. If the service is up and you're getting 401, you might be sending a bearer that the server can't verify. Removing the bearer and falling back to self-host mode is the usual fix for individual operators.
 
@@ -134,5 +134,5 @@ Before diagnosing, confirm what the agent CAN see:
 1. Run the quick triage table at the top of this page. Identify which hook ISN'T firing.
 2. Read the relevant section of [The discipline stack](/explanation/discipline-stack/) — it explains what each hook IS supposed to do.
 3. Cross-reference [Load-bearing files](/reference/load-bearing-files/) to confirm every load-bearing file is present and correct.
-4. If you've identified that something is missing but you don't know how to fix it, ping the operator (Liz) or the loom-agent. Diagnostic info that helps: the output of `/mcp`, `/plugin list`, `cat .mcp.json`, `cat .claude/settings.json`, `cat .env | grep LOOM_PROJECT_ID`.
+4. If you've identified that something is missing but you don't know how to fix it, ask whoever operates your platform deployment. Diagnostic info that helps: the output of `/mcp`, `/plugin list`, `cat .mcp.json`, `cat .claude/settings.json`, `cat .env | grep LOOM_PROJECT_ID`.
 

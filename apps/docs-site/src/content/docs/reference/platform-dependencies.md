@@ -11,14 +11,14 @@ These are the services the Tapestry platform itself depends on. If you're standi
 
 | Service | What it hosts | Why required |
 |---|---|---|
-| **Render** | `loom-agent-context` MCP server, `loom-project-registry`, Postgres (`loom-postgres`), the self-observer cron, future migrated services | The hosted-multitenant deployment target for every backend service. Postgres holds memory records + project registry + candidate registry. The cron emits the synthesis memo every 6h. |
+| **Render** | `memory-mcp` MCP server, `project-registry`, Postgres (`postgres`), the self-observer cron, future migrated services | The hosted-multitenant deployment target for every backend service. Postgres holds memory records + project registry + candidate registry. The cron emits the synthesis memo every 6h. |
 | **Vercel** | `apps/docs-site/` (this site, at [tapestry-khaki.vercel.app](https://tapestry-khaki.vercel.app/)) + `apps/web-dashboard/` (the Project Observatory console, when deployed) | The frontend deployment target. Static docs + the dashboard. |
 | **OpenTelemetry collector** | The OTel transport — receives OTLP traces/logs from the discipline plugin's hooks + future runtime services | The canonical telemetry transport per the [coordination contract](/reference/otel-coordination-contract/). Without it, hook events go to local `hooks.jsonl` only — no cross-machine observability. |
 | **Grafana Cloud** | The dashboards + Loki (logs) + Tempo (traces) + the OTLP gateway | The telemetry destination. Read by the observer (queried for coordination-quality signals); read by the operator (dashboards). |
 
 ## Required for a consuming project (you, the operator wiring a new project)
 
-Most consumers do NOT need accounts at the four services above. The platform owner (Liz) hosts those for the shared deployment. What you need:
+Most consumers do NOT need accounts at the four services above — those belong to whoever stands up the backend deployment. What a consuming project needs:
 
 | Service | Why | Cost |
 |---|---|---|

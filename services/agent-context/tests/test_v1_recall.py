@@ -72,10 +72,11 @@ async def http_client() -> AsyncIterator[httpx.AsyncClient]:
 @pytest.mark.asyncio
 async def test_self_host_no_auth_returns_200_with_self_host_tenant(http_client):
     """No Authorization header → self-host fallback. The handler
-    resolves SELF_HOST_TENANT_ID and calls storage.search with it.
-    We mock storage.search to verify it's called with the expected
-    tenant_id without needing a real DB."""
-    expected_tenant = "1d8ec1b3-d62a-5fab-9a52-eb6a3e09f1c8"
+    resolves SELF_HOST_TENANT_ID (read from env in production; tests
+    use whatever the module resolved at import time) and calls
+    storage.search with it. We mock storage.search to verify it's
+    called with that resolved tenant_id without needing a real DB."""
+    from main import SELF_HOST_TENANT_ID as expected_tenant
 
     with patch("storage.search", return_value=[]) as mock_search:
         resp = await http_client.post(
@@ -224,7 +225,7 @@ async def test_response_passes_storage_rows_through_unchanged(http_client):
             "project_tags": [],
             "ts": 1780000000.0,
             "why": "test fixture",
-            "tenant_id": "1d8ec1b3-d62a-5fab-9a52-eb6a3e09f1c8",
+            "tenant_id": "99999999-9999-4999-9999-999999999999",
             "visibility": "private",
         }
     ]

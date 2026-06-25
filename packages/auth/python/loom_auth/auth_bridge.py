@@ -22,10 +22,12 @@ Both consumers share:
 ## Two-mode commitment (preserved verbatim from each predecessor file)
 
 - **Self-host mode** (no Authorization header, no `LOOM_JWT_PUBLIC_KEY`):
-  resolves to `SELF_HOST_TENANT_ID = "1d8ec1b3-d62a-5fab-9a52-eb6a3e09f1c8"`.
-  Same constant used everywhere in the loom fleet (records/candidates/
+  resolves to `SELF_HOST_TENANT_ID` — set via env var per deployment
+  (`SELF_HOST_TENANT_ID` preferred; `LOOM_SELF_HOST_TENANT_ID` accepted
+  for backward compatibility), with an all-zeros placeholder default.
+  The same value is used across the fleet (records/candidates/
   policy_decisions/projects all live in this single tenant envelope
-  for self-host deployments).
+  for a given self-host deployment).
 
 - **Hosted-multitenant mode** (Bearer JWT + `LOOM_JWT_PUBLIC_KEY` set):
   RS256 signature verified; `tenant_id` claim drives RLS via
@@ -84,17 +86,31 @@ except ImportError:
 # Tenant envelope
 # ---------------------------------------------------------------------------
 
-# Stable self-host tenant_id — MUST match the value at:
-#   infra/migrations/001_init_memory.sql (records table seed)
-#   services/agent-context/main.py (REST _resolve_tenant_for_rest fallback)
-#   services/agent-context/mcp_server.py:DEFAULT_SELF_HOST_TENANT_ID
-#   services/agent-context/mcp_self_host_middleware.py:SELF_HOST_TENANT_ID
+# Stable self-host tenant_id — sourced from env so every deployment runs
+# under its own tenant envelope. The literal UUID is no longer baked here.
+#
+# Resolution order:
+#   1. SELF_HOST_TENANT_ID env (canonical, no prefix)
+#   2. LOOM_SELF_HOST_TENANT_ID env (deprecated alias; kept for backward
+#      compatibility with existing deployments)
+#   3. All-zeros placeholder (clearly synthetic; safe for dev/local smoke;
+#      a real deployment should set its own UUID)
+#
+# This constant is read by every service in the fleet:
+#   services/agent-context/{main,mcp_server,mcp_self_host_middleware}.py
+#   services/{architecture-registry,policy,project-registry}/auth_bridge.py
 #   scripts/{backfill_projects,memory_snapshot,mint_loom_token}.py
 #
-# If this drifts, self-host queries silently scope to the wrong tenant
-# and RLS quietly returns empty result sets. Cross-service drift tests
-# in each service's tests/ pin this constant.
-SELF_HOST_TENANT_ID = "1d8ec1b3-d62a-5fab-9a52-eb6a3e09f1c8"
+# If the env value drifts between services in the same deployment, self-host
+# queries silently scope to the wrong tenant and RLS quietly returns empty
+# result sets. Pin the env in one place per deployment (a shared env group).
+SELF_HOST_TENANT_ID = os.environ.get(
+    "SELF_HOST_TENANT_ID",
+    os.environ.get(
+        "LOOM_SELF_HOST_TENANT_ID",
+        "00000000-0000-0000-0000-000000000000",
+    ),
+)
 
 # Per-request tenant. Set by `verify_bearer()` (FastAPI) or
 # `LoomTokenVerifier.verify_token()` (MCP) when auth succeeds; read by

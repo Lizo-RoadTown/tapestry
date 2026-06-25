@@ -72,12 +72,16 @@ from loom_auth import tenant_ctx_var  # noqa: E402
 #   - services/project-registry/auth_bridge.py:30
 #   - infra/migrations/001_init_memory.sql:200-202
 #
-# Public-template note: in the genericized template, this becomes
-# os.environ.get("LOOM_SELF_HOST_TENANT_ID", "<generated-at-init>"). For
-# Liz's instance it stays a constant.
+# Resolves the same way packages/auth/python/loom_auth/auth_bridge.py does:
+#   1. SELF_HOST_TENANT_ID env (canonical)
+#   2. LOOM_SELF_HOST_TENANT_ID env (deprecated alias; backward compat)
+#   3. All-zeros placeholder (clearly synthetic; real deployments set their own)
 SELF_HOST_TENANT_ID = os.environ.get(
-    "LOOM_SELF_HOST_TENANT_ID",
-    "1d8ec1b3-d62a-5fab-9a52-eb6a3e09f1c8",
+    "SELF_HOST_TENANT_ID",
+    os.environ.get(
+        "LOOM_SELF_HOST_TENANT_ID",
+        "00000000-0000-0000-0000-000000000000",
+    ),
 )
 
 

@@ -56,11 +56,13 @@ CREATE TABLE IF NOT EXISTS platform.tenant_id_mapping (
 CREATE INDEX IF NOT EXISTS tenant_id_mapping_engine_idx
     ON platform.tenant_id_mapping (engine_tenant_id);
 
--- Self-host seed: the-loom's SELF_HOST_TENANT_ID -> engine DEFAULT_TENANT_ID.
--- The source UUID matches loom_auth.SELF_HOST_TENANT_ID
--- (packages/auth/python/loom_auth/auth_bridge.py:97). If these drift, self-host
--- tenant resolution breaks silently.
-INSERT INTO platform.tenant_id_mapping
-    (source_system, source_tenant_id, engine_tenant_id)
-VALUES ('loom', '1d8ec1b3-d62a-5fab-9a52-eb6a3e09f1c8', '00000000-0000-0000-0000-000000000000')
-ON CONFLICT (source_system, source_tenant_id) DO NOTHING;
+-- No seed mapping is created here. Each deployment populates its own
+-- (source_system, source_tenant_id, engine_tenant_id) rows post-migration,
+-- using the SELF_HOST_TENANT_ID value the deployment is configured with.
+-- Example INSERT for a deployment that wants the loom-source tenant to
+-- map to the engine's default tenant:
+--
+--   INSERT INTO platform.tenant_id_mapping
+--       (source_system, source_tenant_id, engine_tenant_id)
+--   VALUES ('loom', '<your SELF_HOST_TENANT_ID>', '00000000-0000-0000-0000-000000000000')
+--   ON CONFLICT (source_system, source_tenant_id) DO NOTHING;

@@ -1,37 +1,39 @@
 ---
 title: Project shape
-description: The observable structure of a project over time. Different shape creates different conditions for user/agent coordination. Tapestry tracks shape because shape change is one of the strongest signals about coordination change.
+description: The structure of a project as it actually is over time — architecture, memory, workflows, corrections — not just its code, and the signal Tapestry watches change.
 ---
 
-:::tip[See also]
-For the public-facing introduction — what project shape feels like, why it matters, what the four motions look like — see **[Project shape](/project-shape)**. This page keeps the precise concept definition.
-:::
+Project shape is what you'd describe if someone asked "what kind of project is this, and what's it like to work in?" It's the accumulated structure of a project over time — its architecture, repos, memory, agents, workflows, skills, the friction you keep hitting, the corrections you keep giving. The codebase is one input to shape, not shape itself.
 
-Project shape is the observable structure of a project over time.
+## Why it matters
 
-Shape is the accumulated pattern of: architecture, repositories, memory, agents, workflows, skills, friction, corrections, dependencies, runtime behavior. It is what you'd describe if someone asked "what kind of project is this, and what's it like to work in?"
-
-## Shape changes without code changing
-
-- A correction the operator gives once becomes a binding rule in memory. The agent behaves differently next session.
-- A pattern recurs three times. The observer surfaces it as a candidate.
-- An external MCP changes its contract. The project's wiring assumes the old one.
-- The operator stops correcting a behavior the agent learned. The pattern stabilized.
-
-The codebase is one input to shape, not shape itself.
+Shape changes even when no code changes. You correct the agent once and it becomes a rule in memory — the agent behaves differently next session. A pattern recurs three times and the observer flags it. You stop correcting a behavior the agent finally learned. None of that touches a source file, but the project is now a different thing to work in. Tapestry watches shape because when shape shifts, coordination between you and the agent shifts with it.
 
 ## The four shape verbs
 
-| Verb | Meaning |
+Shape moves in four recognizable ways. Other docs refer to these by name.
+
+| Verb | What it looks like |
 |---|---|
-| **Drift** | Shape moves away from what the operator and agent think it is |
-| **Stabilize** | Shape converges; corrections stop firing |
+| **Drift** | Shape moves away from what you and the agent think it is |
+| **Stabilize** | Shape settles; corrections stop firing |
 | **Fragment** | Shape splits into incoherent pieces |
-| **Cohere** | Fragments converge on a canonical form |
+| **Cohere** | Fragments converge on one canonical form |
 
-## Why Tapestry tracks shape
+## What you do
 
-Shape change is one of the strongest signals about coordination change. When shape shifts, the coordination patterns inside the project shift too — interfaces emerge or disappear, memory attachment points move, friction patterns change.
+Nothing special. Shape is observed for you as you work — corrections land in memory, recurring patterns surface as candidates. You notice shape mostly when it goes wrong: the same drift returns, or a piece of structure has wandered from where it belongs.
+
+## What it's not
+
+- **Not the codebase.** Code is one input. Memory, corrections, and workflows are shape too.
+- **Not a single snapshot.** Shape is the pattern over time, not the state right now.
+- **Not something you edit directly.** You change shape by working — correcting, building, stabilizing.
+
+## Going deeper
+
+- [The observer](/explanation/the-observer/) — how shape change gets noticed and turned into candidates.
+- [Project shape (overview)](/project-shape) — the public-facing introduction to what the four motions feel like.
 
 ## Related
 

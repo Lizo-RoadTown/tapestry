@@ -1,52 +1,49 @@
 ---
 title: Signal → Interpretation → Pattern
-description: The cognitive pipeline that turns a raw signal into a meaningful pattern. Telemetry produces signals; the observer interprets them; patterns are what survive interpretation. Skipping the middle step is why "I have OTel and Grafana" doesn't add up to "I have an observatory."
+description: Why a logged tool call isn't yet a pattern — something has to read it in context and decide what it meant first.
 ---
 
-A signal is not yet a pattern. A pattern is what you get after something has interpreted the signal. Tapestry treats interpretation as a distinct layer with its own components, contracts, and failure modes — not as a side-effect of dashboards.
+A signal is something that happened: a tool call fired, a memory write logged, a test failed. A pattern is something that keeps happening and means something. Between them sits a step that's easy to skip — interpretation. The observer reads a signal alongside the signals around it, your recent corrections, and the shape of the project, and proposes what it meant. A pattern is an interpretation that repetition has corroborated.
 
-## The pipeline
+## Why it matters
+
+This is why a pile of telemetry isn't the same as understanding. You can have every tool call logged and still know nothing about what's recurring, because nothing has read those signals and proposed meaning. The interpretation step is where raw events turn into something you can act on — and it's a distinct layer with its own component, not a side effect of a dashboard.
+
+## How it works
 
 ```mermaid
 flowchart TB
-    S[Signal<br/>Tool call emitted. Memory write logged. Test failed.<br/>Atomic, time-stamped, attributed.]
-    I[Interpretation<br/>The observer reads signals with context — prior signals, memory,<br/>project shape, recent corrections — and proposes meaning.]
-    P[Pattern<br/>Interpretation that has been corroborated by repetition,<br/>weighted by recurrence, and exposed to the operator.]
-    A[Action<br/>Candidate surfaced. Reminder injected. Skill proposed. Drift flagged.]
+    S[Signal<br/>Tool call fired. Memory write logged. Test failed.]
+    I[Interpretation<br/>The observer reads the signal with context and proposes meaning.]
+    P[Pattern<br/>An interpretation that recurrence has corroborated.]
+    A[Action<br/>Candidate surfaced. Reminder injected. Skill proposed.]
     S --> I --> P --> A
 ```
 
-Each arrow is doing work. Each arrow can fail independently.
+Each step is real work, and each can fail on its own:
 
-## What lives where
+| Step | What it produces | If it breaks |
+|---|---|---|
+| **Signal** | An atomic, time-stamped, attributed event | Missing emission → blind. Wrong attributes → unreadable. |
+| **Interpretation** | A hypothesis about what the signal meant in context | No interpretation → patterns never form. |
+| **Pattern** | An interpretation that has recurred, named and stored | Pattern no one sees → you can't act on it. |
+| **Action** | What you or the platform does because of the pattern | Action with no trace back → invisible. |
 
-| Layer | What it is | Component | Failure mode |
-|---|---|---|---|
-| **Signal** | An atomic event with attributes (timestamp, actor, tool, project, outcome). Produced by hooks, services, runtime instrumentation. | OTel pipeline + local `hooks.jsonl` | Missing emission → blind. Wrong attributes → unreadable. |
-| **Interpretation** | A *hypothesis* about what a signal (or a cluster of signals) means in context. Produced by the observer reading signals + memory + transcripts + diffs. | The observer (cron + on-demand subagent) | No interpretation → patterns never form. Bad interpretation → wrong patterns. |
-| **Pattern** | An interpretation that has recurred or been corroborated. Stored, named, queryable by lens. | Architecture Registry, Candidate Registry | Pattern without exposure → operator can't act on it. |
-| **Action** | What the operator (or platform) does because of the pattern. | Plugin hook, candidate-promotion flow, dashboard card | Action without trace back to pattern → invisible governance. |
+A concrete instance is [observer-derived intent](/explanation/observer-derived-intent/). The signal is "a tool call happened." The interpretation is "you were probably trying to do X." The pattern is "you keep trying to do X under these conditions." The action is "surface a skill candidate for X." Intent is worked out by the observer *after the fact*, which is why it can be revised as more signals arrive — if it were a fixed field stamped onto the event, you'd be stuck with one guess per event forever.
 
-## One concrete instance: intent
+## What it's not
 
-[Observer-derived intent](/explanation/observer-derived-intent/) is one example of this pipeline. The signal is "tool call happened." The interpretation is "the operator was probably trying to X, with confidence Y, based on evidence Z." The pattern is "this operator keeps trying to X under conditions C." The action is "surface a skill candidate for X."
+- **Not a property of the signal.** Meaning is derived later, with context, not emitted at the moment the event fires.
+- **Not a one-shot guess.** Because interpretation is its own step, it can be revised as more evidence accumulates.
+- **Not the same as the materials it operates on.** The [signal hierarchy](/explanation/signal-hierarchy/) is the data flowing through; this is the cognitive step that acts on it at the signals-to-patterns transition.
 
-If intent were a *field on the signal* — emitted at the moment of the tool call — the interpretation layer would collapse into the emission layer, and the platform would be stuck with one guess per event, fixed in place, with no ability to revise. That's why intent is observer-derived, not telemetry-emitted. Same principle for any other derived attribute.
+## Going deeper
 
-## How this composes with the rest of the platform
+- [The observer](/explanation/the-observer/) — the component that runs the interpretation step.
+- [The signal hierarchy](/explanation/signal-hierarchy/) — the six-level ladder this step sits inside.
+- [Observatory lenses](/explanation/observatory-lenses/) — the surfaces through which you encounter patterns.
 
-- **[The signal hierarchy](/explanation/signal-hierarchy/)** describes the *materials* pipeline: Events → Signals → Patterns → Candidates → Skills → Structure. That's the data flowing through. This page describes the *cognitive* pipeline that operates on those materials at the Signals→Patterns transition.
-- **[The observer](/explanation/the-observer/)** is the component that runs the interpretation step.
-- **[Observatory lenses](/explanation/observatory-lenses/)** are the surfaces through which operators encounter patterns — different lenses expose different patterns from the same underlying interpretations.
-- **[Project Intelligence vs Observatory](/explanation/project-intelligence-vs-observatory/)** explains where signals come from (Project Intelligence) versus where patterns get explored (Observatory) — and why running `tapestry onboard` produces the former but not the latter.
+## Related
 
-## The shortest version
-
-```
-Signal: something happened.
-Interpretation: here's what it probably meant.
-Pattern: this kind of thing keeps meaning that.
-Action: do something about it.
-```
-
-Each layer earns its own component. None of them can substitute for the others.
+- [Observer-derived intent](/explanation/observer-derived-intent/) — the worked example above, in full.
+- [Project Intelligence vs Observatory](/explanation/project-intelligence-vs-observatory/) — where signals come from versus where patterns get explored.

@@ -1,111 +1,49 @@
 ---
 title: Observer-derived intent
-description: Intent is not a telemetry field. Telemetry records events; the observer interprets events and derives intent hypotheses. The distinction is load-bearing — adding intent attributes to telemetry collapses the observer's interpretation layer into the emission layer.
+description: Telemetry records what happened — a tool call, a memory write, a correction. Intent is the observer's best guess at why, stored as a hypothesis with confidence and evidence, never as a fact baked into the event.
 ---
 
-Telemetry records events. The observer derives meaning. Intent is observer-derived meaning, not emitted telemetry.
+Telemetry records what happened: a tool call, a memory write, a file change, a correction. None of that says *why* you did it or whether it worked. Intent is the observer's answer to the why — "you were clarifying the project's architecture," stored as a hypothesis with a confidence score and the evidence behind it. It's something the observer works out by reading events, never a field that ships inside an event.
 
-## The shape
+## Why it matters
 
-```
-events
-   ↓
-observer
-   ↓
-interpretation
-   ↓
-intent hypothesis
-```
+The line between "what happened" and "what it meant" is the whole point. If intent were just another telemetry attribute, every emitter would be guessing at meaning at the moment of emission — with no evidence, no confidence, no way to revise. Keeping intent as a separate, observer-derived layer means a guess can be wrong, carry low confidence, and get corrected later. A telemetry field can't do any of that.
 
-Not this:
+## How it works
 
-```
-event
-  → intent field
+Events flow up; meaning is derived on top of them:
+
+```mermaid
+flowchart TB
+  E[Events<br/>tool calls · memory · corrections] --> O[Observer]
+  O --> I[Intent hypothesis<br/>summary · confidence · evidence]
 ```
 
-## What telemetry reliably captures
-
-- a tool call
-- a memory read
-- a memory write
-- a file modification
-- an architecture change
-- a correction event
-
-## What telemetry cannot reliably capture
-
-- what the operator was ultimately trying to accomplish
-- why a correction occurred
-- whether a sequence of actions was successful
-- whether the episode strengthened coordination
-
-Those require interpretation. The observer is the layer that interprets.
-
-## Intent as hypothesis
-
-Intent is stored as a hypothesis with confidence + evidence, not as an unquestioned fact. Schema:
-
-| Field | Example |
+| Layer | What it holds |
 |---|---|
-| `intent_summary` | "Clarify project observatory architecture" |
-| `intent_category` | "architecture_design" |
-| `confidence` | 0.83 |
-| `derivation_method` | "observer" |
-| `supporting_evidence` | `[prompt_ref, architecture_diff_ref, memory_entry_ref]` |
+| **Events** | Facts telemetry can capture reliably — a call happened, a file changed |
+| **Observer** | Reads events, prompts, memory, and diffs together and interprets them |
+| **Intent hypothesis** | A guess at the why, with a confidence level and pointers to the evidence |
 
-## Confidence states
+A hypothesis can land as `high`, `medium`, or `low` confidence — or `unknown`. Unknown is a valid result; the observer would rather admit it doesn't know than assert a wrong intent. Hypotheses can also be revised, and repeated revisions are themselves a signal that the observer is missing context.
 
-- `high_confidence`
-- `medium_confidence`
-- `low_confidence`
-- `unknown`
+## What you do
 
-Unknown intent is a valid outcome. Uncertainty is preferable to false certainty.
+Nothing, for normal operation. The observer derives intent on its own. You see the result in the dashboard, which shows the hypotheses and their supporting evidence — not raw intent fields, because there are none to show.
 
-## What the observer combines
+## What it's not
 
-When deriving an intent hypothesis, the observer may use any combination of:
+- **Not a telemetry attribute.** Intent is never emitted with an event. Adding an intent field to telemetry would collapse interpretation into emission — the distinction this whole layer exists to keep.
+- **Not a fact.** It's a hypothesis with confidence and evidence, open to revision.
+- **Not certain by default.** "Unknown" is a real, acceptable outcome.
 
-- user prompts
-- agent responses
-- tool activity
-- memory activity
-- architecture changes
-- correction events
-- prior observer findings
+## Going deeper
 
-The set of signals the observer used lands in `derivation_method`.
-
-## Corrections become observer signals
-
-Intent hypotheses may be revised. Repeated revisions are themselves signals — they indicate observer weakness, missing context, memory gaps, project-shape changes, or emerging coordination patterns. Those revisions are themselves observable telemetry.
-
-## What intent supports
-
-The purpose of intent derivation is to help the platform answer:
-
-- What was the operator trying to accomplish?
-- What did the agent do?
-- What obstacles appeared?
-- Did memory help or fail?
-- Did coordination strengthen or weaken?
-- Did a durable structure emerge?
-
-Without intent, telemetry can only describe what happened. It cannot describe whether coordination succeeded, failed, improved, degraded, or produced durable structure.
-
-## Dashboard implication
-
-The dashboard does not display raw intent fields. It displays observer-generated intent hypotheses and their supporting evidence.
-
-The [OTel coordination contract](/reference/otel-coordination-contract/) defines what gets emitted (the typed attributes). The observer reads those events + memory + transcripts + diffs and produces the intent hypothesis as a separate output layer.
-
-## Canonical statement
-
-Telemetry records events. The observer derives meaning. Intent is observer-derived meaning, not emitted telemetry.
+- [The observer](/explanation/the-observer/) — the component that derives intent as it watches.
+- [The signal hierarchy](/explanation/signal-hierarchy/) — why interpretation lives at the patterns level, not the events level.
+- [OTel coordination contract](/reference/otel-coordination-contract/) — exactly what gets emitted (intent is deliberately not on the list), plus the hypothesis fields if you need them.
 
 ## Related
 
-- [The observer](/explanation/the-observer/) — the component that derives intent
-- [OTel coordination contract](/reference/otel-coordination-contract/) — what gets emitted (intent is not on the list)
-- [The signal hierarchy](/explanation/signal-hierarchy/) — interpretation lives at the patterns level, not the events level
+- [The observer](/explanation/the-observer/) — the layer that does the interpreting.
+- [The signal hierarchy](/explanation/signal-hierarchy/) — where events, patterns, and structure sit relative to each other.

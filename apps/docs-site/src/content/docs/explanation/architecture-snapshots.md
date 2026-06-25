@@ -93,7 +93,7 @@ Each of these is a one-line silent loss. The agent doesn't crash. It just stops 
 
 Two thin wrappers + one output directory. Total: under 200 lines, all boilerplate.
 
-The canonical pattern is documented in [a real consuming project's PR (commit `2325e67`)](https://github.com/Lizo-RoadTown/sde-extraction/commit/2325e67). Copy the two wrapper files from any existing repo that has them — the reference implementations live in [the platform beta repo's `scripts/architecture_*.py`](https://github.com/Lizo-RoadTown/the-loom/tree/main/scripts) — then commit the empty `docs/architecture-snapshots/` directory with a `.gitkeep`.
+The canonical pattern is documented in a real consuming project's PR (commit `2325e67`). Copy the two wrapper files from any existing repo that has them — the reference implementations live in the platform beta repo's `scripts/architecture_*.py` — then commit the empty `docs/architecture-snapshots/` directory with a `.gitkeep`.
 
 First run produces the first snapshot. From there, every session adds another and diffs against the prior.
 

@@ -16,9 +16,9 @@ Currently lives at `the-loom/services/self-observer/` (Render cron `self-observe
 
 ## Why it exists
 
-Telemetry produces signals. Signals are not patterns. Without a dedicated interpretation layer, every consumer would have to re-invent interpretation locally, and every interpretation would die with the session that ran it. See [Signal → Interpretation → Pattern](/explanation/signal-interpretation-pattern/) for the architectural reason.
+Telemetry produces signals. Signals are not patterns. Without a dedicated interpretation layer, every consumer would have to re-invent interpretation locally, and every interpretation would die with the session that ran it.
 
-The Observer is also why [intent is observer-derived rather than emitted as a telemetry field](/explanation/observer-derived-intent/). Intent is one specific instance of what the Observer produces.
+The Observer is also why intent is observer-derived rather than emitted as a telemetry field. Intent is one specific instance of what the Observer produces.
 
 ## How it interacts with the platform
 
@@ -80,8 +80,5 @@ See [Platform dependencies](/reference/platform-dependencies/) for the full Rend
 
 ## Related
 
-- [Signal → Interpretation → Pattern](/explanation/signal-interpretation-pattern/) — why the Observer is its own layer
 - [The observer (explanation)](/explanation/the-observer/) — the conceptual page
-- [Observer-derived intent](/explanation/observer-derived-intent/) — one instance of what the Observer produces
-- [Project Intelligence vs Observatory](/explanation/project-intelligence-vs-observatory/) — where the Observer sits between the two
 - [Memory](/systems/memory/), [Telemetry](/systems/telemetry/), [Registry](/systems/registry/), [Observatory](/systems/observatory/) — the components the Observer interacts with

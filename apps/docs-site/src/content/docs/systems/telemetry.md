@@ -23,7 +23,7 @@ OTel was chosen as the canonical transport for two reasons:
 1. It's the standard the rest of the observability ecosystem speaks (Grafana, Datadog, Honeycomb, etc.) — substitutable backends.
 2. The typed-attribute contract ([OTel coordination contract](/reference/otel-coordination-contract/)) means signals carry their semantic structure with them, not just bytes.
 
-This is the upstream of [Signal → Interpretation → Pattern](/explanation/signal-interpretation-pattern/) — telemetry is what produces the *signal*; everything downstream is interpretation.
+This is the upstream of Signal → Interpretation → Pattern — telemetry is what produces the *signal*; everything downstream is interpretation.
 
 ## How it interacts with the platform
 
@@ -89,8 +89,6 @@ See [Platform dependencies](/reference/platform-dependencies/) for the full Graf
 ## Related
 
 - [OTel coordination contract](/reference/otel-coordination-contract/) — the typed-attribute schema
-- [Signal → Interpretation → Pattern](/explanation/signal-interpretation-pattern/) — where Telemetry sits in the pipeline (it's the signal-producing layer)
-- [The signal hierarchy](/explanation/signal-hierarchy/) — Telemetry produces Events; downstream layers consume those Events as Signals
 - [Load-bearing files — `OTEL_*`](/reference/load-bearing-files/) — the env-var contract
 - [Observer](/systems/observer/) — the primary consumer of Telemetry signals
 - [Platform dependencies — OTel + Grafana](/reference/platform-dependencies/) — the external service setup

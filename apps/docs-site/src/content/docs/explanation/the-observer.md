@@ -45,11 +45,8 @@ Nothing, for normal operation. Both observers run automatically once the discipl
 ## Going deeper
 
 - [The Observer component](/systems/observer/) — how each observer is wired, how to verify it's running, and what fails if it's missing.
-- [The signal hierarchy](/explanation/signal-hierarchy/) — where "patterns" sit between raw events and finished structure.
-- [How the platform upskills itself](/explanation/upskilling/) — the full path from a recurring correction to a promoted skill.
-- [Observer-derived intent](/explanation/observer-derived-intent/) — one specific thing the observer works out as it watches.
 
 ## Related
 
-- [Project shape](/start/project-shape/) — the thing the observer watches change over time.
+- [What Tapestry is](/start/what-stays-on-track/) — the other mechanisms that turn recurring friction into structure.
 - [What Tapestry is not](/start/what-tapestry-is-not/) — why "observability system" is the wrong frame for it.

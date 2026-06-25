@@ -33,8 +33,6 @@ After a few days of normal use, the cockpit starts populating:
 - Architecture-snapshot runs (if you wire the optional scripts in) populate the **architecture lens**.
 - Recurring candidates across projects start composing under the **cross-project lens** (planned — currently surfaces as deduplicated findings in the candidate inbox).
 
-See [Observatory lenses](/explanation/observatory-lenses/) for what each lens foregrounds.
-
 ## What's the right question to ask the cockpit
 
 The Observatory isn't a status dashboard. It's a *trajectory* dashboard. Ask trajectory questions:
@@ -44,26 +42,9 @@ The Observatory isn't a status dashboard. It's a *trajectory* dashboard. Ask tra
 - Has memory been load-bearing, or have I been re-explaining things? (Memory miss rate vs reinforcement)
 - Has my project's shape changed in ways I didn't notice? (Architecture diffs)
 
-State questions ("is the API up right now?") belong in a regular operational dashboard, not here. See [Signal → Interpretation → Pattern](/explanation/signal-interpretation-pattern/) for why.
-
-## What to do next
-
-You've completed the Start here workflow. The conceptual foundations come next:
-
-1. [User-agent interface](/start/user-agent-interface/) — the primary object the platform observes.
-2. [Project shape](/start/project-shape/) — the substrate that interface evolves in.
-3. [What Tapestry is not](/start/what-tapestry-is-not/) — boundary-setting.
-4. [What keeps a project on track](/start/what-stays-on-track/) — the platform-level story.
-
-Beyond Start here:
-
-- [How it works](/explanation/signal-hierarchy/) — the architectural concepts (signal hierarchy, observer, intent, lenses, upskilling).
-- [Reading the Observatory](/observatory/reading-it/) — the cockpit's controls + chart types + interpretation panel in detail.
-- [Systems](/systems/observer/) — each component's setup + verify + troubleshoot.
+State questions ("is the API up right now?") belong in a regular operational dashboard, not here.
 
 ## Related
 
-- [Observatory — What it is](/observatory/about/) — what the cockpit holds
-- [Reading the Observatory](/observatory/reading-it/) — controls, chart types, interpretation
-- [Observatory lenses](/explanation/observatory-lenses/) — the lens model
-- [Project Intelligence vs Observatory](/explanation/project-intelligence-vs-observatory/) — why onboarding installs the producer but not the surface
+- [The Observatory](/observatory/about/) — what the console holds and how to read it.
+- [What Tapestry is](/start/what-stays-on-track/) — the concepts behind what you're seeing.

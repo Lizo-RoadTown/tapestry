@@ -28,8 +28,3 @@ If you read Tapestry as "a memory system" or "a dashboard," you'll expect the wr
 
 - [Project intelligence](/project-intelligence) — the outcome-led version of what Tapestry accumulates and why.
 - [The observer](/explanation/the-observer/) — why "observability system" is the wrong frame for the part that watches your project.
-
-## Related
-
-- [Project intelligence vs Observatory](/explanation/project-intelligence-vs-observatory/) — keeping the three platform nouns distinct.
-- [Project shape](/start/project-shape/) — what Tapestry watches change over time.

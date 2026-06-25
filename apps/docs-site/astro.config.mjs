@@ -70,28 +70,16 @@ export default defineConfig({
       sidebar: [
         {
           label: "Learn",
-          // Foreground the essentials — how it works + why. The deeper theory
-          // is opt-in under "Going deeper" so the section reads "how + why"
-          // first instead of a wall of concepts.
+          // What people actually need to understand Tapestry: what it is, how
+          // it works, and the surface they watch it through. The deeper
+          // implementation detail lives in Components + Reference for the
+          // developers who need it; the former "Going deeper" theory pages were
+          // archived to docs/archive/website-learn-pages/ on 2026-06-25.
           items: [
+            { label: "What Tapestry is", slug: "start/what-stays-on-track" },
             { label: "The observer", slug: "explanation/the-observer" },
-            { label: "The signal hierarchy", slug: "explanation/signal-hierarchy" },
-            { label: "Project shape", slug: "start/project-shape" },
-            { label: "What keeps a project on track", slug: "start/what-stays-on-track" },
+            { label: "The Observatory", slug: "observatory/about" },
             { label: "What Tapestry is not", slug: "start/what-tapestry-is-not" },
-            {
-              label: "Going deeper",
-              collapsed: true,
-              items: [
-                { label: "User-agent interface", slug: "start/user-agent-interface" },
-                { label: "Project Intelligence vs Observatory", slug: "explanation/project-intelligence-vs-observatory" },
-                { label: "Signal → Interpretation → Pattern", slug: "explanation/signal-interpretation-pattern" },
-                { label: "Observer-derived intent", slug: "explanation/observer-derived-intent" },
-                { label: "Observatory lenses", slug: "explanation/observatory-lenses" },
-                { label: "How the platform upskills itself", slug: "explanation/upskilling" },
-                { label: "Sharing intelligence across projects", slug: "explanation/sharing-intelligence-across-projects" },
-              ],
-            },
           ],
         },
         {
@@ -105,11 +93,9 @@ export default defineConfig({
             { label: "Set up a new project (comprehensive)", slug: "how-to/set-up-a-new-project" },
             { label: "Create your own plugin", slug: "how-to/create-your-own-plugin" },
             { label: "Recover from common failures", slug: "how-to/recover-from-common-failures" },
-            // The Observatory's own usage pages — operational, not architectural.
-            { label: "About the Observatory", slug: "observatory/about" },
-            { label: "Reading the Observatory", slug: "observatory/reading-it" },
+            // The Observatory's actionable pages. What it is + how to read it
+            // lives in Learn ("The Observatory"); the feed contract is in Reference.
             { label: "Run the Observatory", slug: "observatory/run-it" },
-            { label: "The Observatory feed", slug: "observatory/feed" },
             // The live console is a custom Astro page (src/pages/observatory.astro),
             // not a Starlight content doc, so it's a manual link.
             { label: "Open the console", link: "/observatory" },
@@ -146,6 +132,7 @@ export default defineConfig({
           label: "Reference",
           items: [
             { label: "OTel coordination contract", slug: "reference/otel-coordination-contract" },
+            { label: "The Observatory feed", slug: "observatory/feed" },
             { label: "Platform dependencies", slug: "reference/platform-dependencies" },
             { label: "Load-bearing files", slug: "reference/load-bearing-files" },
           ],

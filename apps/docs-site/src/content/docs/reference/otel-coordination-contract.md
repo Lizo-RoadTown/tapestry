@@ -74,7 +74,7 @@ Current attributes per event: `hook_name`, `event`, `exit_code`, `elapsed_ms`, `
 
 ## What this contract does NOT include
 
-Intent. Intent is observer-derived, not telemetry-emitted — see [Observer-derived intent](/explanation/observer-derived-intent/). Adding intent attributes here would conflate the interpretation layer with the emission layer. The observer reads these typed attributes (plus memory, transcripts, diffs, prior findings) and produces an intent hypothesis as a separate output.
+Intent. Intent is observer-derived, not telemetry-emitted. Adding intent attributes here would conflate the interpretation layer with the emission layer. The observer reads these typed attributes (plus memory, transcripts, diffs, prior findings) and produces an intent hypothesis as a separate output.
 
 ## Source of truth
 

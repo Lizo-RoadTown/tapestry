@@ -1,38 +1,47 @@
 ---
 title: The Observatory
-description: The console for watching coordination between the operator and agents across projects over time — how a project's shape is changing, what the observer sees, where friction appears, and how coordination is trending. It lives at /observatory.
+description: The console where you watch coordination between you and your agents over time — what's changing in a project, what the observer sees, where friction appears, and whether things are trending better or worse. It lives at /observatory.
 ---
 
-The Observatory is the console for watching coordination between you and your agents, across projects and over time. It lives at [`/observatory`](/observatory).
+The Observatory is the console where you watch coordination between you and your agents, across projects and over time. It lives at [`/observatory`](/observatory), and it shows how a project's shape is changing, what the observer sees, where coordination friction appears, whether memory is helping or failing, and which way things are trending.
 
-It shows:
+It answers *trajectory* questions — is coordination getting smoother or rougher, is anything stabilizing into a pattern worth keeping — rather than point-in-time status like "is the API up right now," which belongs in an operational dashboard.
 
-- how a project's shape is changing,
-- what the observer sees,
-- where coordination friction appears,
-- whether memory is helping or failing,
-- how coordination is trending over time.
+## How it reads
 
-## How it works
+The console models telemetry as variables over time. You pick a variable to **Show**, optionally **overlay** a second to compare it against, and choose how to view the result:
 
-The Observatory models telemetry as variables over time. You pick a variable, add an overlay variable, and choose a view; the console plots them and interprets the combination.
+| Control | What it sets |
+|---|---|
+| **Show** | The variable to track |
+| **overlaid with** | A second variable to compare, or none |
+| **as** | Trend (a line over time) or relationship (a scatter, one point per day) |
 
-```mermaid
-flowchart LR
-    DS[Data sources] --> DV[Variables over time]
-    DV --> SEL[Variable + overlay]
-    SEL --> VIZ[Chart]
-    VIZ --> INT[Interpretation]
-```
+For whatever you select, an interpretation panel states what you're looking at, why the variables relate, what patterns the view can expose, the observer's current reading, and which signals aren't instrumented yet.
 
-For each view, the console states what you are looking at, why the variables relate, what patterns the view can expose, the observer's current reading, and which signals are not yet instrumented.
+## The variables
 
-## Instrumentation
+| Variable | State |
+|---|---|
+| Architecture changes | instrumented |
+| Working episodes | instrumented |
+| Tool activity | instrumented |
+| Observer candidates | instrumented |
+| Friction recurrence | not instrumented |
+| Memory misses | not instrumented |
+| Correction frequency | not instrumented |
 
-Some variables are not yet instrumented — friction recurrence, memory misses, and corrections. They are selectable but have no data; the console shows them as *not instrumented*.
+A variable that isn't instrumented is still selectable, but has no data — the chart marks it *not instrumented*.
 
-## In this section
+## Lenses
 
-- [Reading the Observatory](/observatory/reading-it/) — the controls, chart types, and interpretation.
-- [Run the Observatory](/observatory/run-it/) — open it or run it locally.
-- [The Observatory feed](/observatory/feed/) — the data the console reads, and how to supply it.
+You look at the same patterns through different lenses — memory, architecture, coordination, observer, cross-project — each foregrounding one dimension and hiding the rest, so the thing you're studying isn't drowned out.
+
+## What you do
+
+Open it and pick the variable that matches your question. The Observatory is your own deployment; the [public demo](https://tapestry-khaki.vercel.app/observatory) runs on sample data as a read-only reference. To open it, run it locally, or feed it live data, see [Run the Observatory](/observatory/run-it/) and [The Observatory feed](/observatory/feed/).
+
+## Related
+
+- [First Observatory visit](/start/first-observatory-visit/) — what a brand-new project looks like.
+- [The observer](/explanation/the-observer/) — what produces the patterns you're looking at.

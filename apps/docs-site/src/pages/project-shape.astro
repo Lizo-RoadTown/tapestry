@@ -1,72 +1,72 @@
 ---
 /**
- * Project Shape.
+ * Why projects compound.
  *
- * Pulled onto the website per the reader-intent IA split. Copy leads with the
- * pain (some projects get easier, some harder; the things that decide it
- * happen outside the code) and introduces the label second (lead with the
- * pain and outcome, not the label). The docs concept page
- * (src/content/docs/start/project-shape.md) keeps the precise definition.
+ * Reframed 2026-06-25: the "project shape" concept was dropped as inaccurate.
+ * The accurate message: an agent doesn't improve on its own between model
+ * releases; Tapestry watches across all your projects and turns recurring
+ * friction into durable structure, so the work keeps improving anyway. Lead
+ * with that, not a label. The route stays /project-shape for stable links.
  */
 import SiteLayout from "../layouts/SiteLayout.astro";
 
-const CONCEPT = "/start/project-shape/";
+const CONCEPT = "/start/what-stays-on-track/";
 const OBSERVATORY = "/observatory";
 
-// What project shape is made of.
+// What recurring friction looks like.
 const PATTERNS = [
-  "how knowledge is stored",
-  "how agents behave",
-  "how work gets done",
-  "what corrections keep recurring",
-  "what skills become reusable",
-  "where coordination breaks down",
+  "a correction you keep repeating",
+  "a workflow you redo by hand every time",
+  "a mistake that keeps coming back",
+  "context you re-explain every session",
+  "a decision the agent forgets",
+  "a fix that doesn't stick",
 ];
 
-// What those patterns determine.
+// What the accumulated structure makes possible.
 const OUTCOMES = [
-  "new contributors ramp up quickly",
-  "agents make the same mistakes repeatedly",
-  "knowledge survives between sessions",
-  "workflows improve over time",
-  "coordination scales as complexity grows",
+  "the same correction stops coming back",
+  "repeated work becomes a reusable skill",
+  "decisions survive between sessions",
+  "improvements carry across all your projects",
+  "a new model doesn't reset what you've built",
 ];
 
-// How a project changes over time — consequence-language, not the verb table.
+// What recurring friction turns into.
 const MOTIONS = [
-  { title: "Things drift", body: "The project behaves differently than everyone expects. Agents need more corrections. Knowledge becomes harder to find.", glyph: `<path d="M3 18h18" stroke-dasharray="2.5 3" opacity="0.5"/><path d="M4 18C10 18 11 8 20 5"/><circle cx="20" cy="5" r="1.6" fill="currentColor" stroke="none"/>` },
-  { title: "Things stabilize", body: "The same corrections stop appearing. Workflows become predictable. The project becomes easier to operate.", glyph: `<path d="M3 6c2 0 2 8 3.5 8S8 8 9.5 8 11 13 12.5 13 14 10 15.5 10 17 12 18.5 12H21"/>` },
-  { title: "Things fragment", body: "Different parts of the project develop conflicting assumptions. Knowledge gets duplicated. Coordination becomes harder.", glyph: `<rect x="3" y="9" width="6.5" height="6.5" rx="1"/><path d="M9.5 11h3M9.5 14h5" opacity="0.5"/><rect x="13" y="5" width="4.5" height="4.5" rx="1"/><rect x="16" y="14" width="4.5" height="4.5" rx="1"/>` },
-  { title: "Things come together", body: "Previously disconnected workflows, knowledge, and practices start reinforcing each other. The project becomes more coherent.", glyph: `<circle cx="4" cy="5" r="1.6"/><circle cx="4" cy="12" r="1.6"/><circle cx="4" cy="19" r="1.6"/><path d="M6 5.5 17 11M6 12h9M6 18.5 17 13" opacity="0.5"/><circle cx="19" cy="12" r="2.6" fill="currentColor" stroke="none"/>` },
+  { title: "Corrections become rules", body: "A fix you make once is captured as a rule the agent keeps. The same drift stops needing the same correction.", glyph: `<path d="M20 6 9 17l-5-5"/>` },
+  { title: "Repeated work becomes skills", body: "Work you do the same way again and again compiles into a named skill, available in every project by reference.", glyph: `<path d="M12 3 2 8l10 5 10-5-10-5Z"/><path d="M2 14l10 5 10-5"/><path d="M2 11l10 5 10-5"/>` },
+  { title: "Decisions become memory", body: "What you decided and why is kept and recalled, instead of re-explained from scratch each session.", glyph: `<ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/><path d="M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/>` },
+  { title: "Patterns become structure", body: "Friction that recurs across projects is surfaced and turned into durable structure you reuse everywhere.", glyph: `<circle cx="4" cy="5" r="1.6"/><circle cx="4" cy="12" r="1.6"/><circle cx="4" cy="19" r="1.6"/><path d="M6 5.5 17 11M6 12h9M6 18.5 17 13" opacity="0.5"/><circle cx="19" cy="12" r="2.6" fill="currentColor" stroke="none"/>` },
 ];
 ---
 
-<SiteLayout title="Project shape — Tapestry" description="Some projects become easier to work in over time; some become harder. The things that decide whether AI collaboration succeeds often happen outside the code. Tapestry tracks them — we call it project shape." activeNav="learn">
-  <!-- hero: the pain, in plain language -->
+<SiteLayout title="Why projects compound — Tapestry" description="An AI agent is fixed until the next model ships — on its own it makes the same mistakes next week. Tapestry watches across all your projects and turns recurring friction into durable structure, so the work keeps getting better even though the agent stays the same." activeNav="learn">
+  <!-- hero: the insight, in plain language -->
   <section class="ps-hero">
     <div class="ps-glow" aria-hidden="true"></div>
     <div class="ps-hero-in reveal">
-      <h1 class="display">Every project develops<br />a <span class="accent">personality.</span></h1>
-      <p class="ps-para">Some projects become easier to work in. Others become harder. The code may barely change — but suddenly everyone knows how things work, decisions are easier to make, and agents stop needing the same corrections over and over.</p>
-      <p class="ps-para">Or the opposite happens. Knowledge fragments. Workflows drift. Context disappears. The same mistakes keep coming back.</p>
+      <h1 class="display">Your agent doesn't improve.<br /><span class="accent">Your projects do.</span></h1>
+      <p class="ps-para">An AI agent is fixed until the next model ships. On its own, it makes the same mistakes next week that it makes today — and when a new model does arrive, it can behave differently enough that you have to recalibrate.</p>
+      <p class="ps-para">Tapestry watches across all your projects and turns recurring friction into structure — so the work keeps getting better even though the agent stays the same.</p>
       <div class="cta-row">
-        <a class="btn btn-lg" href={CONCEPT}>Learn about project shape →</a>
-        <a class="btn btn-ghost btn-lg" href={OBSERVATORY}>Watch it move →</a>
+        <a class="btn btn-lg" href={CONCEPT}>What Tapestry is →</a>
+        <a class="btn btn-ghost btn-lg" href={OBSERVATORY}>Watch it work →</a>
       </div>
     </div>
   </section>
 
-  <!-- name it second -->
+  <!-- name the mechanism -->
   <section class="ps-name">
     <div class="ps-name-in">
       <p class="ps-lead reveal">
-        Most tools only see the code. Tapestry tracks the things that make a project easier or harder
-        to work in over time. <span class="ps-strong">We call that project shape.</span>
+        Every project hits the same kinds of friction — a correction repeated, a workflow redone, context re-explained.
+        <span class="ps-strong">Tapestry captures it once and turns it into structure the agent reuses.</span>
       </p>
       <ul class="ps-patterns reveal">
         {PATTERNS.map((p) => (<li><span class="tick" aria-hidden="true">→</span>{p}</li>))}
       </ul>
-      <p class="ps-because reveal">Because those things often determine project success long before the code does.</p>
+      <p class="ps-because reveal">Because solving the same problem twice is where projects quietly lose their momentum.</p>
     </div>
   </section>
 
@@ -74,22 +74,22 @@ const MOTIONS = [
   <section class="ps-why">
     <div class="ps-why-in reveal">
       <p class="kicker mono">Why it matters</p>
-      <h2 class="display sec-title">Same repository.<br /><span class="accent">Different outcome.</span></h2>
-      <p class="ps-why-body">Two projects can have identical repositories and completely different outcomes. One feels predictable. The other feels chaotic. The difference is rarely the code itself — it's the accumulated decisions, habits, corrections, workflows, and knowledge surrounding it.</p>
-      <p class="ps-why-sub">Those patterns determine whether:</p>
+      <h2 class="display sec-title">Same agent.<br /><span class="accent">Better every week.</span></h2>
+      <p class="ps-why-body">An agent doesn't learn between releases. The improvement in your work can't come from the agent alone — it comes from what accumulates around it: the corrections, decisions, and patterns captured as structure. That structure survives a model change instead of resetting with it.</p>
+      <p class="ps-why-sub">That's what makes sure:</p>
       <ul class="ps-outcomes">
         {OUTCOMES.map((o) => (<li><span class="tick" aria-hidden="true">→</span>{o}</li>))}
       </ul>
-      <p class="ps-why-close">Tapestry makes those patterns visible.</p>
+      <p class="ps-why-close">Tapestry builds that structure automatically.</p>
     </div>
   </section>
 
-  <!-- what changes over time -->
+  <!-- what friction becomes -->
   <section class="ps-motions">
     <header class="sec-head">
-      <p class="kicker mono">What changes over time</p>
-      <h2 class="display sec-title">A few patterns keep appearing.</h2>
-      <p class="sec-sub">As projects evolve, the same handful of motions show up again and again.</p>
+      <p class="kicker mono">What becomes structure</p>
+      <h2 class="display sec-title">Friction goes in. Structure comes out.</h2>
+      <p class="sec-sub">The recurring friction in your work gets captured in a form the agent reuses — automatically.</p>
     </header>
     <div class="ps-motion-grid">
       {MOTIONS.map((m) => (
@@ -100,14 +100,14 @@ const MOTIONS = [
         </article>
       ))}
     </div>
-    <p class="ps-motion-foot reveal">The observer tracks these changes so they can be understood before they become problems.</p>
+    <p class="ps-motion-foot reveal">The observer watches for what recurs, so it becomes structure before it becomes a recurring cost.</p>
   </section>
 
   <!-- cta -->
   <section class="ps-cta">
     <div class="ps-cta-glow" aria-hidden="true"></div>
     <div class="reveal">
-      <h2 class="display ps-cta-title">See your project's shape<br /><span class="accent">move over time.</span></h2>
+      <h2 class="display ps-cta-title">Stop solving the same<br /><span class="accent">problem twice.</span></h2>
       <div class="cta-row center"><a class="btn btn-lg" href="/how-to/set-up-a-new-project/">Set up a project</a><a class="btn btn-ghost btn-lg" href={OBSERVATORY}>Open the Observatory →</a></div>
     </div>
   </section>

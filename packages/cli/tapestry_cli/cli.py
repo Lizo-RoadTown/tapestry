@@ -20,6 +20,7 @@ import sys
 from tapestry_cli import (
     __version__,
     init as init_cmd,
+    make_plugin as make_plugin_cmd,
     observatory as observatory_cmd,
     onboard as onboard_cmd,
 )
@@ -40,6 +41,11 @@ SUBCOMMANDS: dict[str, dict] = {
         "help": "Onboard the current directory as a Tapestry consuming project (no settings.json).",
         "add_arguments": init_cmd.add_arguments,
         "run": init_cmd.run,
+    },
+    "make-plugin": {
+        "help": "Scaffold a personalized Claude Code plugin to publish to your own marketplace.",
+        "add_arguments": make_plugin_cmd.add_arguments,
+        "run": make_plugin_cmd.run,
     },
 }
 

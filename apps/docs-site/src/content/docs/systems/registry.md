@@ -22,7 +22,7 @@ A pattern isn't immediately a fact. The Observer might have low confidence; the 
 
 Separating Candidate from Architecture solves this: the Observer can be eager (write every plausible pattern as a candidate), and only patterns that survive recurrence + policy + operator review become durable facts.
 
-This is the structural backbone of [how the platform upskills itself](/explanation/upskilling/) — the Candidate → Skill → Structure journey runs through the Registry.
+This is the structural backbone of how the platform upskills itself — the Candidate → Skill → Structure journey runs through the Registry.
 
 ## How it interacts with the platform
 
@@ -87,9 +87,6 @@ See [Platform dependencies](/reference/platform-dependencies/) for the full Rend
 
 ## Related
 
-- [How the platform upskills itself](/explanation/upskilling/) — the Candidate → Skill → Structure flow that runs through the Registry
-- [Sharing intelligence across projects](/explanation/sharing-intelligence-across-projects/) — cross-project candidate recurrence
-- [The signal hierarchy](/explanation/signal-hierarchy/) — Candidates and Skills are levels in the hierarchy
 - [Observer](/systems/observer/) — the primary writer
 - [Observatory](/systems/observatory/) — where operators review candidates
 - **Make_Skills engine bridge** — the bidirectional contract with `Lizo-RoadTown/Make_Skills`. The Architecture Registry pushes promotion candidates; the engine pushes back registered-skill metadata + runtime telemetry. HMAC-signed via `BRIDGE_HMAC_SECRET`; implementation lives in `the-loom/services/architecture-registry/bridge_hmac.py` + `bridge_models.py`. A public docs page is planned but not yet written.

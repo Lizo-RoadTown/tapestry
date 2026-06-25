@@ -3,7 +3,7 @@ title: The Observatory feed
 description: The data contract behind the console — the /api/episodes.json endpoint, the sources it reads from, the event shape a live source must provide, and how to point the console at a central coordination store.
 ---
 
-The console reads from one endpoint: **`GET /api/episodes.json`**. This page documents what it returns, where it reads from, and how to supply a live source.
+The console reads from one endpoint: **`GET /api/episodes.json`**. Below: what it returns, where it reads from, and how to supply a live source.
 
 ## Sources
 

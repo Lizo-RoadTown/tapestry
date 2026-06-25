@@ -34,7 +34,7 @@ The OTel credentials live in your `.env` as `OTEL_EXPORTER_OTLP_*` env vars — 
 |---|---|
 | Render | The platform backend doesn't exist. `loom-memory` MCP is unreachable; consuming projects with `loom-memory` declared in `.mcp.json` get connection errors. CORE DIRECTIVE 1 says the agent should HALT and report. |
 | Vercel | This docs site doesn't exist; the Project Observatory console doesn't exist. Consuming projects' Claude Code installs still work (the plugin doesn't depend on Vercel) but you can't read the docs or see the dashboard. |
-| OTel collector | Hook events still write to local `~/.claude/logs/hooks.jsonl` but don't flow anywhere shared. No cross-machine observability. The observer's runtime-telemetry inputs are blind (per the [signal hierarchy](/explanation/signal-hierarchy/) — telemetry is one of several inputs; observer keeps working on the others). |
+| OTel collector | Hook events still write to local `~/.claude/logs/hooks.jsonl` but don't flow anywhere shared. No cross-machine observability. The observer's runtime-telemetry inputs are blind (per the signal hierarchy — telemetry is one of several inputs; observer keeps working on the others). |
 | Grafana Cloud | OTLP push goes to a dead endpoint; emission errors land in `~/.claude/logs/hook-otel-errors.log` (per `_observability.py`); local hook writes still succeed. Dashboards don't exist. |
 | Anthropic / Claude Code | Nothing runs. The whole point is the agent. |
 

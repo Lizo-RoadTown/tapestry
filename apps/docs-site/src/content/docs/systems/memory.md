@@ -28,7 +28,7 @@ Without persistent memory, every session starts cold. Operators have to re-expla
 
 Memory turns those costs into one-time learnings. A correction saved once becomes guidance forever after. A project's accumulated context auto-recalls at SessionStart. The Observer's synthesis memos compound over time.
 
-Memory is the substrate of [the shared multi-agent memory model](/explanation/sharing-intelligence-across-projects/) — hierarchical scopes, provenance chains, visibility tiers, reinforcement model.
+Memory is the substrate of the shared multi-agent memory model — hierarchical scopes, provenance chains, visibility tiers, reinforcement model.
 
 ## How it interacts with the platform
 
@@ -102,7 +102,6 @@ See [Platform dependencies](/reference/platform-dependencies/) for the full Rend
 ## Related
 
 - [The memory MCP (explanation)](/explanation/memory-mcp/) — the conceptual page
-- [Sharing intelligence across projects](/explanation/sharing-intelligence-across-projects/) — the multi-agent memory model
 - [Load-bearing files](/reference/load-bearing-files/) — the `.mcp.json` contract is documented there
 - [Observer](/systems/observer/), [Observatory](/systems/observatory/) — the components that read Memory most heavily
 - CORE DIRECTIVE 1 — why Memory access is mandatory, not optional (the directive's canonical home is currently `the-loom/docs/CORE_DIRECTIVES.md`; it migrates into `tapestry/docs/` once the platform-mode boundaries firm up)

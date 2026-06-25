@@ -10,9 +10,10 @@ What it does (mirrors `docs/howto/onboard-a-project.md` Part 1, steps 2-5):
      (has .git, or has files, or you pass --force).
   2. Pre-check: confirm the slug isn't already registered for your
      tenant (GET /projects/by-slug/<slug>). Idempotent on rerun.
-  3. POST to https://loom-project-registry.onrender.com/projects to
-     register the project. Self-host mode: no Bearer token needed;
-     server falls back to SELF_HOST_TENANT_ID.
+  3. POST to your project-registry deployment's /projects endpoint to
+     register the project (set --registry-url or TAPESTRY_REGISTRY_URL).
+     Self-host mode: no Bearer token needed; server falls back to
+     SELF_HOST_TENANT_ID.
   4. Create .env in the current dir with OTel credentials copied from
      the-loom's .env (so hook events flow to Grafana tagged with this
      new project_id) + LOOM_PROJECT_ID=<slug>.
@@ -45,7 +46,11 @@ from pathlib import Path
 from typing import Any, Optional
 
 
-DEFAULT_REGISTRY_URL = "https://loom-project-registry.onrender.com"
+# No personal deployment baked in. Point this at YOUR backend with
+# --registry-url or the TAPESTRY_REGISTRY_URL env var.
+DEFAULT_REGISTRY_URL = os.environ.get(
+    "TAPESTRY_REGISTRY_URL", "https://your-project-registry.example.com"
+)
 
 
 def _read_loom_env(loom_repo: Path) -> dict[str, str]:
@@ -200,12 +205,13 @@ def _write_env_file(project_dir: Path, slug: str, loom_env: dict[str, str]) -> N
 #   2. LOOM_MEMORY_MCP_URL: pre-Tapestry full URL
 #   3. TAPESTRY_MEMORY_URL: Tapestry-aware bare base; /mcp/memory/ composed
 #   4. LOOM_MEMORY_URL: pre-Tapestry bare base; /mcp/memory/ composed
-#   5. Hardcoded default — the-loom's Render deployment
+#   5. Placeholder — set one of the above to YOUR memory MCP endpoint.
+#      No personal deployment is baked in.
 LOOM_MEMORY_MCP_URL = os.environ.get(
     "TAPESTRY_MEMORY_MCP_URL",
     os.environ.get(
         "LOOM_MEMORY_MCP_URL",
-        f"{os.environ.get('TAPESTRY_MEMORY_URL', os.environ.get('LOOM_MEMORY_URL', 'https://loom-agent-context.onrender.com')).rstrip('/')}/mcp/memory/",
+        f"{os.environ.get('TAPESTRY_MEMORY_URL', os.environ.get('LOOM_MEMORY_URL', 'https://your-memory-host.example.com')).rstrip('/')}/mcp/memory/",
     ),
 )
 LOOM_MEMORY_SERVER_NAME = "loom-memory"

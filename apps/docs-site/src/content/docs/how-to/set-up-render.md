@@ -1,9 +1,9 @@
 ---
-title: Set up Render (platform owner only)
-description: Step-by-step walkthrough for provisioning Tapestry's backend services on Render — managed Postgres + the FastAPI services declared in the-loom's render.yaml Blueprint. Consuming projects don't need this; the platform owner runs it once.
+title: Set up Render 
+description: Step-by-step walkthrough for provisioning Tapestry's backend services on Render — managed Postgres + the FastAPI services declared in the-loom's render.yaml Blueprint. You run this once for your own deployment.
 ---
 
-This walkthrough is for the **platform owner** standing up Tapestry's backend. Consuming projects don't need Render — they connect to the platform owner's deployment via `.mcp.json`. See [Platform dependencies](/reference/platform-dependencies/) for who needs what.
+This walkthrough stands up Tapestry's backend on Render — the services your projects connect to via `.mcp.json`. In self-host you run this once for your own deployment. See [Platform dependencies](/reference/platform-dependencies/) for what's needed.
 
 Estimated time: 20–40 minutes for first provisioning, mostly waiting on builds.
 
@@ -22,7 +22,7 @@ The Render side hosts five Python web services plus one Postgres instance plus o
 
 ## Prerequisites
 
-- A [Render account](https://render.com/) (free tier is enough to start; the platform-owner deployment may need a paid plan once traffic grows — see [Render's pricing](https://render.com/pricing))
+- A [Render account](https://render.com/) (free tier is enough to start; the your own deployment may need a paid plan once traffic grows — see [Render's pricing](https://render.com/pricing))
 - A [GitHub account](https://github.com/) that can read `your deployment repo` (the public repo holding the Blueprint)
 - A Grafana Cloud account with OTel credentials in hand — see [Set up Grafana Cloud + OTel](/how-to/set-up-grafana-cloud/) first; the Render services need `OTEL_EXPORTER_OTLP_*` env vars at provisioning time
 
@@ -133,7 +133,7 @@ If you see `MCP UNREACHABLE: HTTP 404`, the service is still cold-starting (free
 
 Render's free tier covers small projects but the platform's services have constraints:
 
-- Free-tier web services sleep after 15 minutes idle (~60s cold-start when traffic resumes). For the Memory MCP this is a real UX cost — every fresh session hits a cold start. The platform owner typically upgrades `memory-mcp` to a paid plan (starter or above) once consumers are active.
+- Free-tier web services sleep after 15 minutes idle (~60s cold-start when traffic resumes). For the Memory MCP this is a real UX cost — every fresh session hits a cold start. You typically upgrade `memory-mcp` to a paid plan (starter or above) once consumers are active.
 - Managed Postgres has its own pricing tiers; the free tier is fine for early use.
 - The cron schedule (every 6h) is well within free-tier limits.
 

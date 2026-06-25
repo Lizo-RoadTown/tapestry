@@ -46,7 +46,7 @@ The hooks dual-write: local always, remote when env vars are set. Other platform
 
 ## Setup
 
-**Consuming the existing pipeline (default):** request OTel credentials from the platform owner. Add to your project's `.env`:
+**Consuming the existing pipeline (default):** set your OTel credentials. Add to your project's `.env`:
 
 ```sh
 OTEL_EXPORTER_OTLP_ENDPOINT=<gateway URL>

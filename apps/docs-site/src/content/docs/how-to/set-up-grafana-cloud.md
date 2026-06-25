@@ -3,7 +3,7 @@ title: Set up Grafana Cloud + OTel
 description: Step-by-step walkthrough for the telemetry pipeline — sign up for Grafana Cloud, get OTLP credentials, and wire OTEL_EXPORTER_OTLP_* env vars so the discipline plugin's hooks emit to Grafana Loki/Tempo. Required for cross-machine observability.
 ---
 
-This walkthrough is for the **platform owner** standing up the telemetry pipeline. Consuming projects need OTel env vars too (so their hooks emit to the shared Grafana Cloud), but the platform owner shares those credentials on request — the consumer doesn't sign up for Grafana Cloud themselves.
+This walkthrough stands up the telemetry pipeline on Grafana Cloud for your own deployment. Your projects' hooks emit to it via OTel env vars set in each project's `.env`.
 
 Estimated time: 15–25 minutes including waiting for the first signal to land.
 
@@ -102,7 +102,7 @@ Once signals are flowing, the operator can build Grafana dashboards over them. T
 - **Loki** for log queries — search by `service_name`, `hook`, `project_id`, etc. See [Loki query language docs](https://grafana.com/docs/loki/latest/query/).
 - **Tempo** for traces — when runtime services start emitting traces (currently only the hooks emit logs). See [Tempo docs](https://grafana.com/docs/tempo/latest/).
 
-For Tapestry-specific dashboards, the platform owner ships pre-built JSON in `the-loom/infra/grafana/` (when that lands; currently dashboards are operator-built and shared informally).
+For Tapestry-specific dashboards, pre-built dashboard JSON ships in `infra/grafana/` (when that lands; currently dashboards are operator-built and shared informally).
 
 ## Step 6 — Rotate credentials (when needed)
 

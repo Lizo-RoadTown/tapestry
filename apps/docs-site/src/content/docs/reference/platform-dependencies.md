@@ -5,7 +5,7 @@ description: The external services Tapestry runs on. What's required to operate 
 
 Tapestry runs on four external services. Being honest about which ones the platform needs, and which ones a consuming project's operator needs, prevents the surprise of "I installed the plugin and nothing's logging."
 
-## Required for the platform (operator + platform owner)
+## Required to run the platform (self-host)
 
 These are the services the Tapestry platform itself depends on. If you're standing the platform up (or self-hosting all of it), you need accounts at all four.
 
@@ -26,7 +26,7 @@ Most consumers do NOT need accounts at the four services above — those belong 
 | **GitHub access to `Lizo-RoadTown/tapestry`** | So `/plugin marketplace add Lizo-RoadTown/tapestry` resolves. Public repo — no special access needed. | Free. |
 | **(Optional) Grafana Cloud OTel credentials** | Only if you want your project's hook events to flow to the shared Grafana stack alongside other consuming projects' telemetry. Without these, the discipline plugin still works — local `hooks.jsonl` is the source of truth — but no cross-machine observability for your project. | Free tier sufficient for most projects. |
 
-The OTel credentials live in your `.env` as `OTEL_EXPORTER_OTLP_*` env vars — see [Load-bearing files §`OTEL_*`](/reference/load-bearing-files/#otel-otel-telemetry). The platform owner shares these on request.
+The OTel credentials live in your `.env` as `OTEL_EXPORTER_OTLP_*` env vars — see [Load-bearing files §`OTEL_*`](/reference/load-bearing-files/#otel-otel-telemetry). Set these in your project .env.
 
 ## What happens if one is missing
 
@@ -40,9 +40,9 @@ The OTel credentials live in your `.env` as `OTEL_EXPORTER_OTLP_*` env vars — 
 
 ## Self-host vs hosted-multitenant
 
-The platform supports a two-mode commitment (every service has a `PLATFORM_MODE=self_host` default + a `PLATFORM_MODE=hosted` opt-in). Self-host means: run everything yourself, no JWT auth, single-tenant. Hosted-multitenant means: JWT-verified tenant isolation against the platform owner's deployment.
+The platform supports a two-mode commitment (every service has a `PLATFORM_MODE=self_host` default + a `PLATFORM_MODE=hosted` opt-in). Self-host means: run everything yourself, no JWT auth, single-tenant. Hosted-multitenant means: JWT-verified tenant isolation against a shared hosted deployment.
 
-If you're standing up a fully self-hosted Tapestry, you need accounts + deployments at all four services above. If you're a consuming project using the platform owner's hosted deployment, you only need the second table.
+If you're standing up a self-hosted Tapestry (the default), you need accounts + deployments at all four services above. If your projects connect to a shared hosted deployment that someone else runs, you only need the second table.
 
 ## Related
 

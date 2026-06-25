@@ -1,9 +1,9 @@
 ---
-title: Set up Vercel (platform owner only)
-description: Step-by-step walkthrough for deploying Tapestry's frontend on Vercel — the Astro Starlight docs site (this site) and the Observatory cockpit. Consuming projects don't need this; the platform owner runs it once per surface.
+title: Set up Vercel 
+description: Step-by-step walkthrough for deploying Tapestry's frontend on Vercel — the Astro Starlight docs site (this site) and the Observatory cockpit. You run this once per surface for your own deployment.
 ---
 
-This walkthrough is for the **platform owner** deploying Tapestry's frontends. Consuming projects don't need Vercel — they read the deployed docs site at [tapestry-khaki.vercel.app](https://tapestry-khaki.vercel.app/) and the Observatory cockpit. See [Platform dependencies](/reference/platform-dependencies/) for who needs what.
+This walkthrough deploys Tapestry's frontends on Vercel — your docs site and the Observatory console. In self-host you run this for your own deployment. See [Platform dependencies](/reference/platform-dependencies/) for what's needed.
 
 Estimated time: 10–15 minutes for a first deploy. Subsequent deploys are automatic on `git push`.
 

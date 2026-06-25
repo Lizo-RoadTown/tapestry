@@ -2,86 +2,72 @@
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
-**The enterprise system-of-record monorepo for the project-intelligence platform.** Tapestry is where the prototype boundaries — discovered through the existing multi-repo experimentation — consolidate into a clean architecture once each piece has matured in its current home.
+**Tapestry is a user/agent support and reinforcement system.** Memory, telemetry, observability, architecture analysis, friction analysis, and upskilling are mechanisms used to observe, strengthen, stabilize, and evolve coordination between operators and agents — across many projects, over time.
 
-## The loop in one picture
+- **Marketing site + docs:** [tapestry-khaki.vercel.app](https://tapestry-khaki.vercel.app/)
+- **Quickstart:** [Set up a new project](https://tapestry-khaki.vercel.app/how-to/set-up-a-new-project/)
+- **What it is, in depth:** [the docs](https://tapestry-khaki.vercel.app/docs/)
 
-Tapestry's thesis is *agency becomes structure*. A coding agent works on a project; the platform observes what the agent does repeatedly; promotes the durable patterns into reusable structure; feeds the structure back to future agent runs.
+## Install (consumer side)
+
+The two pieces a consuming project installs in their Claude Code session:
 
 ```text
-   ┌────── INPUT: observe ──────┐         ┌───── OUTPUT: compile ─────┐
-   │                            │         │                           │
-   │   consuming projects       │         │   engine/skill-compiler   │
-   │       │                    │         │       ▲                   │
-   │       ▼ telemetry          │         │       │ promoted          │
-   │   project-observatory      │         │   bridge dispatch         │
-   │       │                    │         │       ▲                   │
-   │       ▼ patterns           │         │       │                   │
-   │   local-observer           │         │   policy decision         │
-   │       │                    │         │       ▲                   │
-   │       ▼ Path A candidates  │         │       │ promote           │
-   │   candidate-registry  ◄────┼─────────┼───────┘                   │
-   │       ▲                    │         │       │                   │
-   │       │ Path B candidates  │         │       │                   │
-   │   self-observer            │         │   operator (dashboard)    │
-   │       │                    │         │                           │
-   │       ▼ (every 6h cron)    │         │                           │
-   │   GitHub: scan platform    │         │                           │
-   │   skills/ agents/ tools/   │         │                           │
-   │                            │         │                           │
-   └────────────────────────────┘         └───────────────────────────┘
-
-   Status 2026-06-13:
-   ✓ INPUT  side green for Path B  (self-observer cron live, 40 candidates landed)
-   ✓ OUTPUT side green for kind=skill end-to-end (bridge fires, engine compiles, ack returns)
-   ⏳ Other 8 kinds ack-defer until per-kind handlers ship
+/plugin marketplace add Lizo-RoadTown/tapestry
+/plugin install tapestry-discipline@tapestry
+/plugin install tapestry-patterns@tapestry
 ```
 
-Full architecture diagram with deploy topology + auth + service boundaries lives at [`docs/proposals/2026-06-13-v1-scope-and-roadmap.md`](docs/proposals/2026-06-13-v1-scope-and-roadmap.md).
+Plus the CLI (one-time per machine):
 
-## What Tapestry is
+```sh
+pipx install tapestry-cli
+tapestry onboard <your-project-name>
+```
 
-A single source-control house with **bounded services, clear APIs, clear schemas, clear deploy units, clear ownership**. Internal structure:
+That writes the per-project config (`.env`, `.mcp.json`, `.project-intelligence/`, `.claude/settings.json`) so the discipline plugin activates and the memory MCP connects. See the [Quickstart — VS Code](https://tapestry-khaki.vercel.app/how-to/quickstart-vscode/) walkthrough for the full setup.
 
-- **`apps/`** — user-facing and operator-facing surfaces (web dashboard, admin console, docs site)
-- **`services/`** — bounded backend services (agent context, project registry, project observatory, candidate registry, architecture registry, policy, audit log, telemetry ingestion, skill-making)
-- **`engine/`** — the recursive skill engine (agency-to-structure core, skill compiler, local observer, per-project-type adapters)
-- **`packages/`** — distributable shared code (SDK, CLI, shared types, schemas, auth, UI components)
-- **`integrations/`** — connectors (MCP, VSCode, Claude Code, Codex, GitHub, Grafana)
-- **`templates/`** — project-type seed templates (classroom, software, research, operations)
-- **`infra/`** — deploy artifacts (Docker, Terraform, migrations, deploy configs)
-- **`docs/`** — architecture, ADRs, API contracts, security, migration
-- **`deprecated/`** — legacy imports retained while audit completes
+## What's in this repo
 
-## Parallel-build status
+```text
+tapestry/
+├── apps/
+│   ├── docs-site/           Astro Starlight site + marketing pages (Vercel)
+│   └── web-dashboard/       Operator-facing dashboard (forward home)
+├── services/                Backend bounded services
+│   ├── agent-context/       ← live; the memory MCP (Render-hosted)
+│   ├── project-registry/    ← live; project / repo / machine registration
+│   ├── architecture-registry/   slot README; canonical home pending migration
+│   ├── candidate-registry/      slot README
+│   ├── policy/                  slot README
+│   ├── audit-log/               slot README
+│   ├── docs-mcp/                stdio MCP exposing the docs (pip-installable)
+│   ├── project-observatory/     slot README
+│   ├── skill-making/            slot README
+│   └── telemetry-ingestion/     slot README
+├── engine/                  Recursive skill engine slots (forward homes)
+├── packages/
+│   ├── auth/                Canonical loom_auth (JWT + tenant resolution)
+│   └── cli/                 tapestry-cli (published to PyPI)
+├── integrations/claude-code/
+│   ├── tapestry-discipline/ The discipline plugin (4 hooks; OTel emission)
+│   └── tapestry-patterns/   Reusable agents + skills + scripts (architecture
+│                            snapshot, drift-watcher, infrastructure-mapping, etc.)
+├── templates/               Project-type seed templates
+├── infra/                   Render Blueprint, Postgres migrations, deploy configs
+├── docs/                    Architecture, ADRs, migration, runbooks, plans
+└── .claude-plugin/          Marketplace manifest (`tapestry`)
+```
 
-**This is a parallel-build, not a pause-and-migrate.** The existing prototype repos (`the-loom`, `Make_Skills`, `loom-platform`, plus consuming projects) **continue to be built in**. Tapestry slots are seeded incrementally as each piece matures in its current home.
+Two services (`agent-context`, `project-registry`) have been cut over from `the-loom` to this repo and run in production. The rest of `services/` is forward-home slots: code matures in the legacy source repos and migrates here per the [migration framework](docs/migration-cicd/).
 
-This is intentional: a lot of the architecture is still being discovered through experimentation. Premature consolidation would import unfinished structure into a "clean" repo where the messiness would just relocate.
+## Relationship to other repos
 
-See [`docs/migration/README.md`](docs/migration/README.md) for the migration approach.
+Tapestry is the **canonical product system**. Legacy source repos (`Lizo-RoadTown/the-loom`, `Lizo-RoadTown/Make_Skills`) continue to be built in; mature pieces consolidate here via curated migration PRs. The parallel-build is intentional — premature consolidation would import unfinished structure. See [docs/migration/README.md](docs/migration/README.md) for the approach.
 
-## What's here today (initial spawn)
+## Self-host vs hosted
 
-- The skeleton directory tree with per-slot READMEs explaining each slot's purpose and source
-- Architecture docs in [`docs/architecture/`](docs/architecture/) — canonical version of the platform's bounded contexts
-- Migration docs in [`docs/migration/`](docs/migration/) — inventory + import map + what-to-keep / what-to-retire / naming-corrections
-- `LICENSE` (Apache 2.0)
-- `CLAUDE.md` (agent discipline)
-- `ROADMAP.md` (what's in flight in legacy repos + migration sequencing)
-
-**Zero code yet.** Imports happen in deliberate small PRs as legacy sources mature.
-
-## How to consume / extend Tapestry today
-
-This repo is **private during the prototype phase**. Once the architecture stabilizes and imports complete, Tapestry will flip public — that's the "enterprise public release" target.
-
-While private:
-
-1. Engine work continues in `Lizo-RoadTown/Make_Skills`
-2. Platform work continues in `Lizo-RoadTown/the-loom`
-3. Consuming-project prototypes continue in their own repos (Hub, SDE_Extraction, loom-platform, etc.)
-4. Imports to Tapestry happen via curated PRs that pull stable pieces in and update the relevant `docs/migration/import-map.md` entry
+Tapestry is **self-host by default** — every operator runs their own backend, picks their own tenant UUID, points consuming projects at their own deployment. The platform supports a two-mode commitment (`PLATFORM_MODE=self_host` default; `=hosted` opt-in with multi-tenant JWT). See [Platform dependencies](https://tapestry-khaki.vercel.app/reference/platform-dependencies/) for what each external service does and which are operator-supplied vs platform-supplied.
 
 ## License
 

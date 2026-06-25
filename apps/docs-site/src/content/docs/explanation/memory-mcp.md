@@ -14,7 +14,7 @@ For how the MCP gets wired into your project, see [The plugins](/explanation/plu
 `loom-memory` is an HTTP-transport MCP server hosted at:
 
 ```
-https://loom-agent-context.onrender.com/mcp/memory/
+https://your-memory-host.example.com/mcp/memory/
 ```
 
 It runs as a Render web service backed by Postgres + pgvector. The Postgres rows ARE the memories. The pgvector index enables semantic search via embeddings of memory content.
@@ -73,7 +73,7 @@ The MCP exposes a REST surface (commit `9262943`) so you can read, write, and re
 Recall the top relevant memories for a context:
 
 ```sh
-curl -X POST https://loom-agent-context.onrender.com/v1/recall \
+curl -X POST https://your-memory-host.example.com/v1/recall \
   -H "Content-Type: application/json" \
   -d '{"context": "what was decided about X", "n": 5, "project_tags": ["your-project-id"]}'
 ```
@@ -81,7 +81,7 @@ curl -X POST https://loom-agent-context.onrender.com/v1/recall \
 Read one memory by exact name:
 
 ```sh
-curl -X POST https://loom-agent-context.onrender.com/v1/read \
+curl -X POST https://your-memory-host.example.com/v1/read \
   -H "Content-Type: application/json" \
   -d '{"name": "exact_memory_name"}'
 ```
@@ -89,7 +89,7 @@ curl -X POST https://loom-agent-context.onrender.com/v1/read \
 Write a memory directly (rarely needed — the agent usually does this for you, but useful for seeding or backfilling):
 
 ```sh
-curl -X POST https://loom-agent-context.onrender.com/v1/write \
+curl -X POST https://your-memory-host.example.com/v1/write \
   -H "Content-Type: application/json" \
   -d '{"name": "...", "record_type": "fact", "content": "...", "project_tags": ["your-project-id"]}'
 ```

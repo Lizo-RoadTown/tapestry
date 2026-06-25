@@ -11,7 +11,7 @@ Two services:
 
 | Service | Purpose | Lives at |
 |---|---|---|
-| **Architecture Registry** | The durable structural facts the platform treats as settled — promoted patterns, registered skills, structural drift findings. | `the-loom/services/architecture-registry/` (Render service `loom-architecture-registry`) |
+| **Architecture Registry** | The durable structural facts the platform treats as settled — promoted patterns, registered skills, structural drift findings. | `the-loom/services/architecture-registry/` (Render service `architecture-registry`) |
 | **Candidate Registry** | Patterns surfaced by the Observer that haven't been promoted yet. Includes recurrence count, supporting evidence, observer confidence. | Same service tree; same Postgres backend; separate tables |
 
 The promotion flow goes: Observer writes a candidate → Candidate Registry holds it with reinforcement metadata → Policy service evaluates → operator approves or rejects → on approval, candidate migrates to Architecture Registry as a durable fact.
@@ -56,7 +56,7 @@ The Observer writes; the Policy service evaluates; the operator decides; the Arc
 
 1. Copy `the-loom/services/architecture-registry/` into your Tapestry deployment.
 2. Provision a Render Postgres instance (can share with Memory's Postgres if you prefer one DB).
-3. Deploy as a Render Web Service from `the-loom/infra/deploy/render.yaml` (search `loom-architecture-registry`).
+3. Deploy as a Render Web Service from `the-loom/infra/deploy/render.yaml` (search `architecture-registry`).
 4. Required env vars:
    - `DATABASE_URL` — Render Postgres connection string
    - `BRIDGE_HMAC_SECRET` — for the make-skills bridge (see `bridge_hmac.py`)
@@ -69,8 +69,8 @@ See [Platform dependencies](/reference/platform-dependencies/) for the full Rend
 
 ## Verify
 
-- **Service is reachable:** `curl https://loom-architecture-registry.onrender.com/health` returns 200.
-- **Candidates are accumulating:** `curl https://loom-architecture-registry.onrender.com/candidates?limit=5` returns recent entries; `created_at` within last 24h means the Observer is feeding it.
+- **Service is reachable:** `curl https://your-registry-host.example.com/health` returns 200.
+- **Candidates are accumulating:** `curl https://your-registry-host.example.com/candidates?limit=5` returns recent entries; `created_at` within last 24h means the Observer is feeding it.
 - **Promotions are landing:** query the Architecture Registry endpoint for entries with `promoted_at` set.
 - **Operator can review:** open the Observatory candidate inbox; new candidates should appear with their supporting evidence.
 
@@ -78,12 +78,12 @@ See [Platform dependencies](/reference/platform-dependencies/) for the full Rend
 
 | Symptom | Likely cause | Where to look |
 |---|---|---|
-| Observatory candidate inbox empty | Observer not writing, or write failing | Check `loom-self-observer` Render logs for POST errors; see [Observer troubleshoot](/systems/observer/#troubleshoot) |
+| Observatory candidate inbox empty | Observer not writing, or write failing | Check `self-observer` Render logs for POST errors; see [Observer troubleshoot](/systems/observer/#troubleshoot) |
 | Candidates exist but never promote | Policy service rejecting, or operator hasn't reviewed | Query Candidate Registry with `?status=pending_review`; check Policy service logs |
 | Architecture Registry diverges from expected facts | Manual writes bypassing Policy | Audit Memory for `architecture_registry_write` records without a matching `policy_decision` |
 | Bridge to make-skills failing | HMAC secret mismatch | Verify `BRIDGE_HMAC_SECRET` matches between Tapestry's Registry and Make_Skills' engine |
 | `503` from Render endpoint | Cold start | Wait 30-60s; if persistent, check Render dashboard for service health |
-| Postgres connection timeouts | Connection pool exhausted | Check `loom-postgres` connection count in Render dashboard; scale up the pool in `storage.py` if needed |
+| Postgres connection timeouts | Connection pool exhausted | Check `postgres` connection count in Render dashboard; scale up the pool in `storage.py` if needed |
 
 ## Related
 

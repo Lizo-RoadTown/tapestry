@@ -115,7 +115,7 @@ The five concrete pieces in your repo:
 The two platform-side pieces (hosted, not in your repo):
 
 - **The `tapestry-discipline` plugin** — installed once per machine; enabled per project; provides the four lifecycle hooks (SessionStart, UserPromptSubmit, PreToolUse, Stop).
-- **The `loom-memory` MCP server** — hosted at `loom-agent-context.onrender.com/mcp/memory/`; shared across every Tapestry-consuming project, scoped per-project via `project_tags`.
+- **The `loom-memory` MCP server** — hosted at `your-memory-host.example.com/mcp/memory/`; shared across every Tapestry-consuming project, scoped per-project via `project_tags`.
 
 ## What the agent loses if a piece goes missing
 

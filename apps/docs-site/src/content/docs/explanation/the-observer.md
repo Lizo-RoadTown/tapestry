@@ -28,7 +28,7 @@ flowchart TB
 | **OTel telemetry** | Services + the discipline plugin emit OpenTelemetry via OTLP → Grafana Cloud (`OTEL_EXPORTER_OTLP_*` env vars) | What ran, what failed, latencies, correction events, tool usage |
 | **Architecture snapshots** | SessionStart hook + self-observer Render cron write to `docs/architecture-snapshots/` | Structural state of repos + diffs against prior snapshots |
 | **Session transcripts** | Stop hook parses JSONL transcripts in-session | Skill invocations, recurring patterns inside one session |
-| **Memory** | loom-memory MCP (`loom-agent-context.onrender.com`) | Operator corrections, decisions, project-state notes accumulated across sessions |
+| **Memory** | loom-memory MCP (`your-memory-host.example.com`) | Operator corrections, decisions, project-state notes accumulated across sessions |
 | **Cross-project signals** | Same memory store queried across project tags | Patterns repeating across multiple projects in the fleet |
 
 OTel is the canonical telemetry transport. The architecture-snapshot pipeline and the OTel pipeline are complementary — snapshots give the structural view, telemetry gives the runtime view, and the observer reads both.
@@ -222,7 +222,7 @@ For the self-observer cron:
 memory_read name=self_observer_synthesis_latest
 ```
 
-Should return a synthesis written within the last 6 hours (cron interval). If older, the cron has failed — check the Render dashboard for `loom-self-observer` service status.
+Should return a synthesis written within the last 6 hours (cron interval). If older, the cron has failed — check the Render dashboard for `self-observer` service status.
 
 For both: in the architecture-registry, candidates emitted by the observer have a distinguishable `source` annotation. Operator inspection of the candidates table over time shows new candidates appearing without manual POSTs.
 

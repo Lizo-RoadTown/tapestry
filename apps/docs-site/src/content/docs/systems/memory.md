@@ -7,7 +7,7 @@ Memory is the persistence layer that holds typed records across sessions, projec
 
 ## What it is
 
-An MCP server (HTTP transport) at `https://loom-agent-context.onrender.com/mcp/memory/` exposing six tools:
+An MCP server (HTTP transport) at `https://your-memory-host.example.com/mcp/memory/` exposing six tools:
 
 | Tool | Purpose |
 |---|---|
@@ -20,7 +20,7 @@ An MCP server (HTTP transport) at `https://loom-agent-context.onrender.com/mcp/m
 
 Records are typed (`feedback`, `project`, `user`, `reference`, etc.), tagged with project scope (`["the-loom"]`, `["tapestry"]`, `["sde-extraction"]`), attributed to an actor (`claude-code`, the operator, the Observer), and chained via provenance links.
 
-Currently lives at `the-loom/services/agent-context/` (Render service `loom-agent-context`). Forward path: migrate into `tapestry/services/agent-context/` once boundaries firm up.
+Currently lives at `the-loom/services/agent-context/` (Render service `memory-mcp`). Forward path: migrate into `tapestry/services/agent-context/` once boundaries firm up.
 
 ## Why it exists
 
@@ -37,8 +37,8 @@ flowchart TB
     P[Plugin hooks<br/>SessionStart auto-recall<br/>friction-as-memory writes]
     O[Observer<br/>writes synthesis memos]
     OP[Operator<br/>feedback + decisions]
-    M[Memory MCP<br/>loom-agent-context]
-    PG[(Postgres<br/>loom-postgres)]
+    M[Memory MCP<br/>memory-mcp]
+    PG[(Postgres<br/>postgres)]
     OBSY[Observatory<br/>memory lens]
     P -->|write| M
     O -->|write| M
@@ -47,7 +47,7 @@ flowchart TB
     M -->|read| OBSY
 ```
 
-The Memory MCP is read-write to plugins (auto-recall at SessionStart, friction writes mid-session), the Observer (synthesis memos), and operators (typed records via memory_write). It backs onto Postgres (`loom-postgres` on Render). The Observatory reads through it for the memory lens.
+The Memory MCP is read-write to plugins (auto-recall at SessionStart, friction writes mid-session), the Observer (synthesis memos), and operators (typed records via memory_write). It backs onto Postgres (`postgres` on Render). The Observatory reads through it for the memory lens.
 
 ## Setup
 
@@ -59,7 +59,7 @@ The Memory MCP is read-write to plugins (auto-recall at SessionStart, friction w
     "loom-memory": {
       "transport": {
         "type": "http",
-        "url": "https://loom-agent-context.onrender.com/mcp/memory/"
+        "url": "https://your-memory-host.example.com/mcp/memory/"
       }
     }
   }
@@ -72,7 +72,7 @@ That's it. `tapestry onboard` writes this block for you. Each operator gets a fa
 
 1. Copy `the-loom/services/agent-context/` into your Tapestry deployment.
 2. Provision a Render Postgres instance for record storage.
-3. Deploy as a Render Web Service from `the-loom/infra/deploy/render.yaml` (search `loom-agent-context`).
+3. Deploy as a Render Web Service from `the-loom/infra/deploy/render.yaml` (search `memory-mcp`).
 4. Required env vars:
    - `DATABASE_URL` — Render Postgres connection string
    - `PLATFORM_MODE=hosted` (multi-tenant) or `=self_host` (single-tenant, default)

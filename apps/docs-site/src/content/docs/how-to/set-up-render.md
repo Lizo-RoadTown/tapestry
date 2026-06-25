@@ -13,12 +13,12 @@ The Render side hosts five Python web services plus one Postgres instance plus o
 
 | Resource | Purpose | Source |
 |---|---|---|
-| `loom-postgres` (managed Postgres) | Backing store for memory records, project registry, candidate registry | [the-loom/render.yaml](https://github.com/Lizo-RoadTown/the-loom/blob/main/render.yaml) |
-| `loom-agent-context` (web service) | The Memory MCP — `memory_read/write/recall/list/search/delete` over HTTP + MCP | [the-loom/services/agent-context/](https://github.com/Lizo-RoadTown/the-loom/tree/main/services/agent-context) |
-| `loom-architecture-registry` | Candidate + Architecture registry endpoints | [the-loom/services/architecture-registry/](https://github.com/Lizo-RoadTown/the-loom/tree/main/services/architecture-registry) |
-| `loom-policy` | Promotion policy evaluator | [the-loom/services/policy/](https://github.com/Lizo-RoadTown/the-loom/tree/main/services/policy) |
-| `loom-project-registry` | Project + repo + machine registration | [the-loom/services/project-registry/](https://github.com/Lizo-RoadTown/the-loom/tree/main/services/project-registry) |
-| `loom-self-observer` (cron) | 6-hour scan that interprets signals into candidates | [the-loom/services/self-observer/](https://github.com/Lizo-RoadTown/the-loom/tree/main/services/self-observer) |
+| `postgres` (managed Postgres) | Backing store for memory records, project registry, candidate registry | [the-loom/render.yaml](https://github.com/Lizo-RoadTown/the-loom/blob/main/render.yaml) |
+| `memory-mcp` (web service) | The Memory MCP — `memory_read/write/recall/list/search/delete` over HTTP + MCP | [the-loom/services/agent-context/](https://github.com/Lizo-RoadTown/the-loom/tree/main/services/agent-context) |
+| `architecture-registry` | Candidate + Architecture registry endpoints | [the-loom/services/architecture-registry/](https://github.com/Lizo-RoadTown/the-loom/tree/main/services/architecture-registry) |
+| `policy-service` | Promotion policy evaluator | [the-loom/services/policy/](https://github.com/Lizo-RoadTown/the-loom/tree/main/services/policy) |
+| `project-registry` | Project + repo + machine registration | [the-loom/services/project-registry/](https://github.com/Lizo-RoadTown/the-loom/tree/main/services/project-registry) |
+| `self-observer` (cron) | 6-hour scan that interprets signals into candidates | [the-loom/services/self-observer/](https://github.com/Lizo-RoadTown/the-loom/tree/main/services/self-observer) |
 
 ## Prerequisites
 
@@ -84,7 +84,7 @@ A few keys must be set on individual services (not shared):
 
 | Service | Key | Purpose |
 |---|---|---|
-| `loom-agent-context` | `LOOM_JWT_PRIVATE_KEY` | RSA private key — only this service signs tokens |
+| `memory-mcp` | `LOOM_JWT_PRIVATE_KEY` | RSA private key — only this service signs tokens |
 | `loom-project-observatory` (if deployed) | `GRAFANA_CLOUD_API_URL` | Server-side Grafana query endpoint |
 | `loom-project-observatory` (if deployed) | `GRAFANA_CLOUD_API_TOKEN` | Auth for the query endpoint |
 
@@ -95,15 +95,15 @@ Set these per-service: open the service → **Environment** → **Add Environmen
 Each service must show **Live** in the dashboard. Then check the health endpoints (every Python service in `the-loom/services/*/main.py` exposes `/health`):
 
 ```sh
-curl https://loom-agent-context.onrender.com/health
-curl https://loom-architecture-registry.onrender.com/health
-curl https://loom-policy.onrender.com/health
-curl https://loom-project-registry.onrender.com/health
+curl https://your-memory-host.example.com/health
+curl https://your-registry-host.example.com/health
+curl https://your-policy-host.example.com/health
+curl https://your-project-registry-host.example.com/health
 ```
 
 Each should return `{"status": "ok", "service": "<name>"}`.
 
-For the cron, open [`loom-self-observer`](https://dashboard.render.com/) in the dashboard and check the **Logs** tab. The first run executes within 6 hours of deployment (or you can manually trigger it via **Manual Deploy** → **Trigger Job**).
+For the cron, open [`self-observer`](https://dashboard.render.com/) in the dashboard and check the **Logs** tab. The first run executes within 6 hours of deployment (or you can manually trigger it via **Manual Deploy** → **Trigger Job**).
 
 ## Step 7 — Confirm the Memory MCP is reachable
 
@@ -117,7 +117,7 @@ From a Claude Code session in any test project:
        "loom-memory": {
          "transport": {
            "type": "http",
-           "url": "https://loom-agent-context.onrender.com/mcp/memory/"
+           "url": "https://your-memory-host.example.com/mcp/memory/"
          }
        }
      }
@@ -133,7 +133,7 @@ If you see `MCP UNREACHABLE: HTTP 404`, the service is still cold-starting (free
 
 Render's free tier covers small projects but the platform's services have constraints:
 
-- Free-tier web services sleep after 15 minutes idle (~60s cold-start when traffic resumes). For the Memory MCP this is a real UX cost — every fresh session hits a cold start. The platform owner typically upgrades `loom-agent-context` to a paid plan (starter or above) once consumers are active.
+- Free-tier web services sleep after 15 minutes idle (~60s cold-start when traffic resumes). For the Memory MCP this is a real UX cost — every fresh session hits a cold start. The platform owner typically upgrades `memory-mcp` to a paid plan (starter or above) once consumers are active.
 - Managed Postgres has its own pricing tiers; the free tier is fine for early use.
 - The cron schedule (every 6h) is well within free-tier limits.
 

@@ -87,9 +87,8 @@ export default defineConfig({
             // What the loop produces over time.
             { label: "How the platform upskills itself", slug: "explanation/upskilling" },
             { label: "Sharing intelligence across projects", slug: "explanation/sharing-intelligence-across-projects" },
-            // Boundaries + glossary.
+            // Boundaries.
             { label: "What Tapestry is not", slug: "start/what-tapestry-is-not" },
-            { label: "Names you'll see in these docs", slug: "start/names-you-will-see" },
           ],
         },
         {

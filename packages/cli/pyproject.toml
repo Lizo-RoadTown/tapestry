@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tapestry-cli"
-version = "0.1.1"
+version = "0.1.2"
 description = "Tapestry command-line interface — onboard projects, inspect state, open the Observatory."
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
 authors = [
-  {name = "Liz Osborn", email = "lizocontactinfo@gmail.com"},
+  {name = "Liz Osborn"},
 ]
 keywords = ["tapestry", "agents", "coordination", "observability", "cli"]
 classifiers = [

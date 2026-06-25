@@ -10,7 +10,8 @@ Triggers the architecture-snapshot pipeline:
      diff.md AND requesting it invoke the architecture-analyst subagent to
      produce the narrative report.
 
-Scope-guarded: only fires in Make_Skills or project-starter-scaffolded repos.
+Scope-guarded: only fires when LOOM_PROJECT_ID is set, the cwd matches the
+optional TAPESTRY_SCOPE_DIRS allowlist, or the repo has the snapshot pipeline.
 
 The script does NOT write the narrative itself — that's the analyst agent's
 job. This script ensures the deterministic snapshot + diff data exists, so
@@ -88,6 +89,32 @@ _AGENT_CONTEXT_DEFAULT_URL = os.environ.get(
     ),
 )
 _MCP_PATH = "/mcp/memory/"
+
+
+def _agent_context_base_url() -> str:
+    """Resolve the agent-context base host (used for /health + /v1/recall) from
+    the env precedence. The *_MEMORY_MCP_URL / *_MEMORY_URL vars point at the
+    full /mcp/memory/ endpoint, so strip that suffix to recover the base host —
+    this way all six configuration vars resolve to the same place. Falls back to
+    the example.com placeholder when nothing is configured."""
+    for var in ("TAPESTRY_AGENT_CONTEXT_URL", "LOOM_AGENT_CONTEXT_URL"):
+        v = os.environ.get(var, "").strip()
+        if v:
+            return v.rstrip("/")
+    for var in ("TAPESTRY_MEMORY_MCP_URL", "LOOM_MEMORY_MCP_URL",
+                "TAPESTRY_MEMORY_URL", "LOOM_MEMORY_URL"):
+        v = os.environ.get(var, "").strip()
+        if v:
+            return v.rstrip("/").removesuffix("/mcp/memory").rstrip("/")
+    return _AGENT_CONTEXT_DEFAULT_URL.rstrip("/")
+
+
+def _backend_configured() -> bool:
+    """True iff a real memory backend is configured via env (the resolved base
+    URL is not the example.com placeholder). When unconfigured the plugin runs
+    in pure-discipline mode: no memory probe/recall, no timeout against the
+    placeholder host. The discipline hooks need no backend."""
+    return "example.com" not in _agent_context_base_url()
 
 
 def _check_mcp_reachable(base_url: str, timeout: float = 3.0) -> tuple[bool, str]:
@@ -202,17 +229,7 @@ def _try_recall(cwd_lower: str, n: int = 5, timeout: float = 6.0) -> list[str]:
             "project_tags": project_tags,
         }).encode("utf-8")
 
-        base_url = (
-            os.environ.get("TAPESTRY_AGENT_CONTEXT_URL")
-            or os.environ.get("LOOM_AGENT_CONTEXT_URL")
-            or _AGENT_CONTEXT_DEFAULT_URL
-        )
-        # Strip http://localhost paths — they're for local-dev only; in a
-        # hook fire on Liz's actual machine, the local dev server typically
-        # isn't running. Fall through to the Render URL.
-        if base_url.startswith("http://localhost") or base_url.startswith("http://127."):
-            base_url = _AGENT_CONTEXT_DEFAULT_URL
-        url = base_url.rstrip("/") + "/v1/recall"
+        url = _agent_context_base_url().rstrip("/") + "/v1/recall"
 
         req = urllib.request.Request(
             url=url,
@@ -256,35 +273,26 @@ def _try_recall(cwd_lower: str, n: int = 5, timeout: float = 6.0) -> list[str]:
 def _in_scope(cwd) -> bool:
     """True if tapestry-discipline hooks should run for this repo.
 
-    In scope if EITHER the working-directory path contains a known loom
-    substring (Make_Skills / the-loom / project-starter / _common), OR
-    LOOM_PROJECT_ID is set — the explicit per-project opt-in a consuming
-    project declares via its `.env` (loaded into os.environ by
-    _observability._load_dotenv at import time).
-
-    v0.1.12: added the LOOM_PROJECT_ID clause. Before this the gate was
-    substring-only, so a fully-wired consuming project (LOOM_PROJECT_ID
-    set, CLAUDE.md referencing the discipline) silently no-op'd every hook
-    — e.g. SDE_Extraction. Honoring LOOM_PROJECT_ID closes that class of
-    bug for every future consumer, not just one repo.
+    In scope if LOOM_PROJECT_ID is set (the explicit per-project opt-in a
+    consuming project declares via its `.env`, loaded into os.environ by
+    _observability._load_dotenv at import time), OR the working-directory
+    path matches a substring in the optional TAPESTRY_SCOPE_DIRS env
+    allowlist (comma-separated). No project names are hardcoded — the plugin
+    ships universal; each operator configures their own scope.
 
     Note: session_start keeps an additional ARCHITECTURE.md + snapshot-
     script fallback at its call site for repos that have the snapshot
     pipeline but no LOOM_PROJECT_ID set.
     """
-    cwd_s = str(cwd or "")
-    cwd_l = cwd_s.lower()
-    if (
-        "make_skills" in cwd_l
-        or "make-skills" in cwd_l
-        or "the-loom" in cwd_l
-        or "tapestry" in cwd_l
-        or "project-starter" in cwd_l
-        or "_common" in cwd_s
-    ):
-        return True
     if os.environ.get("LOOM_PROJECT_ID", "").strip():
         return True
+    # Optional path allowlist — no project names hardcoded; operators set
+    # TAPESTRY_SCOPE_DIRS (comma-separated substrings) for path-based scoping.
+    cwd_l = str(cwd or "").lower()
+    allow = os.environ.get("TAPESTRY_SCOPE_DIRS", "")
+    for sub in (s.strip().lower() for s in allow.split(",") if s.strip()):
+        if sub and sub in cwd_l:
+            return True
     return False
 
 
@@ -406,19 +414,26 @@ def main() -> int:
     # Never raises. If the recall fails (network blip, service cold-start
     # timeout, schema drift), the hook still emits the architecture-snapshot
     # context — auto-recall is best-effort, not load-bearing.
-    recall_lines = _try_recall(cwd_lower)
-    if recall_lines:
+    # The memory backend is OPTIONAL. When the operator has pointed the plugin
+    # at a real host (env), do best-effort recall + the MCP reachability probe
+    # (whose "unreachable" warning is load-bearing — CORE DIRECTIVE 1). When NOT
+    # configured, run in pure-discipline mode: skip the network calls and emit a
+    # soft note instead of a violation, so the plugin never times out against
+    # the placeholder host.
+    if _backend_configured():
+        recall_lines = _try_recall(cwd_lower)
+        if recall_lines:
+            msg_lines.append("")
+            msg_lines.extend(recall_lines)
         msg_lines.append("")
-        msg_lines.extend(recall_lines)
-
-    # v0.1.8 (concrete-rule Layer 6): probe the MCP transport and surface a
-    # loud warning if it's unreachable. Silent absence of memory access was
-    # the failure mode the v0.1.8 wiring exists to prevent.
-    base_url = os.environ.get("LOOM_AGENT_CONTEXT_URL") or _AGENT_CONTEXT_DEFAULT_URL
-    if base_url.startswith("http://localhost") or base_url.startswith("http://127."):
-        base_url = _AGENT_CONTEXT_DEFAULT_URL
-    msg_lines.append("")
-    msg_lines.extend(_mcp_status_block(base_url))
+        msg_lines.extend(_mcp_status_block(_agent_context_base_url()))
+    else:
+        msg_lines.append("")
+        msg_lines.append("[memory: not configured — optional]")
+        msg_lines.append(
+            "Set TAPESTRY_MEMORY_MCP_URL to your own memory MCP endpoint to enable "
+            "cross-session recall. The discipline hooks work without it."
+        )
 
     payload = {
         "hookSpecificOutput": {

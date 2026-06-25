@@ -199,20 +199,21 @@ async def test_empty_bearer_token_returns_401(middleware):
 
 
 def test_self_host_tenant_id_matches_canonical():
-    """The middleware's SELF_HOST_TENANT_ID must match the same constant in:
-      - services/agent-context/main.py:44
-      - services/agent-context/mcp_server.py:70
-      - services/project-registry/auth_bridge.py:30
-      - infra/migrations/001_init_memory.sql:200-202
+    """The middleware's SELF_HOST_TENANT_ID must agree with the same
+    constant in:
+      - services/agent-context/main.py
+      - services/agent-context/mcp_server.py
+      - services/project-registry/auth_bridge.py
+      - packages/auth/python/loom_auth/auth_bridge.py (canonical)
 
-    If these drift, RLS policies will silently filter to zero rows for one
-    of the paths. This test is the static check that catches drift before
-    deploy."""
+    All four read from the same env var (SELF_HOST_TENANT_ID, with
+    LOOM_SELF_HOST_TENANT_ID as deprecated alias). The drift this test
+    catches is per-service CONSISTENCY — every path must resolve to the
+    same value for a given deployment's env. The specific UUID is per
+    deployment; the test does not pin one."""
     from mcp_self_host_middleware import SELF_HOST_TENANT_ID as MW_UUID
     from mcp_server import DEFAULT_SELF_HOST_TENANT_ID as SERVER_UUID
     from main import SELF_HOST_TENANT_ID as REST_UUID
 
-    canonical = "1d8ec1b3-d62a-5fab-9a52-eb6a3e09f1c8"
-    assert MW_UUID == canonical, f"middleware drift: {MW_UUID}"
-    assert SERVER_UUID == canonical, f"mcp_server drift: {SERVER_UUID}"
-    assert REST_UUID == canonical, f"main drift: {REST_UUID}"
+    assert MW_UUID == SERVER_UUID, f"middleware vs mcp_server drift: {MW_UUID} != {SERVER_UUID}"
+    assert MW_UUID == REST_UUID, f"middleware vs main drift: {MW_UUID} != {REST_UUID}"

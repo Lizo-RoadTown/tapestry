@@ -40,7 +40,9 @@ async def http_client() -> AsyncIterator[httpx.AsyncClient]:
         yield ac
 
 
-_SELF_HOST_TENANT = "1d8ec1b3-d62a-5fab-9a52-eb6a3e09f1c8"
+# Test-only synthetic UUID. Production self-host tenant resolves from
+# the SELF_HOST_TENANT_ID env var (see packages/auth/python/loom_auth/auth_bridge.py).
+_SELF_HOST_TENANT = "99999999-9999-4999-9999-999999999999"
 
 _VALID_WRITE_BODY = {
     "name": "test_synthesis_memo",

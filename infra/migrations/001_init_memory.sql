@@ -196,13 +196,13 @@ CREATE POLICY records_tenant_delete ON records
 -- mcp_server.py.
 -- ---------------------------------------------------------------------
 
--- Liz's stable self-host tenant_id (deterministic; reproducible across
--- machines without state). Generated via:
---   python -c "import uuid; print(uuid.uuid5(uuid.NAMESPACE_DNS, 'liz.loom.humancensys.com'))"
--- Value: 1d8ec1b3-d62a-5fab-9a52-eb6a3e09f1c8
+-- Self-host tenant_id is per-deployment, set via the SELF_HOST_TENANT_ID
+-- env var (read by packages/auth/python/loom_auth/auth_bridge.py). The
+-- migration file does not bake a UUID in; operators generate their own
+-- (e.g. `python -c "import uuid; print(uuid.uuid4())"`).
 --
--- Don't INSERT into a tenants table — we don't have one yet. The
--- tenant_id is a free-form UUID. A tenants table (with name, owner,
--- created_at) lands in Phase 3 when Project Registry needs it.
+-- No tenants table is created here — tenant_id is a free-form UUID. A
+-- tenants table (with name, owner, created_at) lands in Phase 3 when
+-- Project Registry needs it.
 
 COMMIT;

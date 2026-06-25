@@ -100,6 +100,7 @@ export default defineConfig({
             { label: "Verify it worked", slug: "start/verify-it-worked" },
             { label: "First Observatory visit", slug: "start/first-observatory-visit" },
             { label: "Set up a new project (comprehensive)", slug: "how-to/set-up-a-new-project" },
+            { label: "Create your own plugin", slug: "how-to/create-your-own-plugin" },
             { label: "Recover from common failures", slug: "how-to/recover-from-common-failures" },
             // The Observatory's own usage pages — operational, not architectural.
             { label: "About the Observatory", slug: "observatory/about" },

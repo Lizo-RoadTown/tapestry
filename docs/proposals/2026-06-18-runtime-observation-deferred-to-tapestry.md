@@ -29,7 +29,7 @@
 
 ## What the observer is observing today (PROBE-grounded)
 
-`the-loom/services/self-observer/` is a Render cron (`crn-d8n2q4ernols73d7upbg`, every 6h, plan: starter).
+`the-loom/services/self-observer/` is a Render cron (every 6h, plan: starter).
 
 - **Static file scanning** via GitHub API across 4 hardcoded repos (`config.py:44-80`): `claude-skills-marketplace/plugins/liz-patterns`, `Make_Skills/{subagents, core/runtime/subagents, adapters/*}`, `the-loom/{adapters/.../{skills,agents}, skills_private}`, `docs-agent/{skills, agents}`.
 - **Shape-classification** via three signal sets (`signal_rules.py:189-271`): agent / inline_tool / skill. Emits candidate when verdict differs from current directory location at confidence ≥ 0.3 (`config.py:164`).
@@ -77,7 +77,7 @@ Per `bridge_closed_end_to_end_2026_06_13`, only `kind=skill` has a destination h
 
 - **A3 (line 405, verbatim):** *"Close dispatch-promotion gap per `2026-06-16-candidate-lifecycle-verified.md` Option B (in-service auto-trigger at PATCH time)... ~1 hour code + tests"* — **FIX IN-PLACE in the-loom, NOT defer.**
 - **D2 (line 422):** "correct any keep-warm-dropped claim in render.yaml or memory" (housekeeping memory correction)
-- **D3 (line 423):** "record the service-ID typo: `srv-d8aj2b3bc2fs7382snqg` is telemetry-ingestion, not agent-context" (housekeeping memory correction)
+- **D3 (line 423):** "record the service-ID typo: the cited service ID is telemetry-ingestion, not agent-context" (housekeeping memory correction)
 
 The "Don't fix in the-loom; close in Tapestry" framing v1 attributed to D3 doesn't exist in the audit. Loom-agent's actual §B (DON'T FIX in the-loom, lines 408-412) names memory schema, dashboard redesign, project-observatory build-out, telemetry-ingestion query API — dispatch-promotion is explicitly NOT in that list.
 

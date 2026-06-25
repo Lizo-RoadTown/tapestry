@@ -17,9 +17,9 @@ This surface is **the-loom's running interface**. Not a product shipped to end-u
 
 ## Backend services this site consumes
 
-- `loom-architecture-registry` (`https://loom-architecture-registry.onrender.com`) — `GET /candidates` for the queue, `PATCH /candidates/{id}/status` after a decision applies
-- `loom-policy` (`https://loom-policy.onrender.com`) — `POST /decisions`, `GET /candidates/{id}/policy-state`
-- `loom-project-registry` (`https://loom-project-registry.onrender.com`) — `GET /projects` for filter dropdowns
+- **architecture-registry** (URL set via env) — `GET /candidates` for the queue, `PATCH /candidates/{id}/status` after a decision applies
+- **policy service** (URL set via env) — `POST /decisions`, `GET /candidates/{id}/policy-state`
+- **project-registry** (URL set via env) — `GET /projects` for filter dropdowns
 - Grafana Cloud — embedded iframe in `/dashboard` (until native observability views replace it)
 
 Auth: self-host mode (no JWT header) gets the canonical `SELF_HOST_TENANT_ID` via the backend services' `auth_bridge` fallback. Hosted-multitenant mode (future): the dashboard will mint + attach a Bearer JWT.

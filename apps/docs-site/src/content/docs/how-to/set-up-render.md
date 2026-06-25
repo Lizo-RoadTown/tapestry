@@ -13,17 +13,17 @@ The Render side hosts five Python web services plus one Postgres instance plus o
 
 | Resource | Purpose | Source |
 |---|---|---|
-| `postgres` (managed Postgres) | Backing store for memory records, project registry, candidate registry | [the-loom/render.yaml](https://github.com/Lizo-RoadTown/the-loom/blob/main/render.yaml) |
-| `memory-mcp` (web service) | The Memory MCP — `memory_read/write/recall/list/search/delete` over HTTP + MCP | [the-loom/services/agent-context/](https://github.com/Lizo-RoadTown/the-loom/tree/main/services/agent-context) |
-| `architecture-registry` | Candidate + Architecture registry endpoints | [the-loom/services/architecture-registry/](https://github.com/Lizo-RoadTown/the-loom/tree/main/services/architecture-registry) |
-| `policy-service` | Promotion policy evaluator | [the-loom/services/policy/](https://github.com/Lizo-RoadTown/the-loom/tree/main/services/policy) |
-| `project-registry` | Project + repo + machine registration | [the-loom/services/project-registry/](https://github.com/Lizo-RoadTown/the-loom/tree/main/services/project-registry) |
-| `self-observer` (cron) | 6-hour scan that interprets signals into candidates | [the-loom/services/self-observer/](https://github.com/Lizo-RoadTown/the-loom/tree/main/services/self-observer) |
+| `postgres` (managed Postgres) | Backing store for memory records, project registry, candidate registry | `render.yaml` |
+| `memory-mcp` (web service) | The Memory MCP — `memory_read/write/recall/list/search/delete` over HTTP + MCP | `services/agent-context/` |
+| `architecture-registry` | Candidate + Architecture registry endpoints | `services/architecture-registry/` |
+| `policy-service` | Promotion policy evaluator | `services/policy/` |
+| `project-registry` | Project + repo + machine registration | `services/project-registry/` |
+| `self-observer` (cron) | 6-hour scan that interprets signals into candidates | `services/self-observer/` |
 
 ## Prerequisites
 
 - A [Render account](https://render.com/) (free tier is enough to start; the platform-owner deployment may need a paid plan once traffic grows — see [Render's pricing](https://render.com/pricing))
-- A [GitHub account](https://github.com/) that can read `Lizo-RoadTown/the-loom` (the public repo holding the Blueprint)
+- A [GitHub account](https://github.com/) that can read `your deployment repo` (the public repo holding the Blueprint)
 - A Grafana Cloud account with OTel credentials in hand — see [Set up Grafana Cloud + OTel](/how-to/set-up-grafana-cloud/) first; the Render services need `OTEL_EXPORTER_OTLP_*` env vars at provisioning time
 
 ## Step 1 — Sign up + sign in
@@ -33,7 +33,7 @@ The Render side hosts five Python web services plus one Postgres instance plus o
 
 ## Step 2 — Connect the GitHub repo
 
-Render reads the Blueprint directly from a connected GitHub repo. You need to authorize Render to access `Lizo-RoadTown/the-loom`.
+Render reads the Blueprint directly from a connected GitHub repo. You need to authorize Render to access `your deployment repo`.
 
 1. In the dashboard, click your profile (top-right) → **Account Settings** → **GitHub** → **Configure**.
 2. Authorize Render against `Lizo-RoadTown` (your fork, or the upstream if you're the upstream owner).
@@ -55,7 +55,7 @@ If the file is valid, the command exits 0. If not, it prints the schema errors s
 ## Step 4 — Provision the Blueprint
 
 1. In the Render dashboard, click **New** (top-right) → **Blueprint**. Render's [Infrastructure as Code](https://render.com/docs/infrastructure-as-code) page documents this workflow.
-2. Select the connected `Lizo-RoadTown/the-loom` repo.
+2. Select the connected `your deployment repo` repo.
 3. Render reads `render.yaml` at the repo root and previews what it will create — five web services + one Postgres + one cron, matching the table above.
 4. Click **Apply**.
 
@@ -63,7 +63,7 @@ Render builds each service in parallel. First builds take 3–8 minutes per serv
 
 ## Step 5 — Set the required env vars
 
-The Blueprint declares which env vars each service needs but does not set their values (secrets are operator-supplied). Per [the-loom's render.yaml comments](https://github.com/Lizo-RoadTown/the-loom/blob/main/render.yaml), you need to set these in the dashboard.
+The Blueprint declares which env vars each service needs but does not set their values (secrets are operator-supplied). Per the-loom's render.yaml comments, you need to set these in the dashboard.
 
 ### Shared across services — `loom-shared-secrets` env group
 
@@ -155,6 +155,6 @@ This is by design; the Render MCP only supports updates that don't change billin
 - [Set up Vercel](/how-to/set-up-vercel/) — for the frontend (docs site + Observatory cockpit)
 - [Platform dependencies](/reference/platform-dependencies/) — what each external service does
 - [Memory](/systems/memory/), [Registry](/systems/registry/), [Observer](/systems/observer/) — the Systems pages for the components deployed here
-- [the-loom/render.yaml](https://github.com/Lizo-RoadTown/the-loom/blob/main/render.yaml) — the actual Blueprint file
+- `render.yaml` — the actual Blueprint file
 - [Render docs — Blueprint spec](https://render.com/docs/blueprint-spec)
 - [Render docs — Infrastructure as Code](https://render.com/docs/infrastructure-as-code)

@@ -63,7 +63,7 @@ The mechanisms, paired with the specific weak bond each one reinforces, are in t
 | Weak bond | What goes wrong | The reinforcement |
 |---|---|---|
 | **Memory loss across sessions** | The user said something important last session; the agent doesn't have it next session; correction is lost or has to be re-said. | The **loom-memory MCP** + the SessionStart auto-recall hook. Persistent cross-session memory; top-N relevant memories injected at conversation start. → [Memory MCP](/explanation/memory-mcp/) |
-| **Drift from the user's framing** | The user asks for a "layer" and the agent builds a separate deployed system. The user's load-bearing words get re-interpreted into the agent's default ontology. | **Per-project guard plugins** with framing-clarification gates that force the agent to restate the request in the user's words before building. The `sde-extraction-guard` UserPromptSubmit hook is the canonical example. → [Plugins](/explanation/plugins/) |
+| **Drift from the user's framing** | The user asks for a "layer" and the agent builds a separate deployed system. The user's load-bearing words get re-interpreted into the agent's default ontology. | **Per-project guard plugins** with framing-clarification gates that force the agent to restate the request in the user's words before building. The `your-project-guard` UserPromptSubmit hook is the canonical example. → [Plugins](/explanation/plugins/) |
 | **Silent assumptions about the codebase** | The agent cites facts about the code that come from training-data defaults, not from the actual files. The user trusts the citation; the citation is wrong. | The **PROBE-discipline reminder** injected at the top of every user message by the `tapestry-discipline` UserPromptSubmit hook. "Cite file:line. Don't assert without grep/read." → [Plugins](/explanation/plugins/) |
 | **Forgotten corrections** | The user corrects the agent at minute 10 of a session; by minute 40, the agent has drifted back to the original behavior; by next session, the correction is gone entirely. | The **friction-as-memory rule** — every correction MUST be saved as a `feedback` memory immediately, at the moment of correction, not deferred. The discipline reminder reinforces it; the memory itself preserves it across sessions. → [Memory MCP](/explanation/memory-mcp/) |
 | **Architectural blindness** | The agent has no idea what's deployed, what changed since last session, what services exist, what depends on what. Every conversation starts from zero structural awareness. | The **architecture-snapshot pipeline** at SessionStart. Produces a structural snapshot + diff against prior baseline + narrative summary, injected as session context. → [Architecture snapshots](/explanation/architecture-snapshots/) |
@@ -155,7 +155,7 @@ The diagram above shows how the pieces interconnect. The five summaries below sa
 Three plugins typically active per project:
 - **`tapestry-discipline`** — the universal discipline source (PROBE hooks, MCP wiring, auto-recall, upskilling audit)
 - **`tapestry-patterns`** — the canonical reusable agents, skills, and scripts
-- A **per-project guard plugin** (optional) — project-specific guardrails like `sde-extraction-guard`'s framing-clarification gate
+- A **per-project guard plugin** (optional) — project-specific guardrails like `your-project-guard`'s framing-clarification gate
 
 They compose, they don't replace. All three are designed to coexist.
 

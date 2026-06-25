@@ -24,7 +24,7 @@ Conventions:
 - Append `-dev` if you anticipate spawning an `-app` instance later (a separate Claude Code agent for a deployed user-facing surface). One existing example consuming project uses this pattern: a `-dev` ID for the research/developer-facing instance and a planned `-app` ID for the eventual user-facing app.
 - Single-instance projects don't need the suffix.
 
-Examples: `sde-extraction-dev`, `summer-2026-hub`, `your-project-dev`.
+Examples: `example-project-dev`, `summer-2026-hub`, `your-project-dev`.
 
 ## Step 2 — Install the `tapestry-discipline` plugin
 
@@ -143,13 +143,13 @@ Templates:
 }
 ```
 
-For working examples of these JSON configs, see [an example consuming project's `.project-intelligence/` directory on GitHub](https://github.com/Lizo-RoadTown/sde-extraction/tree/main/.project-intelligence/sde-extraction-dev).
+For working examples of these JSON configs, see an example consuming project's `.project-intelligence/` directory on GitHub.
 
 ## Step 7 — Add architecture-snapshot wrappers (recommended)
 
 The `tapestry-discipline` plugin's SessionStart hook can run `scripts/architecture_snapshot.py` and `scripts/architecture_diff.py` to capture a structural snapshot at session start. These don't need to be your code — they can be thin wrappers that dispatch to the canonical implementations in the `tapestry-patterns` plugin.
 
-See [the wrapper-pattern reference (consuming project PR)](https://github.com/Lizo-RoadTown/sde-extraction/commit/2325e67) for the canonical example.
+See the wrapper-pattern reference (consuming project PR) for the canonical example.
 
 If you skip this step, the SessionStart hook silently no-ops on the snapshot piece — the agent loses the architecture context at session start but otherwise works.
 
@@ -165,7 +165,7 @@ This is the per-project context Claude Code auto-loads. It should explain:
 - Token discipline conventions.
 - Tone.
 
-See [an example consuming project's `CLAUDE.md`](https://github.com/Lizo-RoadTown/sde-extraction/blob/main/CLAUDE.md) for a worked example.
+See an example consuming project's `CLAUDE.md` for a worked example.
 
 ## Step 9 — Register with the Project Registry (when it's live)
 

@@ -80,13 +80,13 @@ Before diagnosing, confirm what the agent CAN see:
 
 **Cause:** `scripts/architecture_snapshot.py` and/or `scripts/architecture_diff.py` are missing from your repo. The SessionStart hook reads from these and silently no-ops if they're absent.
 
-**Fix:** Add the thin wrapper scripts that dispatch to the canonical implementations in the `tapestry-patterns` plugin. See [the wrapper-pattern reference (consuming project PR)](https://github.com/Lizo-RoadTown/sde-extraction/commit/2325e67) for the canonical example. The wrappers are a few lines each.
+**Fix:** Add the thin wrapper scripts that dispatch to the canonical implementations in the `tapestry-patterns` plugin. See the wrapper-pattern reference (consuming project PR) for the canonical example. The wrappers are a few lines each.
 
 **How to confirm fixed:** Start a new session. The SessionStart context should include an architecture narrative (or "no structural changes" diff against the prior baseline).
 
 ### Symptom: Memories I write are tagged for the wrong project
 
-**Cause:** `LOOM_PROJECT_ID` in `.env` drifted from the expected value (e.g., `sde-extraction` instead of `sde-extraction-dev`, or empty, or set to a different project's ID).
+**Cause:** `LOOM_PROJECT_ID` in `.env` drifted from the expected value (e.g., `example-project` instead of `example-project-dev`, or empty, or set to a different project's ID).
 
 **Fix:**
 

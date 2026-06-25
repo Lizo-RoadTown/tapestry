@@ -13,7 +13,7 @@ For the file-by-file reference, see [Load-bearing files](/reference/load-bearing
 |---|---|---|
 | `tapestry-discipline` | `tapestry` | The universal discipline stack: PROBE hooks, memory MCP wiring, auto-recall at session start, upskilling audit at stop. |
 | `tapestry-patterns` | `tapestry` | The canonical reusable agents, skills, and scripts (including the architecture-snapshot canonicals). |
-| Per-project guards (`sde-extraction-guard` etc.) | project-specific | Project-specific guardrails that complement `tapestry-discipline`. Each project that needs its own guard has its own. |
+| Per-project guards (`your-project-guard` etc.) | project-specific | Project-specific guardrails that complement `tapestry-discipline`. Each project that needs its own guard has its own. |
 
 You will likely enable all three for any non-trivial Tapestry-consuming project.
 
@@ -67,17 +67,17 @@ The prior `/plugin install loom-discipline@lizo-loom` (sourced from the-loom) st
 
 The prior `/plugin install liz-patterns@lizo-skills` (sourced from claude-skills-marketplace) still works during the transition window.
 
-## Per-project guards (the `sde-extraction-guard` pattern)
+## Per-project guards (the `your-project-guard` pattern)
 
-**What they do:** add a project-specific discipline layer ON TOP of `tapestry-discipline`. The canonical example is `sde-extraction-guard`, which installs two hooks:
+**What they do:** add a project-specific discipline layer ON TOP of `tapestry-discipline`. The canonical example is `your-project-guard`, which installs two hooks:
 - `UserPromptSubmit` — injects a framing-clarification gate that catches the recurring drift where the operator asks for a "layer" and the agent builds a separate deployed system.
 - `PostToolUse` (matched against `Edit|Write|MultiEdit`) — runs the project's existing `scripts/check_schema.py` after extraction-surface edits to block broken schemas.
 
-**Important: they COMPLEMENT `tapestry-discipline`, they don't replace it.** The `sde-extraction-guard` plugin's own `plugin.json` description says it explicitly. Both plugins should be enabled simultaneously.
+**Important: they COMPLEMENT `tapestry-discipline`, they don't replace it.** The `your-project-guard` plugin's own `plugin.json` description says it explicitly. Both plugins should be enabled simultaneously.
 
-**Where the guard plugin lives:** in the project's own repo at `plugins/<your-guard-name>/`, AND cached at `~/.claude/plugins/cache/<marketplace>/<your-guard-name>/`. The worked example to copy from is [`sde-extraction-guard`](https://github.com/Lizo-RoadTown/sde-extraction/tree/main/plugins/sde-extraction-guard) — a project-specific guard plugin built for a real research project that consumes the platform.
+**Where the guard plugin lives:** in the project's own repo at `plugins/<your-guard-name>/`, AND cached at `~/.claude/plugins/cache/<marketplace>/<your-guard-name>/`. The worked example to copy from is `your-project-guard` — a project-specific guard plugin built for a real research project that consumes the platform.
 
-**Source pattern:** see `Lizo-RoadTown/sde-extraction` for the canonical example. If your project needs its own guard, model it on this pattern — own `.claude-plugin/plugin.json`, own `hooks/hooks.json`, own hook scripts (Node, Python, or shell), optionally own skill files.
+**Source pattern:** see `your-project` for the canonical example. If your project needs its own guard, model it on this pattern — own `.claude-plugin/plugin.json`, own `hooks/hooks.json`, own hook scripts (Node, Python, or shell), optionally own skill files.
 
 ## How the plugins interact
 
@@ -205,11 +205,11 @@ You DON'T need a custom plugin for most projects. `tapestry-discipline` + `tapes
 
 You DO need a custom plugin when:
 
-- Your project has a recurring drift class that the general discipline doesn't catch. The canonical example: the `sde-extraction-guard` framing-clarification gate exists because one project kept hitting a specific drift where the operator asked for a "layer in the existing app" and the agent built a whole separate deployed system instead. The guard injects a per-turn gate that forces the agent to restate what kind of artifact it's building before scaffolding anything.
+- Your project has a recurring drift class that the general discipline doesn't catch. The canonical example: the `your-project-guard` framing-clarification gate exists because one project kept hitting a specific drift where the operator asked for a "layer in the existing app" and the agent built a whole separate deployed system instead. The guard injects a per-turn gate that forces the agent to restate what kind of artifact it's building before scaffolding anything.
 - Your project has a project-specific invariant check that runs on every edit to a particular surface (schema integrity, contract conformance, lint that the general discipline doesn't enforce).
 - Your project bundles a methodology skill that's specific enough to belong with the project, not in the universal `tapestry-patterns`.
 
-The pattern: bundle a project's own `plugins/<name>/` directory in the repo, register it as a local marketplace via `.claude-plugin/marketplace.json`, and enable alongside `tapestry-discipline` in `.claude/settings.json`. Worked example to copy: [`sde-extraction-guard` in a real consuming project](https://github.com/Lizo-RoadTown/sde-extraction/tree/main/plugins/sde-extraction-guard).
+The pattern: bundle a project's own `plugins/<name>/` directory in the repo, register it as a local marketplace via `.claude-plugin/marketplace.json`, and enable alongside `tapestry-discipline` in `.claude/settings.json`. Worked example to copy: `your-project-guard` in a real consuming project.
 
 ## Related
 

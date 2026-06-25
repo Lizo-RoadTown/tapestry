@@ -18,7 +18,7 @@ An MCP server (HTTP transport) at `https://your-memory-host.example.com/mcp/memo
 | `memory_list` | List record names by tag |
 | `memory_delete` | Remove a record |
 
-Records are typed (`feedback`, `project`, `user`, `reference`, etc.), tagged with project scope (`["the-loom"]`, `["tapestry"]`, `["sde-extraction"]`), attributed to an actor (`claude-code`, the operator, the Observer), and chained via provenance links.
+Records are typed (`feedback`, `project`, `user`, `reference`, etc.), tagged with project scope (`["the-loom"]`, `["tapestry"]`, `["example-project"]`), attributed to an actor (`claude-code`, the operator, the Observer), and chained via provenance links.
 
 Currently lives at `the-loom/services/agent-context/` (Render service `memory-mcp`). Forward path: migrate into `tapestry/services/agent-context/` once boundaries firm up.
 
@@ -105,4 +105,4 @@ See [Platform dependencies](/reference/platform-dependencies/) for the full Rend
 - [Sharing intelligence across projects](/explanation/sharing-intelligence-across-projects/) — the multi-agent memory model
 - [Load-bearing files](/reference/load-bearing-files/) — the `.mcp.json` contract is documented there
 - [Observer](/systems/observer/), [Observatory](/systems/observatory/) — the components that read Memory most heavily
-- [CORE DIRECTIVE 1](https://github.com/Lizo-RoadTown/the-loom/blob/main/docs/CORE_DIRECTIVES.md) — why Memory access is mandatory, not optional (the directive's canonical home is currently `the-loom/docs/CORE_DIRECTIVES.md`; it migrates into `tapestry/docs/` once the platform-mode boundaries firm up)
+- CORE DIRECTIVE 1 — why Memory access is mandatory, not optional (the directive's canonical home is currently `the-loom/docs/CORE_DIRECTIVES.md`; it migrates into `tapestry/docs/` once the platform-mode boundaries firm up)

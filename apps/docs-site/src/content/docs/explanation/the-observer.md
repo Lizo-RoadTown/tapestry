@@ -156,7 +156,7 @@ The Path A observer watches what HAPPENS in sessions. The self-observer cron wat
 
 ## The self-observer Render cron
 
-**Where it lives:** in `services/self-observer/` (currently in the-loom; eventual destination is `tapestry/services/self-observer/`). Deployed as Render cron `crn-d8n2q4ernols73d7upbg` running every 6 hours on the starter plan.
+**Where it lives:** in `services/self-observer/`. Deployed as a scheduled job that runs every 6 hours.
 
 **What it does (one scan pass):**
 

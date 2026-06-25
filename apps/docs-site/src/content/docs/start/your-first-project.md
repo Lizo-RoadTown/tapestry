@@ -38,7 +38,7 @@ See [Project Intelligence vs Observatory](/explanation/project-intelligence-vs-o
 
 1. [Verify it worked](/start/verify-it-worked/) — four quick checks that the wiring landed.
 2. [First Observatory visit](/start/first-observatory-visit/) — open the dashboard and learn what to look for.
-3. (Optional) Write a `CLAUDE.md` in your project root. Onboarding does not author one — it's project-specific. See an example at [the-loom's CLAUDE.md](https://github.com/Lizo-RoadTown/the-loom/blob/main/CLAUDE.md).
+3. (Optional) Write a `CLAUDE.md` in your project root. Onboarding does not author one — it's project-specific. See an example at the-loom's CLAUDE.md.
 
 ## Related
 

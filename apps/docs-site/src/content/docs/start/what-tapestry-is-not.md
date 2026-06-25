@@ -1,26 +1,35 @@
 ---
 title: What Tapestry is not
-description: Anchoring against false analogies. Tapestry does pieces of LangSmith, Grafana, AgentOps, memory MCPs, knowledge graphs — but is none of them.
+description: Tapestry borrows pieces from memory tools, observability stacks, and tracing — but it is none of them. Here's what it actually is, frame by frame.
 ---
 
-:::tip[See also]
-For the outcome-led positioning, see the **[home page](/home)** and **[Project intelligence](/project-intelligence)**. This page is for readers who arrive with a different frame loaded — it names which analogies break and where.
-:::
+Tapestry helps you and your agents work together better over time — it notices what keeps happening in your projects, reinforces what works, and turns recurring patterns into durable structure. Memory, telemetry, observability, and upskilling are mechanisms it uses to do that. They are not the thing itself.
 
-Tapestry is a user/agent support and reinforcement system. Projects, interfaces, memory, telemetry, observability, architecture analysis, friction analysis, and upskilling are mechanisms it uses to observe, strengthen, stabilize, and evolve coordination between the operator and agents.
+Readers often arrive with one of those mechanisms loaded as the whole picture. Each table row names the frame, then what Tapestry actually is instead.
 
-Readers often arrive with one of these frames loaded. None of them is the right one.
+## Why it matters
 
-| Reader's frame | The actual relationship |
+If you read Tapestry as "a memory system" or "a dashboard," you'll expect the wrong thing, look in the wrong place, and conclude it's broken when it's working as designed. The frame you arrive with decides what you go looking for.
+
+## Frame by frame
+
+| You might read it as… | What it actually is |
 |---|---|
-| Memory system (Mem0, Letta, Zep) | Memory is one reinforcement mechanism |
-| Observability system (Grafana, OpenTelemetry) | Observability is one reinforcement mechanism |
-| Upskilling engine (training pipeline) | Upskilling materializes stabilized coordination patterns into durable structure |
-| Interface observatory | Interfaces are one observable manifestation of coordination; one signal among many |
-| Project portfolio dashboard | The same reinforcement loop applied across many projects |
-| Coordination protocol | Coordination is the focal phenomenon, not a wire protocol |
-| Project observability | Project telemetry is one source of evidence about coordination |
-| Agent tracing (LangSmith, AgentOps) | Tracing produces telemetry; telemetry is one reinforcement mechanism |
-| Workflow orchestration (Airflow, Temporal) | Tapestry does not run workflows; it observes them |
-| Knowledge graph | Memory accumulates state; entities + relationships are not the primary structure |
-| CRM | Not record-keeping |
+| A memory system (Mem0, Letta, Zep) | Memory is one mechanism. Tapestry uses it to reinforce what's worth keeping. |
+| An observability stack (Grafana, OpenTelemetry) | Observability is one source of evidence about how coordination is going. |
+| An agent tracing tool (LangSmith, AgentOps) | Tracing produces telemetry. Telemetry is one input among several. |
+| A training pipeline | Upskilling is the step that turns a stabilized pattern into a reusable skill or rule. |
+| A project dashboard | The dashboard is one surface onto the patterns — not the system behind them. |
+| A workflow orchestrator (Airflow, Temporal) | Tapestry does not run your workflows. It observes them. |
+| A knowledge graph | Memory accumulates state, but entities-and-relationships is not the primary structure. |
+| A CRM | Not record-keeping. The point is the reinforcement loop, not the records. |
+
+## Going deeper
+
+- [Project intelligence](/project-intelligence) — the outcome-led version of what Tapestry accumulates and why.
+- [The observer](/explanation/the-observer/) — why "observability system" is the wrong frame for the part that watches your project.
+
+## Related
+
+- [Project intelligence vs Observatory](/explanation/project-intelligence-vs-observatory/) — keeping the three platform nouns distinct.
+- [Project shape](/start/project-shape/) — what Tapestry watches change over time.

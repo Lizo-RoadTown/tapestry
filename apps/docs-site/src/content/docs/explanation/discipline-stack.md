@@ -176,7 +176,7 @@ A one-line JSON entry per plugin in your project's `.claude/settings.json`:
   "enabledPlugins": {
     "tapestry-discipline@tapestry": true,
     "tapestry-patterns@tapestry": true,
-    "your-guard@lizo-skills": true
+    "your-guard@your-marketplace": true
   }
 }
 ```

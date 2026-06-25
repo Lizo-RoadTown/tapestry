@@ -11,7 +11,7 @@ Two services:
 
 | Service | Purpose | Lives at |
 |---|---|---|
-| **Architecture Registry** | The durable structural facts the platform treats as settled — promoted patterns, registered skills, structural drift findings. | `the-loom/services/architecture-registry/` (Render service `architecture-registry`) |
+| **Architecture Registry** | The durable structural facts the platform treats as settled — promoted patterns, registered skills, structural drift findings. | `services/architecture-registry/` (Render service `architecture-registry`) |
 | **Candidate Registry** | Patterns surfaced by the Observer that haven't been promoted yet. Includes recurrence count, supporting evidence, observer confidence. | Same service tree; same Postgres backend; separate tables |
 
 The promotion flow goes: Observer writes a candidate → Candidate Registry holds it with reinforcement metadata → Policy service evaluates → operator approves or rejects → on approval, candidate migrates to Architecture Registry as a durable fact.
@@ -54,12 +54,12 @@ The Observer writes; the Policy service evaluates; the operator decides; the Arc
 
 **Self-hosting the Registry:**
 
-1. Copy `the-loom/services/architecture-registry/` into your Tapestry deployment.
+1. Copy `services/architecture-registry/` into your Tapestry deployment.
 2. Provision a Render Postgres instance (can share with Memory's Postgres if you prefer one DB).
-3. Deploy as a Render Web Service from `the-loom/infra/deploy/render.yaml` (search `architecture-registry`).
+3. Deploy as a Render Web Service from `render.yaml` (search `architecture-registry`).
 4. Required env vars:
    - `DATABASE_URL` — Render Postgres connection string
-   - `BRIDGE_HMAC_SECRET` — for the make-skills bridge (see `bridge_hmac.py`)
+   - `BRIDGE_HMAC_SECRET` — for the engine bridge (see `bridge_hmac.py`)
    - `MEMORY_BASE_URL` — to write audit memos
    - `OTEL_EXPORTER_OTLP_*` — for emitting registry runtime telemetry
 5. Same service handles both Candidate and Architecture endpoints; no separate deployment.
@@ -81,7 +81,7 @@ See [Platform dependencies](/reference/platform-dependencies/) for the full Rend
 | Observatory candidate inbox empty | Observer not writing, or write failing | Check `self-observer` Render logs for POST errors; see [Observer troubleshoot](/systems/observer/#troubleshoot) |
 | Candidates exist but never promote | Policy service rejecting, or operator hasn't reviewed | Query Candidate Registry with `?status=pending_review`; check Policy service logs |
 | Architecture Registry diverges from expected facts | Manual writes bypassing Policy | Audit Memory for `architecture_registry_write` records without a matching `policy_decision` |
-| Bridge to make-skills failing | HMAC secret mismatch | Verify `BRIDGE_HMAC_SECRET` matches between Tapestry's Registry and Make_Skills' engine |
+| Bridge to the engine failing | HMAC secret mismatch | Verify `BRIDGE_HMAC_SECRET` matches between Tapestry's Registry and the skill engine |
 | `503` from Render endpoint | Cold start | Wait 30-60s; if persistent, check Render dashboard for service health |
 | Postgres connection timeouts | Connection pool exhausted | Check `postgres` connection count in Render dashboard; scale up the pool in `storage.py` if needed |
 
@@ -89,4 +89,4 @@ See [Platform dependencies](/reference/platform-dependencies/) for the full Rend
 
 - [Observer](/systems/observer/) — the primary writer
 - [Observatory](/systems/observatory/) — where operators review candidates
-- **Make_Skills engine bridge** — the bidirectional contract with `Lizo-RoadTown/Make_Skills`. The Architecture Registry pushes promotion candidates; the engine pushes back registered-skill metadata + runtime telemetry. HMAC-signed via `BRIDGE_HMAC_SECRET`; implementation lives in `the-loom/services/architecture-registry/bridge_hmac.py` + `bridge_models.py`. A public docs page is planned but not yet written.
+- **The engine bridge** — the bidirectional contract with the skill engine. The Architecture Registry pushes promotion candidates; the engine pushes back registered-skill metadata + runtime telemetry. HMAC-signed via `BRIDGE_HMAC_SECRET`; implementation lives in `services/architecture-registry/bridge_hmac.py` + `bridge_models.py`. A public docs page is planned but not yet written.

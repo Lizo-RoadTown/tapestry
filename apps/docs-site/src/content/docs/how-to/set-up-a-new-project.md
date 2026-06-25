@@ -35,7 +35,7 @@ In any Claude Code session:
 /plugin install tapestry-discipline@tapestry
 ```
 
-This installs to your machine's plugin cache at `~/.claude/plugins/cache/tapestry/tapestry-discipline/<version>/`. It is now AVAILABLE on your machine. It is NOT YET enabled in any specific project. The prior `loom-discipline@lizo-loom` install command still works during the transition.
+This installs to your machine's plugin cache at `~/.claude/plugins/cache/tapestry/tapestry-discipline/<version>/`. It is now AVAILABLE on your machine. It is NOT YET enabled in any specific project.
 
 ## Step 3 — Enable the plugin in your project's `.claude/settings.json`
 
@@ -55,7 +55,7 @@ If you have a per-project guard plugin you also want enabled (e.g., a SDE-style 
 {
   "enabledPlugins": {
     "tapestry-discipline@tapestry": true,
-    "your-guard@lizo-skills": true
+    "your-guard@your-marketplace": true
   }
 }
 ```

@@ -9,10 +9,10 @@ The Observer is the component that produces patterns from signals. Nothing else 
 
 A component with two runtime modes:
 
-- **Scheduled cron** — runs every 6 hours, scans platform-owned repos for category drift, writes synthesis memos + candidate findings.
+- **Scheduled cron** — runs every 6 hours, scans your repos for category drift, writes synthesis memos + candidate findings.
 - **On-demand subagent** — invoked from a Claude Code session via `Agent({subagent_type: "liz-patterns:drift-watcher"})` or `liz-patterns:agentic-upskilling` to interpret a single project's recent activity.
 
-Currently lives at `the-loom/services/self-observer/` (Render cron `self-observer`). Forward path: migrate into `tapestry/services/self-observer/` once the bounded-context boundaries firm up.
+Lives at `services/self-observer/` (Render cron `self-observer`).
 
 ## Why it exists
 
@@ -49,15 +49,15 @@ The Observer is platform-level. You stand it up as part of your deployment; your
 
 **Self-hosting the Observer:**
 
-1. Copy `the-loom/services/self-observer/` into your Tapestry deployment.
-2. Deploy as a Render cron — schedule from `the-loom/infra/deploy/render.yaml` (search for `self-observer`).
-3. Required env vars (see `the-loom/services/self-observer/config.py`):
+1. Copy `services/self-observer/` into your Tapestry deployment.
+2. Deploy as a Render cron — schedule from `render.yaml` (search for `self-observer`).
+3. Required env vars (see `services/self-observer/config.py`):
    - `MEMORY_BASE_URL` — points to your Memory MCP
    - `CANDIDATE_REGISTRY_URL` — points to your Candidate Registry
    - `ARCHITECTURE_REGISTRY_URL` — points to your Architecture Registry
    - `OTEL_EXPORTER_OTLP_ENDPOINT` + `OTEL_EXPORTER_OTLP_HEADERS` — for emitting the observer's own runtime telemetry
-   - `GITHUB_TOKEN` — for scanning platform-owned repos
-4. The cron's signal-rule definitions live in `the-loom/services/self-observer/signal_rules.py`; tune them to your project set.
+   - `GITHUB_TOKEN` — for scanning your repos
+4. The cron's signal-rule definitions live in `services/self-observer/signal_rules.py`; tune them to your project set.
 
 See [Platform dependencies](/reference/platform-dependencies/) for the full Render + Grafana setup.
 

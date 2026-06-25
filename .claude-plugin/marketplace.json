@@ -3,8 +3,7 @@
   "name": "tapestry",
   "description": "Tapestry — the user/agent support and reinforcement system. Memory, telemetry, observability, architecture analysis, friction analysis, and upskilling as mechanisms that observe, strengthen, stabilize, and evolve coordination between operators and agents. This marketplace ships the Claude Code plugins that wire consuming projects into the platform.",
   "owner": {
-    "name": "Liz Osborn",
-    "email": "lizocontactinfo@gmail.com"
+    "name": "Liz Osborn"
   },
   "metadata": {
     "pluginRoot": "./integrations/claude-code"

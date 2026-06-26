@@ -38,7 +38,7 @@ export default defineConfig({
         PageTitle: "./src/components/PageActions.astro",
       },
       // Brand fonts, matching the site front page (/):
-      // Instrument Serif (display) / Inter (body) / JetBrains Mono (code).
+      // Space Grotesk (display) / Inter (body) / JetBrains Mono (code).
       head: [
         { tag: "link", attrs: { rel: "preconnect", href: "https://fonts.googleapis.com" } },
         { tag: "link", attrs: { rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: true } },
@@ -46,7 +46,7 @@ export default defineConfig({
           tag: "link",
           attrs: {
             rel: "stylesheet",
-            href: "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap",
+            href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap",
           },
         },
       ],

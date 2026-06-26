@@ -20,7 +20,7 @@
   --faint: #8b9492;
   --brand: #5fd3da;
   --warn: #d8b06a;
-  --font-d: "Instrument Serif", Georgia, serif;
+  --font-d: "Space Grotesk", "Inter", system-ui, sans-serif;
   --font-s: "Inter", system-ui, sans-serif;
   --font-m: "JetBrains Mono", ui-monospace, Consolas, monospace;
   --maxw: 1120px;
@@ -40,8 +40,8 @@ body {
 a { color: inherit; text-decoration: none; }
 
 .mono { font-family: var(--font-m); font-variant-numeric: tabular-nums; }
-.display { font-family: var(--font-d); font-weight: 400; letter-spacing: 0.01em; }
-.accent { font-family: var(--font-d); font-style: italic; background: linear-gradient(120deg, var(--brand), #9be8ec); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.display { font-family: var(--font-d); font-weight: 500; letter-spacing: -0.005em; }
+.accent { font-family: var(--font-d); font-weight: 600; background: linear-gradient(120deg, var(--brand), #9be8ec); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .kicker { font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--brand); margin: 0 0 14px; }
 
 /* reveal-on-scroll */
@@ -59,10 +59,10 @@ a { color: inherit; text-decoration: none; }
 /* nav */
 .nav { position: sticky; top: 0; z-index: 50; border-bottom: 1px solid var(--edge-soft); background: #0a0d0ecc; backdrop-filter: blur(12px); }
 .nav-in { max-width: var(--maxw); margin: 0 auto; padding: 14px 24px; display: flex; align-items: center; gap: 28px; }
-.brand { display: inline-flex; align-items: center; gap: 9px; }
-.brand-mark { display: inline-flex; flex: none; width: 26px; height: 26px; }
+.brand { display: inline-flex; align-items: center; gap: 10px; }
+.brand-mark { display: inline-flex; flex: none; width: 30px; height: 30px; }
 .brand-mark svg { width: 100%; height: 100%; display: block; }
-.wordmark { font-family: var(--font-s); font-weight: 600; font-size: 15px; text-transform: uppercase; letter-spacing: 0.22em; background: linear-gradient(100deg, var(--brand) 12%, #dff3f4 78%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.wordmark { font-family: var(--font-d); font-weight: 500; font-size: 17px; text-transform: uppercase; letter-spacing: 0.26em; background: linear-gradient(96deg, #3fb6bd 0%, #5fd3da 30%, #eafeff 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .links { display: flex; align-items: center; gap: 8px; margin-left: auto; font-size: 14px; }
 .navlink { color: var(--faint); transition: color 0.15s; padding: 8px 10px; }
 .navlink:hover, .navlink[aria-current="page"] { color: var(--ink); }

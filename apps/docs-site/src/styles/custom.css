@@ -9,7 +9,7 @@
  * ─────────────────────────────────────────────────────────────────────── */
 
 :root {
-  --font-d: "Instrument Serif", Georgia, serif;
+  --font-d: "Space Grotesk", "Inter", system-ui, sans-serif;
   --sl-font: "Inter", system-ui, sans-serif;
   --sl-font-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
   /* Tapestry brand */
@@ -74,12 +74,12 @@
 /* Display serif: site title + the top two heading levels, like the front
  * pages. Smaller headings stay in Inter for hierarchy clarity. */
 .site-title {
-  font-family: var(--sl-font);
+  font-family: var(--font-d);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.2em;
   font-size: 0.95rem;
-  background: linear-gradient(100deg, var(--tap-brand) 12%, #dff3f4 78%);
+  background: linear-gradient(96deg, #3fb6bd 0%, #5fd3da 30%, #eafeff 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;

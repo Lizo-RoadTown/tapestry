@@ -36,6 +36,17 @@ const SEGMENTS = [
   { who: "AI product team", problem: "“We have agents. We don't know if they're improving.”", gives: ["Coordination signals", "Observer interpretations", "The Observatory"] },
   { who: "Enterprise innovation", problem: "“Dozens of experiments, no institutional memory.”", gives: ["Cross-project intelligence", "Skill formation", "Reusable structures"] },
 ];
+const PILLARS = [
+  { title: "Woven Recursion", body: "Each cycle weaves through the last, strengthening the whole.", icon: `<path d="M5 8 16 19M8 5 19 16M19 8 8 19M16 5 5 16"/>` },
+  { title: "Growing Structure", body: "Every loop expands the system, adding capability and context.", icon: `<circle cx="12" cy="12" r="6.5"/><circle cx="11" cy="6" r="1.3" fill="currentColor" stroke="none"/><path d="M16.8 7.6 18.6 9.2 16.9 11"/>` },
+  { title: "Compound Intelligence", body: "Connections create structure. Structure enables outcomes.", icon: `<circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/>` },
+  { title: "Built to Evolve", body: "Skills grow. Systems adapt. Results compound.", icon: `<path d="M4 20h16M8 20v-4M12 20v-7M16 20v-10"/><path d="M5 14 10 10 13 12 19 6"/><path d="M16 6h3v3"/>` },
+];
+const STAGES = [
+  { label: "Initial cycle", sub: "Establish", body: "One project, one loop — work observed, knowledge kept.", icon: `<circle cx="20" cy="20" r="13"/><circle cx="20" cy="20" r="2.6"/><circle cx="20" cy="7" r="2.2" fill="currentColor" stroke="none"/><circle cx="20" cy="33" r="2.2" fill="currentColor" stroke="none"/>` },
+  { label: "Recursive cycles", sub: "Strengthen", body: "Loops compound; patterns recur and harden into structure.", icon: `<circle cx="20" cy="20" r="2.6"/><ellipse cx="20" cy="20" rx="16" ry="6"/><ellipse cx="20" cy="20" rx="16" ry="6" transform="rotate(60 20 20)"/><ellipse cx="20" cy="20" rx="16" ry="6" transform="rotate(120 20 20)"/>` },
+  { label: "Compound intelligence", sub: "Scale", body: "Structure carries across projects; the whole system gets sharper.", icon: `<g transform="rotate(45 20 20)"><rect x="9" y="9" width="22" height="22" rx="6" stroke-opacity="0.4"/><rect x="13" y="13" width="14" height="14" rx="4" stroke-opacity="0.7"/><rect x="16.5" y="16.5" width="7" height="7" rx="2"/></g><circle cx="20" cy="20" r="2.5" fill="currentColor" stroke="none"/>` },
+];
 ---
 
 <SiteLayout title="Tapestry — project intelligence for AI-native teams" description="Tapestry helps operators accumulate capability instead of rebuilding context. Observe project evolution, preserve knowledge, discover patterns, and turn repeated work into durable structure.">
@@ -85,6 +96,42 @@ const SEGMENTS = [
         </article>
       ))}
     </div>
+  </section>
+
+  <!-- pillars -->
+  <section class="pillars">
+    <header class="sec-head">
+      <p class="kicker mono">What makes it compound</p>
+      <h2 class="display sec-title">Four principles, one fabric.</h2>
+    </header>
+    <div class="pillar-grid">
+      {PILLARS.map((p) => (
+        <article class="pillar reveal">
+          <span class="pillar-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" set:html={p.icon} /></span>
+          <h3 class="pillar-t mono">{p.title}</h3>
+          <p class="pillar-b">{p.body}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <!-- growth storyline -->
+  <section class="story">
+    <header class="sec-head">
+      <p class="kicker mono">Woven growth over time</p>
+      <h2 class="display sec-title">It gets stronger as it goes.</h2>
+    </header>
+    <div class="story-row">
+      {STAGES.map((s) => (
+        <article class="stage reveal">
+          <span class="stage-ic" aria-hidden="true"><svg viewBox="0 0 40 40" width="62" height="62" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" set:html={s.icon} /></span>
+          <h3 class="stage-t display">{s.label}</h3>
+          <p class="stage-sub mono">{s.sub}</p>
+          <p class="stage-b">{s.body}</p>
+        </article>
+      ))}
+    </div>
+    <p class="story-close">Tapestry is the fabric of intelligent work. Agents act. Cycles recur. Structure emerges. <span class="accent">The whole becomes stronger than the sum of its parts.</span></p>
   </section>
 
   <!-- go deeper -->
@@ -243,5 +290,29 @@ const SEGMENTS = [
   }
   @media (prefers-reduced-motion: reduce) {
     .orbit, .flow, .pulse { animation: none; }
+  }
+
+  /* pillars */
+  .pillars { max-width: var(--maxw); margin: 0 auto; padding: clamp(40px, 7vw, 84px) 24px 0; }
+  .pillar-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 42px; }
+  .pillar { padding: 24px 22px; border: 1px solid var(--edge); border-radius: 16px; background: linear-gradient(180deg, var(--raised), var(--surface-2)); transition: border-color 0.25s, transform 0.25s var(--ease); }
+  .pillar:hover { border-color: #34474a; transform: translateY(-3px); }
+  .pillar-ic { display: inline-flex; align-items: center; justify-content: center; width: 46px; height: 46px; border-radius: 12px; color: var(--brand); background: #5fd3da12; border: 1px solid #5fd3da26; margin-bottom: 18px; }
+  .pillar-t { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--brand); margin: 0 0 9px; }
+  .pillar-b { font-size: 14.5px; line-height: 1.5; color: var(--dim); margin: 0; }
+
+  /* growth storyline */
+  .story { max-width: var(--maxw); margin: 0 auto; padding: clamp(48px, 8vw, 96px) 24px; }
+  .story-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; margin-top: 46px; }
+  .stage { text-align: center; padding: 0 10px; }
+  .stage-ic { display: inline-flex; color: var(--brand); margin-bottom: 14px; }
+  .stage-t { font-size: 21px; margin: 0 0 3px; }
+  .stage-sub { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--brand); margin: 0 0 12px; }
+  .stage-b { font-size: 14px; line-height: 1.55; color: var(--dim); margin: 0 auto; max-width: 28ch; }
+  .story-close { text-align: center; max-width: 56ch; margin: 52px auto 0; font-family: var(--font-d); font-weight: 500; font-size: clamp(19px, 2.4vw, 26px); line-height: 1.4; color: var(--ink); }
+
+  @media (max-width: 860px) {
+    .pillar-grid { grid-template-columns: repeat(2, 1fr); }
+    .story-row { grid-template-columns: 1fr; gap: 38px; }
   }
 </style>

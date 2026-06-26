@@ -74,10 +74,15 @@
 /* Display serif: site title + the top two heading levels, like the front
  * pages. Smaller headings stay in Inter for hierarchy clarity. */
 .site-title {
-  font-family: var(--font-d);
-  font-weight: 400;
-  letter-spacing: 0.01em;
-  font-size: 1.4rem;
+  font-family: var(--sl-font);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 0.95rem;
+  background: linear-gradient(100deg, var(--tap-brand) 12%, #dff3f4 78%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 .sl-markdown-content h1,
 .sl-markdown-content h2,

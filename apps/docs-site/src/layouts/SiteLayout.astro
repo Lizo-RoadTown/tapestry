@@ -46,6 +46,10 @@ const LEARN_MENU = [
   { title: "The Observatory", href: "/observatory/about/" },
   { title: "What Tapestry is not", href: "/start/what-tapestry-is-not/" },
 ];
+
+// Brand logomark — the recursive-loop emblem (Work / Observe / Discover / Reuse
+// around a glowing core). Inlined so nav + footer share one source.
+const MARK = `<svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><circle cx="20" cy="20" r="17" stroke="#3a4648" stroke-width="1.1"/><circle cx="20" cy="20" r="11" stroke="#3a4648" stroke-width="1.1"/><circle cx="20" cy="20" r="6.5" fill="#5fd3da" opacity="0.16"/><circle cx="20" cy="20" r="3.1" fill="#5fd3da"/><circle cx="20" cy="3" r="1.8" fill="#5fd3da"/><circle cx="37" cy="20" r="1.8" fill="#5fd3da"/><circle cx="20" cy="37" r="1.8" fill="#5fd3da"/><circle cx="3" cy="20" r="1.8" fill="#5fd3da"/><circle cx="27.78" cy="27.78" r="1.4" fill="#9be8ec"/></svg>`;
 ---
 
 <!doctype html>
@@ -55,6 +59,7 @@ const LEARN_MENU = [
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -62,7 +67,7 @@ const LEARN_MENU = [
   <body>
     <header class="nav">
       <div class="nav-in">
-        <a class="wordmark" href="/">Tapestry</a>
+        <a class="brand" href="/" aria-label="Tapestry — home"><span class="brand-mark" set:html={MARK} /><span class="wordmark">Tapestry</span></a>
         <nav class="links" aria-label="Primary">
           <div class="menu" data-menu>
             <button class="menu-trigger" aria-haspopup="true" aria-expanded="false">Platform <span class="caret" aria-hidden="true">▾</span></button>
@@ -127,8 +132,8 @@ const LEARN_MENU = [
     <footer class="footer">
       <div class="foot-in">
         <div class="foot-brand">
-          <span class="wordmark">Tapestry</span>
-          <p class="foot-tag">Project intelligence for AI-native teams. Accumulate capability instead of rebuilding context.</p>
+          <a class="brand" href="/" aria-label="Tapestry — home"><span class="brand-mark" set:html={MARK} /><span class="wordmark">Tapestry</span></a>
+          <p class="foot-tag">Agentic Recursive Project Intelligence. Recursive skills that get bigger, better, and more structural over time.</p>
         </div>
         <div class="foot-cols">
           <div class="foot-col"><p class="foot-h mono">Platform</p><a href="/project-intelligence">Project intelligence</a><a href="/how-it-works">How it works</a><a href="/project-shape">Project shape</a><a href={OBSERVATORY}>Observatory</a></div>
@@ -137,7 +142,7 @@ const LEARN_MENU = [
           <div class="foot-col"><p class="foot-h mono">Community</p><a href={GITHUB}>GitHub</a><a href="/explanation/discipline-stack/">Discipline stack</a></div>
         </div>
       </div>
-      <p class="foot-fine mono">Built in parallel with the fleet it will eventually hold. Names are transitional.</p>
+      <p class="foot-fine mono">Tapestry · Agentic Recursive Project Intelligence</p>
     </footer>
 
     <script>

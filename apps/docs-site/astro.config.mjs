@@ -24,6 +24,8 @@ export default defineConfig({
     mermaid({ theme: "dark" }),
     starlight({
       title: "Tapestry",
+      logo: { src: "./src/assets/tapestry-mark.svg", alt: "Tapestry" },
+      favicon: "/favicon.svg",
       description:
         "What keeps a project on track when it plugs into the Tapestry platform: the discipline stack of plugins, MCP wiring, hooks, and project intelligence — and how to recover when one piece goes missing.",
       customCss: ["./src/styles/custom.css"],

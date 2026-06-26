@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none" role="img" aria-label="Tapestry">
+  <circle cx="20" cy="20" r="17" stroke="#3a4648" stroke-width="1.1"/>
+  <circle cx="20" cy="20" r="11" stroke="#3a4648" stroke-width="1.1"/>
+  <circle cx="20" cy="20" r="6.5" fill="#5fd3da" opacity="0.16"/>
+  <circle cx="20" cy="20" r="3.1" fill="#5fd3da"/>
+  <circle cx="20" cy="3" r="1.8" fill="#5fd3da"/>
+  <circle cx="37" cy="20" r="1.8" fill="#5fd3da"/>
+  <circle cx="20" cy="37" r="1.8" fill="#5fd3da"/>
+  <circle cx="3" cy="20" r="1.8" fill="#5fd3da"/>
+  <circle cx="27.78" cy="27.78" r="1.4" fill="#9be8ec"/>
+</svg>

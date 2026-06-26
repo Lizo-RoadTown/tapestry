@@ -1,8 +1,8 @@
 {
   "name": "tapestry",
-  "displayName": "Tapestry",
-  "description": "Register Tapestry's MCP servers (memory + docs) with VS Code so they're available to Copilot Chat and other MCP-aware agents.",
-  "version": "0.1.0",
+  "displayName": "Tapestry — Memory & Docs for AI Chat",
+  "description": "Give VS Code's AI chat your Tapestry memory and docs — so Copilot and other MCP-aware assistants can recall past decisions and search Tapestry's documentation. No Claude Code required.",
+  "version": "0.1.1",
   "publisher": "tapestry",
   "license": "Apache-2.0",
   "homepage": "https://tapestry-khaki.vercel.app/",

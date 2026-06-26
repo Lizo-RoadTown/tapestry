@@ -17,10 +17,10 @@ const OBSERVATORY = "/observatory";
 const SETUP = `${DOCS}how-to/set-up-a-new-project/`;
 
 const CAPABILITIES = [
-  { outcome: "Observe project evolution", mech: "Telemetry · Observatory", body: "Watch how each project's shape changes over time. Raw sessions become coordination episodes — intent, action, friction, structure — so the work is legible, not just logged.", icon: `<circle cx="12" cy="12" r="3"/><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/>` },
-  { outcome: "Preserve knowledge", mech: "Memory", body: "Context, corrections, and the reasons behind decisions carry between sessions and across projects. The next session starts where the last one left off instead of from zero.", icon: `<ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/><path d="M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/>` },
-  { outcome: "Discover patterns", mech: "Observer", body: "The observer reads what's actually happening and surfaces the patterns — what worked, what keeps breaking, where the same correction gets made again. Findings, not raw counters.", icon: `<path d="M12 2a9 9 0 1 0 9 9"/><path d="M12 7v5l3 2"/><path d="M16 3l5 2-2 5"/>` },
-  { outcome: "Build durable structure", mech: "Upskilling · Templates", body: "Repeated work becomes named, reusable skills and templates — available in every project by reference, not copy. Capability compounds instead of being rebuilt each time.", icon: `<path d="M12 3 2 8l10 5 10-5-10-5Z"/><path d="M2 14l10 5 10-5"/><path d="M2 11l10 5 10-5"/>` },
+  { outcome: "Observe project evolution", mech: "Telemetry · Observatory", body: "See what changed, what got stuck, and what became part of the project.", icon: `<circle cx="12" cy="12" r="3"/><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/>` },
+  { outcome: "Preserve knowledge", mech: "Memory", body: "Carry decisions, corrections, and context forward between sessions.", icon: `<ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/><path d="M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/>` },
+  { outcome: "Discover patterns", mech: "Observer", body: "Find the repeated fixes, failures, and useful moves hiding in the work.", icon: `<path d="M12 2a9 9 0 1 0 9 9"/><path d="M12 7v5l3 2"/><path d="M16 3l5 2-2 5"/>` },
+  { outcome: "Build durable structure", mech: "Upskilling · Templates", body: "Turn repeated work into reusable skills, templates, and workflows.", icon: `<path d="M12 3 2 8l10 5 10-5-10-5Z"/><path d="M2 14l10 5 10-5"/><path d="M2 11l10 5 10-5"/>` },
 ];
 const PAINS = [
   "Every project starts from scratch.",
@@ -49,7 +49,7 @@ const STAGES = [
 ];
 ---
 
-<SiteLayout title="Tapestry — project intelligence for AI-native teams" description="Tapestry helps operators accumulate capability instead of rebuilding context. Observe project evolution, preserve knowledge, discover patterns, and turn repeated work into durable structure.">
+<SiteLayout title="Tapestry: project intelligence for AI-native teams" description="Tapestry helps teams stop starting over. It watches how a project changes, keeps the useful context, finds patterns in repeated work, and turns those patterns into reusable structure.">
   <!-- hero -->
   <section class="hero">
     <div class="hero-glow" aria-hidden="true"></div>
@@ -57,7 +57,7 @@ const STAGES = [
     <div class="hero-in reveal">
       <p class="kicker mono">Project intelligence platform</p>
       <h1 class="display">Project intelligence for<br /><span class="accent">AI-native teams.</span></h1>
-      <p class="lede">Tapestry helps operators accumulate capability instead of rebuilding context — observe project evolution, preserve knowledge, discover patterns, and turn repeated work into durable structure.</p>
+      <p class="lede">Tapestry helps teams stop starting over. It watches how a project changes, keeps the useful context, finds patterns in repeated work, and turns those patterns into reusable structure.</p>
       <div class="cta-row">
         <a class="btn btn-lg" href={SETUP}>Set up a project</a>
         <a class="btn btn-ghost btn-lg" href="#what">See how it works →</a>
@@ -65,8 +65,8 @@ const STAGES = [
     </div>
 
     <figure class="viz reveal" aria-label="The Tapestry mark: woven layers of work, observation, discovery, and reuse, compounding around a shared core.">
-      <img class="viz-img" src="/tapestry-hero.png" alt="The Tapestry mark — a woven emblem of work, observation, discovery, and reuse around a glowing core." />
-      <figcaption class="viz-cap mono">Each pass weaves into the last — work, observation, pattern, structure — and the whole grows stronger.</figcaption>
+      <img class="viz-img" src="/tapestry-hero.png" alt="The Tapestry mark: a woven emblem of work, observation, discovery, and reuse around a glowing core." />
+      <figcaption class="viz-cap mono">Each project builds on the last.</figcaption>
     </figure>
   </section>
 
@@ -74,7 +74,7 @@ const STAGES = [
   <section class="what" id="what">
     <header class="sec-head">
       <p class="kicker mono">What it does</p>
-      <h2 class="display sec-title">Capability that accumulates.</h2>
+      <h2 class="display sec-title">Capability turned into structure.</h2>
       <p class="sec-sub">Four things, each backed by a mechanism that keeps running across every project.</p>
     </header>
     <div class="cards">
@@ -104,30 +104,12 @@ const STAGES = [
         </article>
       ))}
     </div>
-  </section>
-
-  <!-- growth storyline -->
-  <section class="story">
-    <header class="sec-head">
-      <p class="kicker mono">Woven growth over time</p>
-      <h2 class="display sec-title">It gets stronger as it goes.</h2>
-    </header>
-    <div class="story-row">
-      {STAGES.map((s) => (
-        <article class="stage reveal">
-          <span class="stage-ic" aria-hidden="true"><svg viewBox="0 0 40 40" width="62" height="62" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" set:html={s.icon} /></span>
-          <h3 class="stage-t display">{s.label}</h3>
-          <p class="stage-sub mono">{s.sub}</p>
-          <p class="stage-b">{s.body}</p>
-        </article>
-      ))}
-    </div>
-    <p class="story-close">Tapestry is the fabric of intelligent work. Agents act. Cycles recur. Structure emerges. <span class="accent">The whole becomes stronger than the sum of its parts.</span></p>
+    <p class="story-close">Tapestry turns repeated agent work into reusable structure. Each cycle keeps what was learned, connects it to the project, and <span class="accent">makes the next cycle easier to build on.</span></p>
   </section>
 
   <!-- go deeper -->
   <section class="explore">
-    <p class="explore-text mono">Go deeper — <a href="/use-cases">use cases</a> · <a href="/open-source">open source</a> · <a href="/project-intelligence">project intelligence</a> · <a href="/observatory">the Observatory</a></p>
+    <p class="explore-text mono">Go deeper: <a href="/use-cases">use cases</a> · <a href="/open-source">open source</a> · <a href="/project-intelligence">project intelligence</a> · <a href="/observatory">the Observatory</a></p>
   </section>
 
   <!-- quickstart -->
@@ -156,7 +138,7 @@ const STAGES = [
   <section class="cta-band">
     <div class="cta-glow" aria-hidden="true"></div>
     <div class="reveal">
-      <h2 class="display cta-title">Accumulate capability.<br /><span class="accent">Stop rebuilding context.</span></h2>
+      <h2 class="display cta-title">Turn repeated work into structure.<br /><span class="accent">Keep the context that makes it useful.</span></h2>
       <div class="cta-row center"><a class="btn btn-lg" href={SETUP}>Set up a project</a><a class="btn btn-ghost btn-lg" href={GITHUB}>View on GitHub →</a></div>
     </div>
   </section>
@@ -284,7 +266,7 @@ const STAGES = [
   }
 
   /* pillars */
-  .pillars { max-width: var(--maxw); margin: 0 auto; padding: clamp(40px, 7vw, 84px) 24px 0; }
+  .pillars { max-width: var(--maxw); margin: 0 auto; padding: clamp(44px, 7vw, 88px) 24px clamp(48px, 8vw, 92px); }
   .pillar-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 42px; }
   .pillar { padding: 24px 22px; border: 1px solid var(--edge); border-radius: 16px; background: linear-gradient(180deg, var(--raised), var(--surface-2)); transition: border-color 0.25s, transform 0.25s var(--ease); }
   .pillar:hover { border-color: #34474a; transform: translateY(-3px); }

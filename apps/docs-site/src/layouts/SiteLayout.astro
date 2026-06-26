@@ -46,6 +46,10 @@ const LEARN_MENU = [
   { title: "The Observatory", href: "/observatory/about/" },
   { title: "What Tapestry is not", href: "/start/what-tapestry-is-not/" },
 ];
+
+// Brand logomark — the recursive-loop emblem (Work / Observe / Discover / Reuse
+// around a glowing core). Inlined so nav + footer share one source.
+const MARK = `<svg viewBox="0 0 64 64" fill="none" aria-hidden="true"><circle cx="32" cy="32" r="28" stroke="#5fd3da" stroke-opacity="0.3" stroke-width="1" stroke-dasharray="2 4.5"/><circle cx="51.8" cy="12.2" r="1.3" fill="#9be8ec"/><circle cx="12.2" cy="51.8" r="1.3" fill="#9be8ec"/><g stroke="#5fd3da" stroke-width="1.6"><rect x="11" y="11" width="42" height="42" rx="10" transform="rotate(45 32 32)"/><rect x="16.5" y="16.5" width="31" height="31" rx="8" transform="rotate(45 32 32)" stroke-opacity="0.85"/><rect x="22" y="22" width="20" height="20" rx="5.5" transform="rotate(45 32 32)" stroke-opacity="0.7"/></g><g fill="#5fd3da"><circle cx="32" cy="3.8" r="2"/><circle cx="60.2" cy="32" r="2"/><circle cx="32" cy="60.2" r="2"/><circle cx="3.8" cy="32" r="2"/></g><circle cx="32" cy="32" r="8" fill="#5fd3da" opacity="0.16"/><circle cx="32" cy="32" r="4.4" fill="none" stroke="#5fd3da" stroke-width="1.2"/><circle cx="32" cy="32" r="2.4" fill="#5fd3da"/><circle cx="32" cy="32" r="1" fill="#dffafb"/></svg>`;
 ---
 
 <!doctype html>
@@ -55,6 +59,7 @@ const LEARN_MENU = [
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -62,7 +67,7 @@ const LEARN_MENU = [
   <body>
     <header class="nav">
       <div class="nav-in">
-        <a class="wordmark" href="/">Tapestry</a>
+        <a class="brand" href="/" aria-label="Tapestry — home"><span class="brand-mark" set:html={MARK} /><span class="wordmark">Tapestry</span></a>
         <nav class="links" aria-label="Primary">
           <div class="menu" data-menu>
             <button class="menu-trigger" aria-haspopup="true" aria-expanded="false">Platform <span class="caret" aria-hidden="true">▾</span></button>
@@ -127,8 +132,8 @@ const LEARN_MENU = [
     <footer class="footer">
       <div class="foot-in">
         <div class="foot-brand">
-          <span class="wordmark">Tapestry</span>
-          <p class="foot-tag">Project intelligence for AI-native teams. Accumulate capability instead of rebuilding context.</p>
+          <a class="brand" href="/" aria-label="Tapestry — home"><span class="brand-mark" set:html={MARK} /><span class="wordmark">Tapestry</span></a>
+          <p class="foot-tag">Agentic Recursive Project Intelligence. Recursive skills that get bigger, better, and more structural over time.</p>
         </div>
         <div class="foot-cols">
           <div class="foot-col"><p class="foot-h mono">Platform</p><a href="/project-intelligence">Project intelligence</a><a href="/how-it-works">How it works</a><a href="/project-shape">Project shape</a><a href={OBSERVATORY}>Observatory</a></div>
@@ -137,7 +142,7 @@ const LEARN_MENU = [
           <div class="foot-col"><p class="foot-h mono">Community</p><a href={GITHUB}>GitHub</a><a href="/explanation/discipline-stack/">Discipline stack</a></div>
         </div>
       </div>
-      <p class="foot-fine mono">Built in parallel with the fleet it will eventually hold. Names are transitional.</p>
+      <p class="foot-fine mono">Tapestry · Agentic Recursive Project Intelligence</p>
     </footer>
 
     <script>

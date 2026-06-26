@@ -1,0 +1,60 @@
+{
+  "name": "tapestry",
+  "displayName": "Tapestry — Memory & Docs for AI Chat",
+  "description": "Give VS Code's AI chat your Tapestry memory and docs — so Copilot and other MCP-aware assistants can recall past decisions and search Tapestry's documentation. No Claude Code required.",
+  "version": "0.1.1",
+  "publisher": "tapestry",
+  "license": "Apache-2.0",
+  "homepage": "https://tapestry-khaki.vercel.app/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Lizo-RoadTown/tapestry.git",
+    "directory": "integrations/vscode"
+  },
+  "engines": {
+    "vscode": "^1.99.0"
+  },
+  "categories": ["AI", "Other"],
+  "keywords": ["tapestry", "mcp", "memory", "agent", "coordination"],
+  "activationEvents": ["onStartupFinished"],
+  "main": "./out/extension.js",
+  "contributes": {
+    "mcpServerDefinitionProviders": [
+      {
+        "id": "tapestry.mcpServers",
+        "label": "Tapestry MCP servers"
+      }
+    ],
+    "configuration": {
+      "title": "Tapestry",
+      "properties": {
+        "tapestry.memoryMcpUrl": {
+          "type": "string",
+          "default": "",
+          "description": "The URL of your Tapestry memory MCP deployment, e.g. https://your-memory-host.example.com/mcp/memory/ . Leave empty to skip registering the memory server."
+        },
+        "tapestry.docsMcpCommand": {
+          "type": "string",
+          "default": "python",
+          "description": "The Python interpreter used to launch the docs MCP via `python -m docs_mcp`. Override if `python` doesn't resolve to your tapestry-docs-mcp install on PATH (e.g. `python3` or an absolute path)."
+        },
+        "tapestry.docsMcpEnabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to register the tapestry-docs stdio MCP server. Requires `pip install tapestry-docs-mcp` first."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package --out tapestry-${npm_package_version}.vsix"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.99.0",
+    "typescript": "^5.4.0",
+    "@vscode/vsce": "^3.0.0"
+  }
+}

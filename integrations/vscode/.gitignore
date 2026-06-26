@@ -1,0 +1,4 @@
+# Build + dependency artifacts for the VS Code extension — never committed.
+node_modules/
+out/
+*.vsix

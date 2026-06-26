@@ -27,6 +27,16 @@ tapestry onboard <your-project-name>
 
 That writes the per-project config (`.env`, `.mcp.json`, `.project-intelligence/`, `.claude/settings.json`) so the discipline plugin activates and the memory MCP connects. See the [Quickstart — VS Code](https://tapestry-khaki.vercel.app/how-to/quickstart-vscode/) walkthrough for the full setup.
 
+## Install (VS Code without Claude Code)
+
+For VS Code users who want Tapestry's memory + docs MCP servers available to Copilot Chat (no Claude Code required), install the Tapestry VS Code extension:
+
+```sh
+code --install-extension tapestry.tapestry
+```
+
+Marketplace listing: <https://marketplace.visualstudio.com/items?itemName=tapestry.tapestry>. After install, set `tapestry.memoryMcpUrl` in VS Code settings to your deployment's memory MCP URL and reload. See [`integrations/vscode/README.md`](integrations/vscode/README.md) for full setup.
+
 ## What's in this repo
 
 ```text

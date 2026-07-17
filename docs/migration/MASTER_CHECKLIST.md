@@ -111,7 +111,12 @@ Per `tapestry/docs/proposals/2026-06-13-v1-scope-and-roadmap.md` §5 (sequenced 
 - [ ] **Step 6** — web-dashboard v1 lift
 - [ ] **Step 7** — architecture-registry + policy lift + render.yaml
 - [ ] **Step 7a** — telemetry-ingestion + project-observatory lift
-- [ ] **Step 8** — discipline plugins migrate to `tapestry/integrations/claude-code/`
+- [ ] **Step 8** — discipline plugins migrate to `tapestry/integrations/claude-code/` — when activated, includes:
+  - the loom-discipline plugin lift itself
+  - extended-migration-audit §2.1 — subagents (planner/researcher/coordinator/roadmap-maintenance/schema-migrator) + architecture-analyst — DEFERRED HERE, needs ADR-0004 for destination directory
+  - extended-migration-audit §2.8 — self-observer sub-modules (signal_rules.py, synthesis.py, github_scanner.py, telemetry_client.py, memory_client.py, candidate_client.py, README.md, tests/) — DEFERRED HERE, treat as multi-bullet not single bullet
+  - extended-migration-audit §2.9 — loom-discipline completeness checklist: agents/architecture-analyst.md + commands/architecture-report.md + skills/loom-discipline/SKILL.md + tests/ + URL repointing — DEFERRED HERE, treat as 5 sub-tasks
+  - destination-side URL repointing per [migration-plan §6.4](docs/plans/2026-06-18-tapestry-migration-readiness-and-execution.md#64--hardcoded-loom-onrendercom-urls-pr-prep-2-target-list)
 
 ### Q3. Loop-closure auto-write
 

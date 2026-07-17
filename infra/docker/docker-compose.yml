@@ -1,0 +1,134 @@
+# Three-service stack: postgres + api + ui
+#
+# Run from this directory:
+#   cp .env.template .env    # fill in keys
+#   docker compose up -d
+#   docker compose logs -f
+#
+# The api and ui mount the repo's skills/, subagents/, AGENTS.md, and
+# deepagents.toml as READ-ONLY volumes — edit them in your editor and the
+# running services see the changes (no rebuild). Only the API needs a
+# restart if you change deepagents.toml itself.
+
+name: make-skills
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-make_skills}
+      # Trust mode: no password required. Safe because port 5432 is not exposed
+      # to the host — only the api container on the private docker network can
+      # reach postgres. If you ever uncomment the `ports:` line below, switch
+      # back to POSTGRES_PASSWORD with a real value.
+      POSTGRES_HOST_AUTH_METHOD: trust
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-make_skills}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    # Postgres is internal — not exposed to host. Uncomment to expose for psql access.
+    # ports:
+    #   - "5432:5432"
+
+  api:
+    build:
+      context: ../..              # repo root, so the Dockerfile can COPY platform/
+      dockerfile: platform/deploy/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # Pillar 0 — selects auth backend at startup. self_host (default) means
+      # no auth, single tenant. hosted means JWT-verified per-request tenant.
+      PLATFORM_MODE: ${PLATFORM_MODE:-self_host}
+      # Auth.js shared secret for HS256 JWT verification. Required when
+      # PLATFORM_MODE=hosted; must byte-match web/.env.local AUTH_SECRET.
+      AUTH_SECRET: ${AUTH_SECRET:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:?must be set in .env}
+      LLAMA_CLOUD_API_KEY: ${LLAMA_CLOUD_API_KEY:-}
+      TAVILY_API_KEY: ${TAVILY_API_KEY:-}
+      LANGSMITH_API_KEY: ${LANGSMITH_API_KEY:-}
+      LANGSMITH_PROJECT: ${LANGSMITH_PROJECT:-make-skills}
+      LANGSMITH_TRACING: ${LANGSMITH_TRACING:-false}
+      # Pillar 1 model providers — all optional; lazy-loaded
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN:-}
+      TOGETHER_API_KEY: ${TOGETHER_API_KEY:-}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      OLLAMA_AUTH_HEADER: ${OLLAMA_AUTH_HEADER:-}  # e.g. "Bearer <secret>" when pointing at Docker Cloud / VPS
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}@postgres:5432/${POSTGRES_DB:-make_skills}
+      AGENT_CONFIG_PATH: /repo/deepagents.toml
+      AGENT_REPO_ROOT: /repo
+    volumes:
+      # Mount the repo (read-write) so the agent reads skills/subagents/AGENTS.md/deepagents.toml
+      # AND can update ROADMAP.md as it ships work. (On Render, no volume mount; the
+      # baked-in /app copy is read-only there until a future git-commit-from-container path.)
+      - ../..:/repo
+    ports:
+      - "${API_PORT:-8001}:8001"
+    command: ["uvicorn", "services.api.main:app", "--host", "0.0.0.0", "--port", "8001"]
+
+  grafana:
+    image: grafana/grafana:11.3.0
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # Anonymous access — no login required. Safe locally; tighten if exposed.
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: "Editor"
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+      # Embedding into the Next.js chat UI via iframe.
+      GF_SECURITY_ALLOW_EMBEDDING: "true"
+      GF_SECURITY_COOKIE_SAMESITE: "disabled"
+      # Auto-provisioned datasource and dashboards (mounted below).
+      GF_PATHS_PROVISIONING: /etc/grafana/provisioning
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports:
+      - "${GRAFANA_PORT:-3001}:3000"
+
+  # Loki — log aggregation backend for the dev-experience observability layer.
+  # Receives entries from Promtail (below), serves Grafana queries from the
+  # dev-experience dashboard. See docs/runbooks/dev-experience-observability.md.
+  loki:
+    image: grafana/loki:3.3.0
+    restart: unless-stopped
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ./loki-config.yml:/etc/loki/local-config.yaml:ro
+      - loki-data:/tmp/loki
+    ports:
+      # Internal port; expose only if you want to query Loki API directly.
+      - "${LOKI_PORT:-3100}:3100"
+
+  # Promtail — tails the developer's Claude Code hook log
+  # (~/.claude/logs/hooks.jsonl) and ships entries to Loki.
+  # Mounting the host's ~/.claude/logs/ as read-only into /var/log/claude/.
+  # The DEV_HOOKS_LOG_DIR env var lets users override the host path; defaults
+  # to ~/.claude/logs which works for the standard Claude Code install.
+  promtail:
+    image: grafana/promtail:3.3.0
+    restart: unless-stopped
+    depends_on:
+      - loki
+    command: -config.file=/etc/promtail/config.yml
+    volumes:
+      - ./promtail-config.yml:/etc/promtail/config.yml:ro
+      - ${DEV_HOOKS_LOG_DIR:-${HOME}/.claude/logs}:/var/log/claude:ro
+
+volumes:
+  postgres-data:
+  grafana-data:
+  loki-data:

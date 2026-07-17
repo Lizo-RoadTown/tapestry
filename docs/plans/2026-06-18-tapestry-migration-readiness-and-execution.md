@@ -435,6 +435,7 @@ For each step, in roadmap order.
 - `the-loom/apps/web-dashboard/` source (Next.js 14)
 - Phase 6 maturity in the legacy source (audit §6 notes Phase 6 is in flight)
 - Vercel deployment target
+- **URL repointing precheck per [§6.4](#64--hardcoded-loom-onrendercom-urls-pr-prep-2-target-list)** (extended-migration-audit §1.4)
 
 **Outputs produced:**
 - `tapestry/apps/web-dashboard/` populated
@@ -458,6 +459,7 @@ For each step, in roadmap order.
 - `the-loom/services/policy/` source (741 LOC)
 - A3 auto-trigger code at `architecture-registry/main.py:234-249` — **must port verbatim** OR redesign per Tapestry policy daemon
 - `infra/deploy/render.yaml` for Tapestry
+- **URL repointing precheck per [§6.4](#64--hardcoded-loom-onrendercom-urls-pr-prep-2-target-list)** (extended-migration-audit §1.4)
 
 **Outputs produced:**
 - `tapestry/services/architecture-registry/` populated
@@ -482,6 +484,7 @@ For each step, in roadmap order.
 - **NEW from followup §4.2:** decision on Postgres rollup + read API for self-host parity
 - **NEW from followup §2:** decision on observation-decomposer component (the missing architecture)
 - **NEW from followup §3.1:** policy-bounded cascade design (max_auto_level per kind/risk)
+- **URL repointing precheck per [§6.4](#64--hardcoded-loom-onrendercom-urls-pr-prep-2-target-list)** (extended-migration-audit §1.4)
 
 **Outputs produced:**
 - `tapestry/services/telemetry-ingestion/` populated WITH Postgres rollup + read API (per followup §1.6 — not optional for self-host parity)
@@ -504,6 +507,7 @@ For each step, in roadmap order.
 - `the-loom/adapters/claude-code/loom-discipline/` source (27 files)
 - `Make_Skills/adapters/claude-code/make-skills-discipline/` source — **DOES NOT EXIST per `feedback_tapestry_is_canonical...` reconciliation 2026-06-14** (make-skills-discipline was deleted from marketplace in commit `63604cd`). So Step 8 migrates ONE flavor, not two.
 - Marketplace publishing CI
+- **URL repointing precheck per [§6.4](#64--hardcoded-loom-onrendercom-urls-pr-prep-2-target-list)** (extended-migration-audit §1.4)
 
 **Outputs produced:**
 - `tapestry/integrations/claude-code/discipline/loom/` populated
@@ -545,6 +549,16 @@ Two new modules:
 **Migration handling:** port to `tapestry/services/project-observatory/` per MANIFESTO §4.3 mapping (project-observatory absorbs the self-observer role). URL targets rebind from `loom-agent-context.onrender.com` to `mcp.tapestry.io`. The §3.3 synthesis memo's content survives unchanged because the schema survives unchanged.
 
 **6.4 — Hardcoded `loom-*.onrender.com` URLs (PR-prep-2 target list)**
+
+Inventory per PROBE 2026-06-18 (excluding `docs/` + `tests/` + architecture snapshots):
+
+**Update 2026-06-22 (from extended-migration-audit §1.4):** PR-prep-2a (source-side env-precedence externalization) is **DONE** per [MASTER_CHECKLIST.md:101](../../MASTER_CHECKLIST.md). Tapestry-agent's PROBE (`tapestry_agent_probe_audit_1_4_url_externalization_findings_2026_06_22`) confirms `observer.py:90-93`, `_observability.py`, and `Make_Skills/core/runtime/agent.py:108` all carry the correct `TAPESTRY_*_URL → LOOM_*_URL → hardcoded default` precedence chain or are comment-only references. **The remaining work is destination-side verification:** for each affected service's cutover, verify the env-precedence chain resolves to the new Tapestry host BEFORE flipping. Enumerated as sub-step in Steps 6 / 7 / 7a / 8 "Inputs needed" below — easy to miss otherwise.
+
+Per-service URL repointing checklist (one commit per service during cutover):
+- [ ] **Step 6 (web-dashboard):** `apps/web-dashboard/app/page.tsx` + `apps/web-dashboard/app/candidates/page.tsx` URLs flip from `loom-*.onrender.com` to `api.tapestry.io`. Verify locally before Vercel deploy.
+- [ ] **Step 7 (architecture-registry + policy):** `architecture-registry/promote_dispatcher.py:88-105` URL targets resolve to the Tapestry-hosted candidate-registry. Bridge HMAC dual-secret window during cutover.
+- [ ] **Step 7a (telemetry-ingestion):** `engine/skill-making/` telemetry-sender targets resolve to Tapestry telemetry-ingestion endpoint. Check `LOOM_TELEMETRY_CALLBACK_URL` defaults.
+- [ ] **Step 8 (loom-discipline plugin):** `adapters/claude-code/loom-discipline/.claude-plugin/plugin.json:30` + `scripts/session_start.py:77` + `scripts/observer.py:84` + `scripts/_observability.py` OTLP target — all flip from `loom-*.onrender.com` to `mcp.tapestry.io` / Tapestry telemetry endpoint.
 
 Inventory per PROBE 2026-06-18 (excluding `docs/` + `tests/` + architecture snapshots):
 

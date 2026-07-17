@@ -28,3 +28,6 @@ services/docs-mcp/dist/
 
 # Playwright MCP screenshot/console dumps
 .playwright-mcp/
+
+# Redundant brand-sheet archive (extracted contents are committed)
+docs/assets/*.zip

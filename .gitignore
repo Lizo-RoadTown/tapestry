@@ -25,3 +25,6 @@ services/docs-mcp/*.egg-info/
 services/docs-mcp/build/
 services/docs-mcp/dist/
 *.egg-info/
+
+# Playwright MCP screenshot/console dumps
+.playwright-mcp/

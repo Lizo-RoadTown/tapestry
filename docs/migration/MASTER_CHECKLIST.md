@@ -118,6 +118,16 @@ Per `tapestry/docs/proposals/2026-06-13-v1-scope-and-roadmap.md` §5 (sequenced 
   - extended-migration-audit §2.9 — loom-discipline completeness checklist: agents/architecture-analyst.md + commands/architecture-report.md + skills/loom-discipline/SKILL.md + tests/ + URL repointing — DEFERRED HERE, treat as 5 sub-tasks
   - destination-side URL repointing per [migration-plan §6.4](docs/plans/2026-06-18-tapestry-migration-readiness-and-execution.md#64--hardcoded-loom-onrendercom-urls-pr-prep-2-target-list)
 
+### Q2c. Author Tapestry-specific top-level prose docs
+
+Per extended-migration-audit §2.11 (PR-9, 2026-06-22): Make_Skills' top-level `ARCHITECTURE.md`, `CONTRIBUTING.md`, `AGENTS.md` were lifted to `docs/_archive/make-skills-*.md` as provenance reference. Tapestry needs its own authored top-level versions:
+
+- [ ] `tapestry/ARCHITECTURE.md` — top-level engine + service-fleet architecture (companion to `docs/architecture/UMBRELLA.md`)
+- [ ] `tapestry/CONTRIBUTING.md` — Tapestry-specific contribution norms (paths, branch conventions, CI)
+- [ ] `tapestry/AGENTS.md` — cross-IDE agent persona for the Tapestry repo
+
+`CHANGELOG.md` intentionally deferred (Tapestry starts fresh per §6 Q6 decision).
+
 ### Q3. Loop-closure auto-write
 
 Per MANIFESTO Part 4.7 — engine compile output → plugin file → git commit → push. Currently manual. Future scope.

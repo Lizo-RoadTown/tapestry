@@ -10,7 +10,7 @@
 
 ## §0 — Migration state at audit time (2026-06-22)
 
-Per [MASTER_CHECKLIST.md:104-107](../../MASTER_CHECKLIST.md):
+Per [MASTER_CHECKLIST.md:104-107](../migration/MASTER_CHECKLIST.md):
 
 | Step | Status |
 |---|---|
@@ -20,7 +20,7 @@ Per [MASTER_CHECKLIST.md:104-107](../../MASTER_CHECKLIST.md):
 | Step 4 — engine | **CODE-LIFT COMPLETE 2026-06-21** (PR #9); no prod cutover owed (`make-skills-api` is a different app's host) |
 | Step 5 — templates + CLI | **IN PROGRESS** (CLI lifted 2026-06-21; templates pending) |
 | Step 6 (web-dashboard), Step 7 (architecture-registry + policy + telemetry), Step 7a, Step 8 (loom-discipline + self-observer) | **QUEUED** |
-| PR-prep-3 — `packages/migration-toolkit/` v0.1.0 | **DOC + scaffolding shipped, executable code pending** ([MASTER_CHECKLIST.md:103](../../MASTER_CHECKLIST.md)) |
+| PR-prep-3 — `packages/migration-toolkit/` v0.1.0 | **DOC + scaffolding shipped, executable code pending** ([MASTER_CHECKLIST.md:103](../migration/MASTER_CHECKLIST.md)) |
 
 Tapestry on-disk inventory the audit uses as ground truth: `services/{agent-context, architecture-registry, audit-log, candidate-registry, policy, project-observatory, project-registry, skill-making, telemetry-ingestion}` · `packages/{auth, cli, schemas, sdk, shared-types, ui}` · `engine/{adapters, agency-to-structure, local-observer, skill-compiler}` · `apps/{admin-console, docs-site, web-dashboard}` · plus top-level `scripts/`, `deprecated/`, `templates/`, `integrations/`, `infra/`.
 
@@ -71,7 +71,7 @@ Every row in §§1–4 cites a path. Operator + future-agents PROBE the cited pa
 - `Make_Skills/core/auth/tenant_context.py` — `current_tenant` ContextVar (the async-boundary chokepoint)
 - `Make_Skills/core/db/db.py` — `tenant_conn()` async pool helper with transactional `SET LOCAL app.tenant_id`
 
-**Why this is tier-1 — corrected framing:** Step 1 lifted the canonical loom-side `loom_auth` package (per [MASTER_CHECKLIST.md:102](../../MASTER_CHECKLIST.md), PR-prep-2b consolidated the 4 duplicate `auth_bridge.py` copies in the-loom into one canonical lib in 2026-06-19; Step 1 then lifted THAT to `tapestry/packages/auth/python/loom_auth/`). The `loom_auth` package is the canonical TWO-MODE JWT verifier (self-host fallback + hosted RS256). What it does NOT include: the `TenantContext` class surface, the pgcrypto BYO-key store, the `current_tenant` ContextVar, the RLS-correct `tenant_conn()`. These four are the Make_Skills-side platform primitives that have no loom-side equivalent. Without them, Tapestry will either re-implement them poorly or leave services to manually manage tenant context.
+**Why this is tier-1 — corrected framing:** Step 1 lifted the canonical loom-side `loom_auth` package (per [MASTER_CHECKLIST.md:102](../migration/MASTER_CHECKLIST.md), PR-prep-2b consolidated the 4 duplicate `auth_bridge.py` copies in the-loom into one canonical lib in 2026-06-19; Step 1 then lifted THAT to `tapestry/packages/auth/python/loom_auth/`). The `loom_auth` package is the canonical TWO-MODE JWT verifier (self-host fallback + hosted RS256). What it does NOT include: the `TenantContext` class surface, the pgcrypto BYO-key store, the `current_tenant` ContextVar, the RLS-correct `tenant_conn()`. These four are the Make_Skills-side platform primitives that have no loom-side equivalent. Without them, Tapestry will either re-implement them poorly or leave services to manually manage tenant context.
 
 **Destination:** `tapestry/packages/auth/python/loom_auth/` (alongside the existing shim) — or split `secrets.py` to its own `packages/secrets/` (operator decides, see §5). `tenant_conn()` may belong in `tapestry/packages/sdk/python/db.py` (currently scaffold-only — see §6 open question 2).
 
@@ -100,7 +100,7 @@ Every row in §§1–4 cites a path. Operator + future-agents PROBE the cited pa
 - `the-loom/adapters/claude-code/loom-discipline/scripts/_observability.py` — hardcodes OTLP exporter URL
 - `Make_Skills/core/runtime/agent.py` (likely) — hardcodes engine + memory URLs
 
-**Why this is tier-1:** PR-prep-2a (source-side externalization) is DONE per [MASTER_CHECKLIST.md:101](../../MASTER_CHECKLIST.md). The destination-side flip is the actual remaining work and is NOT named in the existing plan. Step 7 cannot ship without it — a service that boots pointing at the wrong host is wrong even when the code is right. Step 8 (loom-discipline migration) has the same problem in 3+ scripts.
+**Why this is tier-1:** PR-prep-2a (source-side externalization) is DONE per [MASTER_CHECKLIST.md:101](../migration/MASTER_CHECKLIST.md). The destination-side flip is the actual remaining work and is NOT named in the existing plan. Step 7 cannot ship without it — a service that boots pointing at the wrong host is wrong even when the code is right. Step 8 (loom-discipline migration) has the same problem in 3+ scripts.
 
 **Destination:** N/A — this is a sub-step within each affected service's cutover. Each service must verify its `TAPESTRY_*_URL → LOOM_*_URL → hardcoded default` env-precedence chain works against the new host BEFORE cutover.
 

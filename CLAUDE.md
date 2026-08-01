@@ -2,6 +2,8 @@
 
 Project context for Claude Code. Loaded into every conversation. Keep it tight; subsystem-specific rules belong in subdirectory `CLAUDE.md` files (e.g., `services/<svc>/CLAUDE.md`), not here.
 
+> **Canonical directive set:** [`docs/CORE_DIRECTIVES.md`](docs/CORE_DIRECTIVES.md) holds D1–D3 in full. The two sections below summarize D1 and D2 for always-loaded context; D3 (every substantive session ends with an upskilling report) is enforced by the discipline hooks and documented in the canonical file.
+
 ## CORE DIRECTIVE 1 — loom-memory access is mandatory
 
 Every session in this repo MUST have the `loom-memory` MCP server reachable. Tools: `memory_read`, `memory_write`, `memory_recall`, `memory_search`, `memory_list`, `memory_delete`. Endpoint: `https://loom-agent-context.onrender.com/mcp/memory/`. The `.mcp.json` here is wired with the URL; v0.1.8 of loom-agent-context added a self-host fallback so no JWT header is needed (each operator gets their own fallback tenant).

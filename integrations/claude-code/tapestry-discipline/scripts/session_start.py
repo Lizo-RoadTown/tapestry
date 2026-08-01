@@ -181,7 +181,8 @@ def _mcp_status_block(base_url: str) -> list[str]:
         "",
         "Why this warning exists:",
         "  loom-memory access is a concrete rule of this platform (see "
-        "skills_private/concrete-rule/SKILL.md). Silent absence of memory access "
+        "integrations/claude-code/skills/concrete-rule/SKILL.md). Silent absence "
+        "of memory access "
         "was the failure mode that prompted v0.1.8's defense-in-depth wiring.",
         "*****",
     ]

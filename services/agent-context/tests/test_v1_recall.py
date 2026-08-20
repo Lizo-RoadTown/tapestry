@@ -213,6 +213,154 @@ async def test_empty_project_tags_passes_none_to_storage(http_client):
     assert mock_search.call_args.kwargs.get("project_tags") is None
 
 
+# ---------------------------------------------------------------------------
+# Memory-auth gate (2026-08-08) — anonymous flag + shared secret
+#
+# NOTE ON EMPTY BEARER: the REST path (main.py:_resolve_tenant_for_rest) does
+# NOT treat an empty `Bearer ` as anonymous — it rejects it as malformed
+# (main.py:72-74). This differs from the MCP middleware, which routes empty
+# `Bearer ` through the anonymous gate (mcp_self_host_middleware.py:189-199).
+# The tests below pin the REST path's ACTUAL behavior.
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_no_auth_anon_disabled_returns_401(http_client, monkeypatch):
+    """(b) LOOM_ALLOW_ANONYMOUS_SELF_HOST=0 + no header → 401. The gate
+    closes the anonymous escape hatch once every client carries the key."""
+    monkeypatch.setenv("LOOM_ALLOW_ANONYMOUS_SELF_HOST", "0")
+    with patch("storage.search", return_value=[]) as mock_search:
+        resp = await http_client.post(
+            "/v1/recall",
+            json={"context": "anon disabled", "n": 1},
+        )
+    assert resp.status_code == 401, f"expected 401, got {resp.status_code}: {resp.text[:200]}"
+    mock_search.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_no_auth_anon_default_on_returns_200(http_client, monkeypatch):
+    """(a) Anonymous defaults ON: with the flag unset, no header → self-host
+    tenant (independent of whether a key is configured)."""
+    from main import SELF_HOST_TENANT_ID as expected_tenant
+
+    monkeypatch.delenv("LOOM_ALLOW_ANONYMOUS_SELF_HOST", raising=False)
+    with patch("storage.search", return_value=[]) as mock_search:
+        resp = await http_client.post(
+            "/v1/recall",
+            json={"context": "anon default on", "n": 1},
+        )
+    assert resp.status_code == 200
+    assert mock_search.call_args.kwargs["tenant_id"] == expected_tenant
+
+
+@pytest.mark.asyncio
+async def test_shared_secret_bearer_resolves_to_self_host(http_client, monkeypatch):
+    """(c) Bearer == the configured shared secret → self-host tenant. Checked
+    before JWT verification (the key is not a JWT)."""
+    from main import SELF_HOST_TENANT_ID as expected_tenant
+
+    monkeypatch.setenv("TAPESTRY_MEMORY_API_KEY", "s3cret-shared-key")
+    with patch("storage.search", return_value=[]) as mock_search:
+        resp = await http_client.post(
+            "/v1/recall",
+            headers={"Authorization": "Bearer s3cret-shared-key"},
+            json={"context": "shared secret", "n": 1},
+        )
+    assert resp.status_code == 200, f"unexpected {resp.status_code}: {resp.text[:200]}"
+    assert mock_search.call_args.kwargs["tenant_id"] == expected_tenant
+
+
+@pytest.mark.asyncio
+async def test_shared_secret_via_loom_alias(http_client, monkeypatch):
+    """LOOM_MEMORY_API_KEY alias resolves the same as TAPESTRY_MEMORY_API_KEY."""
+    from main import SELF_HOST_TENANT_ID as expected_tenant
+
+    monkeypatch.delenv("TAPESTRY_MEMORY_API_KEY", raising=False)
+    monkeypatch.setenv("LOOM_MEMORY_API_KEY", "alias-key")
+    with patch("storage.search", return_value=[]) as mock_search:
+        resp = await http_client.post(
+            "/v1/recall",
+            headers={"Authorization": "Bearer alias-key"},
+            json={"context": "alias key", "n": 1},
+        )
+    assert resp.status_code == 200
+    assert mock_search.call_args.kwargs["tenant_id"] == expected_tenant
+
+
+@pytest.mark.asyncio
+async def test_wrong_shared_secret_returns_401(http_client, monkeypatch):
+    """(d) A Bearer that is neither the shared secret nor a valid JWT → 401,
+    even with anonymous access ON (the caller tried to authenticate)."""
+    monkeypatch.setenv("TAPESTRY_MEMORY_API_KEY", "the-right-key")
+    monkeypatch.delenv("LOOM_ALLOW_ANONYMOUS_SELF_HOST", raising=False)
+    with patch("storage.search", return_value=[]) as mock_search:
+        resp = await http_client.post(
+            "/v1/recall",
+            headers={"Authorization": "Bearer the-wrong-key"},
+            json={"context": "wrong key", "n": 1},
+        )
+    assert resp.status_code == 401
+    mock_search.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_empty_bearer_rest_returns_401(http_client, monkeypatch):
+    """(e) REST path: empty `Bearer ` → 401 malformed. Unlike the MCP
+    middleware, the REST path does NOT route empty Bearer through the
+    anonymous gate — see the NOTE at the top of this section."""
+    monkeypatch.delenv("LOOM_ALLOW_ANONYMOUS_SELF_HOST", raising=False)
+    with patch("storage.search", return_value=[]) as mock_search:
+        resp = await http_client.post(
+            "/v1/recall",
+            headers={"Authorization": "Bearer "},
+            json={"context": "empty bearer", "n": 1},
+        )
+    assert resp.status_code == 401
+    mock_search.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_anon_flag_independent_of_key_set(http_client, monkeypatch, jwt_minter):
+    """(f) The anonymous gate is INDEPENDENT of whether a key is configured.
+    With a key set AND anon ON, all three succeed via the REST path:
+    no header → self-host, shared secret → self-host, valid JWT → claim."""
+    from main import SELF_HOST_TENANT_ID as self_host_tenant
+
+    monkeypatch.setenv("TAPESTRY_MEMORY_API_KEY", "coexist-key")
+    monkeypatch.delenv("LOOM_ALLOW_ANONYMOUS_SELF_HOST", raising=False)
+
+    # no header → anonymous still works despite the key being set
+    with patch("storage.search", return_value=[]) as mock_search:
+        resp = await http_client.post(
+            "/v1/recall", json={"context": "no header", "n": 1}
+        )
+    assert resp.status_code == 200
+    assert mock_search.call_args.kwargs["tenant_id"] == self_host_tenant
+
+    # shared secret → self-host tenant
+    with patch("storage.search", return_value=[]) as mock_search:
+        resp = await http_client.post(
+            "/v1/recall",
+            headers={"Authorization": "Bearer coexist-key"},
+            json={"context": "key", "n": 1},
+        )
+    assert resp.status_code == 200
+    assert mock_search.call_args.kwargs["tenant_id"] == self_host_tenant
+
+    # valid JWT → claim tenant (still works with a key configured)
+    custom_tenant = "abcabcab-1111-2222-3333-dddddddddddd"
+    token = jwt_minter(custom_tenant)
+    with patch("storage.search", return_value=[]) as mock_search:
+        resp = await http_client.post(
+            "/v1/recall",
+            headers={"Authorization": f"Bearer {token}"},
+            json={"context": "jwt", "n": 1},
+        )
+    assert resp.status_code == 200
+    assert mock_search.call_args.kwargs["tenant_id"] == custom_tenant
+
+
 @pytest.mark.asyncio
 async def test_response_passes_storage_rows_through_unchanged(http_client):
     """The handler returns whatever storage.search returns, wrapped in

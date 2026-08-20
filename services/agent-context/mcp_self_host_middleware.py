@@ -64,6 +64,10 @@ if str(_PKG_PATH) not in sys.path:
     sys.path.insert(0, str(_PKG_PATH))
 
 from loom_auth import tenant_ctx_var  # noqa: E402
+from loom_auth.auth_bridge import (  # noqa: E402
+    anonymous_access_allowed,
+    api_key_matches,
+)
 
 
 # Stable self-host tenant_id. MUST match:
@@ -165,31 +169,46 @@ class SelfHostFallbackAuthMiddleware:
                 auth_header = value
                 break
 
-        # Case 1: No Authorization header → self-host fallback.
-        if auth_header is None:
+        # Parse the bearer token. token stays None for an absent header;
+        # becomes "" for a "Bearer " with an empty value. A non-Bearer
+        # Authorization header (e.g. "Basic ...") is rejected outright.
+        token: str | None = None
+        if auth_header is not None:
+            try:
+                auth_str = auth_header.decode("latin-1")
+            except UnicodeDecodeError:
+                await _send_401(send, "Malformed Authorization header")
+                return
+            parts = auth_str.split(" ", 1)
+            if len(parts) == 2 and parts[0].lower() == "bearer":
+                token = parts[1].strip()
+            else:
+                await _send_401(send, "Malformed Authorization header")
+                return
+
+        # Case 1: no token (absent header, or empty "Bearer ") → anonymous
+        # gate. An empty Bearer is treated as anonymous, not malformed, so a
+        # static .mcp.json referencing ${TAPESTRY_MEMORY_API_KEY} stays valid
+        # when that var is unset (mode-agnostic config; see the auth rollout).
+        if not token:
+            if anonymous_access_allowed():
+                tenant_ctx_var.set(SELF_HOST_TENANT_ID)
+                await self.app(scope, receive, send)
+                return
+            await _send_401(send, "Authorization required")
+            return
+
+        # Case 2: shared secret → the deployment's own self-host tenant.
+        # Checked before JWT because the key is not a JWT and fails RS256.
+        if api_key_matches(token):
             tenant_ctx_var.set(SELF_HOST_TENANT_ID)
             await self.app(scope, receive, send)
             return
 
-        # Case 2-4: Authorization header present. Must be "Bearer <token>"
-        # and the token must verify. Any other shape → 401.
-        try:
-            auth_str = auth_header.decode("latin-1")
-        except UnicodeDecodeError:
-            await _send_401(send, "Malformed Authorization header")
-            return
-
-        parts = auth_str.split(" ", 1)
-        if len(parts) != 2 or parts[0].lower() != "bearer" or not parts[1].strip():
-            await _send_401(send, "Malformed Authorization header")
-            return
-
-        token = parts[1].strip()
+        # Case 3: valid RS256 Bearer JWT → tenant from the claim.
         tenant_id = self._verify_bearer(token)
         if tenant_id is None:
             await _send_401(send, "Invalid or expired token")
             return
-
-        # Case 2: valid Bearer → tenant from claim.
         tenant_ctx_var.set(tenant_id)
         await self.app(scope, receive, send)

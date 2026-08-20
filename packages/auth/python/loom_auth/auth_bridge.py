@@ -54,6 +54,7 @@ RS256 + key-load + tenant-set core. Both core paths now share the
 """
 from __future__ import annotations
 
+import hmac
 import os
 from contextvars import ContextVar
 from typing import Optional
@@ -163,6 +164,73 @@ def _decode_rs256(token: str, public_key: str) -> Optional[dict]:
         )
     except JWTError:
         return None
+
+
+# ---------------------------------------------------------------------------
+# Anonymous-access gate (2026-08-08)
+# ---------------------------------------------------------------------------
+#
+# Before this gate existed, a request with NO Authorization header was served
+# SELF_HOST_TENANT_ID by both entry points (services/agent-context/main.py's
+# `_resolve_tenant_for_rest` and mcp_self_host_middleware's Case 1). Because
+# the tenant is chosen server-side from env, the caller did not even need to
+# know the tenant UUID: any anonymous request over the public internet was
+# handed the deployment's entire memory store, and RLS then granted every row
+# in that tenant regardless of each record's `visibility`.
+#
+# The anonymous gate and the shared secret are INDEPENDENT switches (see
+# anonymous_access_allowed below). During the staged rollout anonymous defaults
+# ON so deploying the gate is a no-op; it is flipped off explicitly only after
+# every client carries the key, then the HTTP anonymous path is removed.
+#
+# Resolution order for the shared secret:
+#   1. TAPESTRY_MEMORY_API_KEY (canonical)
+#   2. LOOM_MEMORY_API_KEY (alias, matches the *_MEMORY_MCP_URL naming pair)
+#
+# Deliberately read per-call rather than at import: deployments and tests set
+# these after module import, and a module-level constant would freeze the
+# first value seen.
+
+
+def _memory_api_key() -> str:
+    """The configured shared secret, or '' when none is set."""
+    return (
+        os.environ.get("TAPESTRY_MEMORY_API_KEY")
+        or os.environ.get("LOOM_MEMORY_API_KEY")
+        or ""
+    ).strip()
+
+
+def anonymous_access_allowed() -> bool:
+    """True iff a request with no (or an empty) Authorization header may be
+    served the self-host tenant.
+
+    Governed SOLELY by LOOM_ALLOW_ANONYMOUS_SELF_HOST, and INDEPENDENT of
+    whether a shared secret is configured. The independence is required for a
+    staged rollout that never drops memory: during migration the key and
+    anonymous access must BOTH work — deploy the gate + set the key with
+    anonymous still ON gives zero client impact, then anonymous is flipped OFF
+    only after every client (across every machine) carries the key. Coupling
+    the two ("a configured key closes anonymous") makes "enable the key" and
+    "revoke anonymous" the same action, with no overlap window — the exact
+    fleet-wide silent memory loss this gate exists to avoid.
+
+    Defaults to ALLOWED (unset -> on) so that merely deploying this gate changes
+    nothing until the operator explicitly sets LOOM_ALLOW_ANONYMOUS_SELF_HOST=0
+    after provisioning. The HTTP anonymous path (this escape hatch) is removed
+    entirely once the rollout completes.
+    """
+    return os.environ.get("LOOM_ALLOW_ANONYMOUS_SELF_HOST", "1").strip() != "0"
+
+
+def api_key_matches(token: str) -> bool:
+    """Constant-time comparison of a presented bearer token against the
+    configured shared secret. False when no secret is configured, so an
+    unconfigured deployment can never be unlocked by a guessed empty token."""
+    key = _memory_api_key()
+    if not key or not token:
+        return False
+    return hmac.compare_digest(token, key)
 
 
 def resolve_tenant() -> str:

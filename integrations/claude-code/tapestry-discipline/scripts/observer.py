@@ -8,7 +8,7 @@ mechanism — without it, candidates only land via manual operator POSTs.
 
 ## Layer composition
 
-  Stop hook (v0.1.9, CORE DIRECTIVE 2)
+  Stop hook (v0.1.9, CORE DIRECTIVE 3)
       ↓ surfaces "*** UPSKILLING PASS NOT RUN ***" if missed
   Agent runs the upskilling pass
       ↓ emits "Skills invoked this session: ... (N uses)" + memory_write
@@ -133,7 +133,7 @@ _SLUG_INVALID = re.compile(r"[^a-zA-Z0-9_-]+")
 
 
 # Upskilling-report parser. Each line looks like one of these (per
-# skills_private/agentic-upskilling/SKILL.md:92-113):
+# docs/CORE_DIRECTIVES.md Directive 3):
 #
 #     - layered-explanation       (15+ uses)
 #     - layered-explanation (15 uses)
@@ -235,8 +235,8 @@ def parse_upskilling_report(raw: str) -> dict[str, int]:
     """Find the most recent upskilling-report block in the transcript
     and parse out "Skills invoked: ... (N uses)" lines.
 
-    The report block per skills_private/agentic-upskilling/SKILL.md:92-113
-    has the marker "Skills invoked this session" followed by indented lines.
+    The report block per docs/CORE_DIRECTIVES.md Directive 3 has the marker
+    "Skills invoked this session" followed by indented lines.
     This function:
       1. Locates the LATEST assistant text containing the marker.
       2. Extracts the section starting from the marker until the next

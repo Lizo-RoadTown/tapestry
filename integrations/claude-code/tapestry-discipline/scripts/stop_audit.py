@@ -9,7 +9,7 @@ Fires at the end of the agent's turn. Runs two audits + one observer:
    accompanying file:line citation. Surfaces "Stop-audit detected an
    unsubstantiated stack claim" via additionalContext.
 
-2. **Agentic-upskilling audit** (v0.1.9, CORE DIRECTIVE 2). Walks the
+2. **Agentic-upskilling audit** (v0.1.9, CORE DIRECTIVE 3). Walks the
    FULL session transcript. If the session crossed a "substantive
    boundary" heuristic (≥ 1 git commit/push action, OR ≥ 10 tool calls
    AND ≥ 3 assistant turns, OR ≥ 30 assistant turns) AND NO upskilling
@@ -107,7 +107,7 @@ REMINDER = (
 )
 
 # ---------------------------------------------------------------------------
-# Upskilling-pass check (v0.1.9 / CORE DIRECTIVE 2)
+# Upskilling-pass check (v0.1.9 / CORE DIRECTIVE 3)
 # ---------------------------------------------------------------------------
 
 # Substantive-boundary thresholds. A session crosses the boundary if ANY hold.
@@ -120,8 +120,8 @@ SUBSTANTIVE_GIT_ACTION_REGEX = re.compile(
 )
 
 # Phrases an agent must emit when running the upskilling pass per
-# skills_private/agentic-upskilling/SKILL.md:92-113. ALL must appear in
-# the same session transcript for the report to be considered "run".
+# docs/CORE_DIRECTIVES.md Directive 3. ALL must appear in the same session
+# transcript for the report to be considered "run".
 UPSKILLING_REPORT_MARKERS = (
     re.compile(r"skills?\s+invoked\s+this\s+session", re.IGNORECASE),
     re.compile(r"promotion\s+candidates", re.IGNORECASE),
@@ -138,10 +138,9 @@ UPSKILLING_WARNING = (
     "assistant turns and/or git actions) but no agentic-upskilling end-of-"
     "session report was emitted.\n"
     "\n"
-    "CORE DIRECTIVE 2 (docs/CORE_DIRECTIVES.md): every substantive session ends "
-    "with the structured report per skills_private/agentic-upskilling/"
-    "SKILL.md:92-113 — Skills invoked, Tools called, Promotion candidates, "
-    "Demotion candidates, Recommendations.\n"
+    "CORE DIRECTIVE 3 (docs/CORE_DIRECTIVES.md): every substantive session ends "
+    "with the structured report per Directive 3 — Skills invoked, Tools called, "
+    "Promotion candidates, Demotion candidates, Recommendations.\n"
     "\n"
     "Recovery:\n"
     "  1. Emit the report in your next response, then\n"
@@ -338,7 +337,7 @@ def main() -> int:
     cited = bool(CITATION_REGEX.search(last_assistant_text))
     claim_violation = bool(claims and not cited)
 
-    # Check 2: agentic-upskilling audit (v0.1.9 / CORE DIRECTIVE 2). Operates
+    # Check 2: agentic-upskilling audit (v0.1.9 / CORE DIRECTIVE 3). Operates
     # on FULL session, gated by substantive-boundary heuristic + already-warned
     # marker (to avoid noisy repeated warnings on every turn after threshold).
     session_id = data.get("session_id") or ""

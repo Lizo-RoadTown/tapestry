@@ -237,9 +237,14 @@ def _write_mcp_config(project_dir: Path) -> None:
     provides memory access.
     """
     mcp_path = project_dir / ".mcp.json"
+    # Mode-agnostic auth header: references the shared-secret env var by name.
+    # When TAPESTRY_MEMORY_API_KEY is unset the client sends "Bearer " (empty),
+    # which the memory server treats as anonymous — so this config is valid both
+    # before the credential exists and after, and needs no change at flip time.
     loom_memory_entry = {
         "type": "http",
         "url": LOOM_MEMORY_MCP_URL,
+        "headers": {"Authorization": "Bearer ${TAPESTRY_MEMORY_API_KEY}"},
     }
 
     if mcp_path.exists():

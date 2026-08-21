@@ -32,6 +32,8 @@ if str(_PKG_PATH) not in sys.path:
 from loom_auth.auth_bridge import (  # noqa: E402, F401
     LoomTokenVerifier,
     SELF_HOST_TENANT_ID,
+    anonymous_access_allowed,
+    api_key_matches,
     resolve_tenant,
     tenant_ctx_var,
     verify_bearer,
@@ -40,6 +42,8 @@ from loom_auth.auth_bridge import (  # noqa: E402, F401
 __all__ = [
     "LoomTokenVerifier",
     "SELF_HOST_TENANT_ID",
+    "anonymous_access_allowed",
+    "api_key_matches",
     "resolve_tenant",
     "tenant_ctx_var",
     "verify_bearer",

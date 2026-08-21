@@ -43,7 +43,11 @@ import storage
 # package via the auth_bridge shim (PR-prep-2b consolidation 2026-06-19).
 # All loom services that fall back to self-host land in the same tenant
 # envelope; canonical lives at packages/auth/python/loom_auth/auth_bridge.py.
-from auth_bridge import SELF_HOST_TENANT_ID  # noqa: E402
+from auth_bridge import (  # noqa: E402
+    SELF_HOST_TENANT_ID,
+    anonymous_access_allowed,
+    api_key_matches,
+)
 
 
 async def _resolve_tenant_for_rest(
@@ -61,12 +65,20 @@ async def _resolve_tenant_for_rest(
     services/project-registry/auth_bridge.py:verify_bearer pattern.
     """
     if not authorization:
-        return SELF_HOST_TENANT_ID
+        if anonymous_access_allowed():
+            return SELF_HOST_TENANT_ID
+        raise HTTPException(401, "Authorization required")
 
     parts = authorization.split(" ", 1)
     if len(parts) != 2 or parts[0].lower() != "bearer" or not parts[1]:
         raise HTTPException(401, "Malformed Authorization header")
     token = parts[1].strip()
+
+    # Self-host shared secret: presenting the configured key resolves to the
+    # deployment's own tenant. Checked before JWT verification because the
+    # key is not a JWT and would fail RS256 decode.
+    if api_key_matches(token):
+        return SELF_HOST_TENANT_ID
 
     public_key = os.environ.get("LOOM_JWT_PUBLIC_KEY")
     if not public_key:

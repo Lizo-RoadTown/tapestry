@@ -61,7 +61,10 @@ _VALID_WRITE_BODY = {
 
 @pytest.mark.asyncio
 async def test_write_self_host_no_auth_inserts_with_self_host_tenant(http_client):
-    """No Authorization → SELF_HOST_TENANT_ID flows to storage."""
+    """No Authorization → SELF_HOST_TENANT_ID flows to storage (anonymous
+    access defaults ON, so no header falls through to the self-host tenant)."""
+    from main import SELF_HOST_TENANT_ID as expected_tenant
+
     with patch("storage.insert_records", return_value=1) as mock_insert:
         resp = await http_client.post("/v1/write", json=_VALID_WRITE_BODY)
 
@@ -70,7 +73,7 @@ async def test_write_self_host_no_auth_inserts_with_self_host_tenant(http_client
     assert body == {"ok": True, "name": "test_synthesis_memo", "inserted": 1}
     mock_insert.assert_called_once()
     kwargs = mock_insert.call_args.kwargs
-    assert kwargs["tenant_id"] == _SELF_HOST_TENANT
+    assert kwargs["tenant_id"] == expected_tenant
     # records[0] should carry the name as the id, plus type/content/etc.
     records = kwargs["records"]
     assert len(records) == 1
@@ -106,6 +109,33 @@ async def test_write_invalid_bearer_returns_401(http_client):
         json=_VALID_WRITE_BODY,
     )
     assert resp.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_write_no_auth_anon_disabled_returns_401(http_client, monkeypatch):
+    """Memory-auth gate applies to /v1/write too: with anonymous access
+    disabled and no header, the write is rejected 401 (no silent insert)."""
+    monkeypatch.setenv("LOOM_ALLOW_ANONYMOUS_SELF_HOST", "0")
+    with patch("storage.insert_records", return_value=1) as mock_insert:
+        resp = await http_client.post("/v1/write", json=_VALID_WRITE_BODY)
+    assert resp.status_code == 401
+    mock_insert.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_write_shared_secret_inserts_with_self_host_tenant(http_client, monkeypatch):
+    """Bearer == shared secret → self-host tenant flows to storage on write."""
+    from main import SELF_HOST_TENANT_ID as expected_tenant
+
+    monkeypatch.setenv("TAPESTRY_MEMORY_API_KEY", "s3cret-shared-key")
+    with patch("storage.insert_records", return_value=1) as mock_insert:
+        resp = await http_client.post(
+            "/v1/write",
+            headers={"Authorization": "Bearer s3cret-shared-key"},
+            json=_VALID_WRITE_BODY,
+        )
+    assert resp.status_code == 200, f"unexpected {resp.status_code}: {resp.text[:200]}"
+    assert mock_insert.call_args.kwargs["tenant_id"] == expected_tenant
 
 
 @pytest.mark.asyncio
@@ -174,7 +204,8 @@ async def test_read_self_host_no_auth_returns_record(http_client):
     # Allow either positional or kwarg passing of record_id
     args = mock_get.call_args.args
     assert ("test_synthesis_memo" in args) or (kwargs.get("record_id") == "test_synthesis_memo")
-    assert kwargs.get("tenant_id") == _SELF_HOST_TENANT
+    from main import SELF_HOST_TENANT_ID as expected_tenant
+    assert kwargs.get("tenant_id") == expected_tenant
 
 
 @pytest.mark.asyncio

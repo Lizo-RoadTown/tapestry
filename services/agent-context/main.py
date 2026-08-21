@@ -203,7 +203,24 @@ mcp_http.mount_into(app, path="/mcp/memory")
 
 @app.get("/health")
 async def health() -> dict[str, str]:
-    return {"status": "ok", "service": "loom-agent-context"}
+    """Liveness + deployed-version probe.
+
+    `commit` is the git SHA Render deployed (RENDER_GIT_COMMIT, set
+    automatically in the Render build environment; falls back to a generic
+    GIT_COMMIT for other hosts, else "unknown" for local runs). This is the
+    reliable way to confirm which code is live — read this, not behavioral
+    edge-probes, to verify a deploy landed."""
+    commit = (
+        os.environ.get("RENDER_GIT_COMMIT")
+        or os.environ.get("GIT_COMMIT")
+        or "unknown"
+    )
+    return {
+        "status": "ok",
+        "service": "loom-agent-context",
+        "version": app.version,
+        "commit": commit,
+    }
 
 
 @app.post("/v1/recall", response_model=RecallResponse)

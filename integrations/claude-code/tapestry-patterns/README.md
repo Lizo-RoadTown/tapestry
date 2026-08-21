@@ -47,7 +47,7 @@ Future work: expose those tools as MCP, then move the agent into this plugin. Tr
 ## Installation
 
 ```bash
-/plugin marketplace add Lizo-RoadTown/claude-skills-marketplace
+/plugin marketplace add Lizo-RoadTown/tapestry
 /plugin install tapestry-patterns@tapestry
 ```
 

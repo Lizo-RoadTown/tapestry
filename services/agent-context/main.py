@@ -64,15 +64,22 @@ async def _resolve_tenant_for_rest(
     for the SessionStart hook + dev workflows; matches
     services/project-registry/auth_bridge.py:verify_bearer pattern.
     """
-    if not authorization:
+    # A Bearer scheme with an empty/missing token is treated exactly like no
+    # header (falls through to the anonymous gate) — never a hard 401. A static
+    # config's "Bearer ${TAPESTRY_MEMORY_API_KEY}" whose var is unset expands to
+    # "Bearer " (trailing whitespace is stripped in transit), and that must not
+    # lock the client out. Only a non-Bearer scheme is malformed.
+    parts = (authorization or "").strip().split(" ", 1)
+    scheme = parts[0].lower() if parts and parts[0] else ""
+    token = parts[1].strip() if len(parts) == 2 else ""
+
+    if not token:
         if anonymous_access_allowed():
             return SELF_HOST_TENANT_ID
         raise HTTPException(401, "Authorization required")
 
-    parts = authorization.split(" ", 1)
-    if len(parts) != 2 or parts[0].lower() != "bearer" or not parts[1]:
+    if scheme != "bearer":
         raise HTTPException(401, "Malformed Authorization header")
-    token = parts[1].strip()
 
     # Self-host shared secret: presenting the configured key resolves to the
     # deployment's own tenant. Checked before JWT verification because the

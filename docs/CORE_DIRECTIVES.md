@@ -63,4 +63,55 @@ invoked, Tools called, Promotion candidates, Demotion candidates, Recommendation
 
 **Where it goes.** Emit the report in the final response, then write it to
 loom-memory as a `lesson`-type record named
-`upskilling_report_session_<YYYY_MM_DD>` with the relevant `project_tags`.
+`upskilling_report_session_<YYYY_MM_DD>` with the relevant `project_tags`. The
+Stop hook counts the report as run **only when that `memory_write` happens** —
+emitting the text alone is not enough (and is deliberately not enough: the
+persisted record is what feeds the loop).
+
+### Report format
+
+This exact shape is what the observer parses to extract skill counts and
+promotion candidates. Keep the headers and bullet shapes verbatim.
+
+```markdown
+## Agentic-upskilling report — session <YYYY-MM-DD>
+
+### Skills invoked this session
+- <skill-slug> (<N> uses)
+- superpowers:systematic-debugging (3 uses)
+
+### Tools called this session
+- Read (30)
+- Bash (25)
+
+### Promotion candidates
+- <name> — <one-line rationale>
+- None
+
+### Demotion candidates
+- None
+
+### Recommendations
+- <free-form text>
+```
+
+Rules that keep it parseable:
+
+- The skills header MUST contain `Skills invoked this session`.
+- Skill bullets are **slug** names (no spaces) with a count: `(N uses)`, `(N)`,
+  or `: N`. A bullet with no count is ignored.
+- `Promotion candidates` header verbatim; each bullet uses ` — ` (em dash)
+  between the name and its one-line rationale; write `None` when there are none.
+- Keep `Tools called` / `Promotion candidates` after the skills section so the
+  section-boundary scan bounds each correctly.
+
+Then persist:
+
+```
+memory_write(
+  name="upskilling_report_session_<YYYY_MM_DD>",   # underscores; matches the Stop-hook gate
+  record_type="lesson",
+  content=<the report body above>,
+  project_tags=[<LOOM_PROJECT_ID>],
+)
+```

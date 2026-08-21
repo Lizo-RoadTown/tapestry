@@ -103,9 +103,12 @@ class TestScanSessionMetrics(unittest.TestCase):
         m = stop_audit._scan_session_metrics(raw)
         self.assertTrue(m["git_action_seen"])
 
-    def test_upskilling_report_detected_via_canonical_phrases(self):
-        # Both markers ("Skills invoked this session" + "Promotion candidates")
-        # must appear for the report to be considered emitted.
+    def test_prose_phrases_alone_dont_count(self):
+        # REGRESSION: emitting the report's section-header phrases in assistant
+        # text must NOT count as the report being run. The old detector matched
+        # these phrases anywhere in the transcript, which false-fired whenever
+        # the report/observer/spec was merely discussed (163/166 in-scope
+        # sessions). Detection now requires an actual memory_write tool block.
         raw = _jsonl(
             _assistant_text_entry(
                 "Upskilling pass:\n\n"
@@ -115,7 +118,19 @@ class TestScanSessionMetrics(unittest.TestCase):
             ),
         )
         m = stop_audit._scan_session_metrics(raw)
-        self.assertTrue(m["upskilling_report_seen"])
+        self.assertFalse(m["upskilling_report_seen"])
+
+    def test_memory_read_of_prior_report_does_not_count(self):
+        # A memory_READ/recall of a prior upskilling_report_* record must NOT
+        # trip the flag (only a memory_write does). Closes the second loophole.
+        raw = _jsonl(
+            _assistant_tool_use_entry(
+                "mcp__loom-memory__memory_read",
+                {"name": "upskilling_report_session_2026_06_12"},
+            ),
+        )
+        m = stop_audit._scan_session_metrics(raw)
+        self.assertFalse(m["upskilling_report_seen"])
 
     def test_upskilling_report_detected_via_memory_write_tool_call(self):
         # Alternative: memory_write with name starting `upskilling_report_`.

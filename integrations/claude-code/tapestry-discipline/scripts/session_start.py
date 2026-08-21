@@ -180,9 +180,9 @@ def _mcp_status_block(base_url: str) -> list[str]:
         "for this session but does NOT persist to the cross-project store",
         "",
         "Why this warning exists:",
-        "  loom-memory access is a concrete rule of this platform (see "
-        "skills_private/concrete-rule/SKILL.md). Silent absence of memory access "
-        "was the failure mode that prompted v0.1.8's defense-in-depth wiring.",
+        "  loom-memory access is a concrete rule of this platform "
+        "(CORE DIRECTIVE 1; see docs/CORE_DIRECTIVES.md). Silent absence of "
+        "memory access was the failure mode that prompted the defense-in-depth wiring.",
         "*****",
     ]
 
@@ -307,6 +307,37 @@ def _in_scope(cwd) -> bool:
     return False
 
 
+def _resolve_patterns_scripts_dir(cwd: Path) -> Path | None:
+    """Locate the tapestry-patterns plugin's scripts/ dir (canonical home of
+    architecture_snapshot.py / architecture_diff.py). Returns None if not found.
+
+    Search order mirrors the proven wrapper at tapestry/scripts/
+    architecture_snapshot.py: an explicit env override, the sibling plugin next
+    to this one (${CLAUDE_PLUGIN_ROOT}/../tapestry-patterns), the standard
+    plugin install locations, and the monorepo source layout (running inside
+    tapestry itself). tapestry-discipline depends on tapestry-patterns being
+    installed for snapshots to run."""
+    candidates: list[Path] = []
+    env_dir = os.environ.get("TAPESTRY_PATTERNS_SCRIPTS") or os.environ.get("LIZ_PATTERNS_SCRIPTS")
+    if env_dir:
+        candidates.append(Path(env_dir))
+    plugin_root = os.environ.get("CLAUDE_PLUGIN_ROOT")
+    if plugin_root:
+        candidates.append(Path(plugin_root).parent / "tapestry-patterns" / "scripts")
+    home = Path.home()
+    candidates.extend([
+        home / ".claude" / "plugins" / "cache" / "tapestry" / "tapestry-patterns" / "scripts",
+        home / ".claude" / "plugins" / "marketplaces" / "tapestry" / "plugins" / "tapestry-patterns" / "scripts",
+        # Monorepo source layout: this file is
+        # integrations/claude-code/tapestry-discipline/scripts/session_start.py
+        Path(__file__).resolve().parents[2] / "tapestry-patterns" / "scripts",
+    ])
+    for cdir in candidates:
+        if (cdir / "architecture_snapshot.py").exists():
+            return cdir
+    return None
+
+
 def main() -> int:
     start = now_ms()
     log_event("SessionStart", "start")
@@ -337,11 +368,21 @@ def main() -> int:
         log_event("SessionStart", "end", exit_code=0, elapsed_ms=now_ms() - start, scope_in=False, action="noop", note="out_of_scope")
         return 0
 
-    snapshot_script = cwd / "scripts" / "architecture_snapshot.py"
-    diff_script = cwd / "scripts" / "architecture_diff.py"
+    # Resolve the CANONICAL snapshot/diff scripts from the tapestry-patterns
+    # plugin (one canonical home; MANIFESTO Pillar 1) — NOT per-project copies,
+    # NOT bundled in this (tapestry-discipline) plugin. This is why every
+    # project — including ones seeded before this change — gets snapshots
+    # without carrying any script of its own. Cross-plugin dependency:
+    # tapestry-patterns must be installed for snapshots to run.
+    scripts_dir = _resolve_patterns_scripts_dir(cwd)
+    if scripts_dir is None:
+        # tapestry-patterns not found (not installed, or unusual layout).
+        log_event("SessionStart", "end", exit_code=0, elapsed_ms=now_ms() - start, scope_in=True, action="noop", note="patterns_scripts_unresolved")
+        return 0
+    snapshot_script = scripts_dir / "architecture_snapshot.py"
+    diff_script = scripts_dir / "architecture_diff.py"
     if not snapshot_script.exists():
-        # No scripts installed yet in this repo — silently skip.
-        log_event("SessionStart", "end", exit_code=0, elapsed_ms=now_ms() - start, scope_in=True, action="noop", note="snapshot_script_absent")
+        log_event("SessionStart", "end", exit_code=0, elapsed_ms=now_ms() - start, scope_in=True, action="noop", note="canonical_snapshot_script_absent")
         return 0
 
     # Resolve python — prefer system python, fall back to specific paths
@@ -354,10 +395,11 @@ def main() -> int:
         sorted(snapshot_dir.glob("*-snapshot.json")) if snapshot_dir.exists() else []
     )
 
-    # Run snapshot
+    # Run snapshot. --repo-root pins output to THIS project's
+    # docs/architecture-snapshots/, not the plugin's own dir.
     try:
         subprocess.run(
-            [python_exe, str(snapshot_script)],
+            [python_exe, str(snapshot_script), "--repo-root", str(cwd)],
             cwd=str(cwd),
             check=True,
             capture_output=True,
@@ -371,7 +413,7 @@ def main() -> int:
     # script handles the no-prior case gracefully).
     try:
         subprocess.run(
-            [python_exe, str(diff_script)],
+            [python_exe, str(diff_script), "--repo-root", str(cwd)],
             cwd=str(cwd),
             check=True,
             capture_output=True,

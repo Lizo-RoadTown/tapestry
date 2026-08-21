@@ -1,31 +1,32 @@
-"""loom init — onboard the current directory as a loom consuming project.
+"""tapestry init — onboard the current directory as a Tapestry consuming project.
 
-The implementation behind `loom init` (and the legacy `scripts/loom_init.py`
-shim). Stdlib-only so it runs equally from PowerShell / bash / zsh on
-Windows / macOS / Linux without extra installs.
+The implementation behind `tapestry init` (the `loom` alias still dispatches
+here). Stdlib-only so it runs equally from PowerShell / bash / zsh on
+Windows / macOS / Linux without extra installs. No dependency on any other
+repo (the old the-loom coupling was removed).
 
-What it does (mirrors `docs/howto/onboard-a-project.md` Part 1, steps 2-5):
+What it does:
 
   1. Pre-check: confirm you're in a directory that looks like a project
      (has .git, or has files, or you pass --force).
-  2. Pre-check: confirm the slug isn't already registered for your
-     tenant (GET /projects/by-slug/<slug>). Idempotent on rerun.
-  3. POST to your project-registry deployment's /projects endpoint to
-     register the project (set --registry-url or TAPESTRY_REGISTRY_URL).
-     Self-host mode: no Bearer token needed; server falls back to
-     SELF_HOST_TENANT_ID.
-  4. Create .env in the current dir with OTel credentials copied from
-     the-loom's .env (so hook events flow to Grafana tagged with this
-     new project_id) + LOOM_PROJECT_ID=<slug>.
-  5. Create .project-intelligence/ folder per the platform-data-model.
-  6. Print confirmation + next-steps.
+  2. Register the project with the Project Registry (GET by-slug is
+     idempotent; POST /projects otherwise). Set --registry-url or
+     TAPESTRY_REGISTRY_URL. Self-host: no Bearer token; the server falls
+     back to SELF_HOST_TENANT_ID.
+  3. Create .env with LOOM_PROJECT_ID=<slug> (the master scope gate for the
+     tapestry-discipline hooks) + OTel vars sourced from the environment.
+  4. Wire the loom-memory MCP server into .mcp.json (with the auth header).
+  5. Initialize .project-intelligence/ (project-context.json carries the
+     registry UUID the observer needs).
+  6. Seed the project skeleton: CLAUDE.md (inlines CORE DIRECTIVE 1),
+     .gitignore, docs/ (architecture-snapshots/, architecture/, adr/), and
+     skills/. All writes are idempotent — nothing existing is overwritten.
 
 What it does NOT do:
-  - Does NOT create a GitHub repo (use `gh repo create` or the
-    PowerShell scaffolder for that).
-  - Does NOT install the tapestry-discipline Claude Code plugin.
-  - Does NOT install skills (Phase 5 SDK install-path future work).
-  - Does NOT touch .gitignore (warns if .env not gitignored).
+  - Does NOT create a GitHub repo (use `gh repo create`).
+  - Does NOT install the Claude Code plugins (see the printed next-steps).
+  - Does NOT seed architecture-snapshot scripts — the tapestry-discipline
+    hook runs the canonical tapestry-patterns scripts directly.
 
 Dual-mode:
   - Self-host (default): no --token, server falls back to SELF_HOST_TENANT_ID.
@@ -53,27 +54,17 @@ DEFAULT_REGISTRY_URL = os.environ.get(
 )
 
 
-def _read_loom_env(loom_repo: Path) -> dict[str, str]:
-    """Read the-loom's .env to pull OTel credentials for propagation."""
-    env_path = loom_repo / ".env"
-    out: dict[str, str] = {}
-    if not env_path.is_file():
-        return out
-    try:
-        for line in env_path.read_text(encoding="utf-8").splitlines():
-            line = line.strip()
-            if not line or line.startswith("#") or "=" not in line:
-                continue
-            key, _, value = line.partition("=")
-            key = key.strip()
-            value = value.strip()
-            if len(value) >= 2 and value[0] == value[-1] and value[0] in ("'", '"'):
-                value = value[1:-1]
-            if key:
-                out[key] = value
-    except OSError:
-        pass
-    return out
+# OpenTelemetry vars propagated into a new project's .env. Sourced from the
+# current process environment (never from a the-loom checkout — that dependency
+# was removed). Only ENDPOINT + HEADERS actually gate telemetry export; the rest
+# are metadata.
+_OTEL_KEYS = (
+    "OTEL_EXPORTER_OTLP_ENDPOINT",
+    "OTEL_EXPORTER_OTLP_PROTOCOL",
+    "OTEL_EXPORTER_OTLP_HEADERS",
+    "OTEL_RESOURCE_ATTRIBUTES",
+    "OTEL_SERVICE_NAME",
+)
 
 
 def _gitignore_has_env(project_dir: Path) -> bool:
@@ -162,8 +153,15 @@ def _register_project(
         raise RuntimeError(f"Registry POST /projects returned HTTP {e.code}: {err_body}")
 
 
-def _write_env_file(project_dir: Path, slug: str, loom_env: dict[str, str]) -> None:
-    """Create .env with OTel propagation + LOOM_PROJECT_ID. Does NOT overwrite."""
+def _write_env_file(project_dir: Path, slug: str) -> None:
+    """Create .env with LOOM_PROJECT_ID + OTel propagation. Does NOT overwrite.
+
+    LOOM_PROJECT_ID is the master scope gate — the tapestry-discipline hooks
+    only fire for a project when it is set. OTel values are sourced from the
+    current process environment when present; otherwise commented placeholders
+    are written so the operator can fill them in. No dependency on a the-loom
+    checkout (removed).
+    """
     env_path = project_dir / ".env"
     if env_path.exists():
         print(f"  WARN: {env_path} already exists; not overwriting.")
@@ -171,29 +169,30 @@ def _write_env_file(project_dir: Path, slug: str, loom_env: dict[str, str]) -> N
         return
 
     lines = [
-        "# .env for this consuming project of the-loom.",
-        "# Generated by `loom init` — review before using.",
-        "# Gitignore me. (See .gitignore — loom warns if not present.)",
+        "# .env for this Tapestry consuming project.",
+        "# Generated by `tapestry init` — review before using. Gitignore me.",
         "",
         f"LOOM_PROJECT_ID={slug}",
         "",
-        "# OTel credentials propagated from the-loom/.env so this project's",
-        "# hook events flow to the same Grafana Cloud stack, tagged with the",
-        "# project_id above.",
+        "# OpenTelemetry export — sourced from your environment at init time so",
+        "# this project's hook events flow to the same stack, tagged with the",
+        "# project_id above. Unset vars are written as commented placeholders.",
     ]
-    for key in (
-        "OTEL_EXPORTER_OTLP_ENDPOINT",
-        "OTEL_EXPORTER_OTLP_PROTOCOL",
-        "OTEL_EXPORTER_OTLP_HEADERS",
-        "OTEL_RESOURCE_ATTRIBUTES",
-        "OTEL_SERVICE_NAME",
-    ):
-        value = loom_env.get(key)
+    found_any = False
+    for key in _OTEL_KEYS:
+        value = os.environ.get(key)
         if value:
             lines.append(f"{key}={value}")
+            found_any = True
+        else:
+            lines.append(f"# {key}=")
     lines.append("")
     env_path.write_text("\n".join(lines), encoding="utf-8")
     print(f"  wrote {env_path}")
+    if not found_any:
+        print("  NOTE: no OTEL_* vars found in the environment; wrote commented")
+        print("        placeholders. Set them in .env (or export them) to enable")
+        print("        telemetry.")
 
 
 # Constants for the loom-memory MCP server entry — this is the concrete rule
@@ -346,6 +345,224 @@ def _write_project_intelligence(
     print(f"  initialized {pi}/")
 
 
+_CLAUDE_MD_TEMPLATE = """# Working in {name}
+
+Project context for Claude Code. Loaded into every conversation. Keep it tight.
+
+<!-- Seeded by `tapestry init`. Edit freely — a starting skeleton, not a contract. -->
+
+## What this project is
+
+{description}
+
+<!-- One or two plain sentences: what this repo is for and what "done" looks
+     like. Describe what *is*, not what it *isn't*. -->
+
+## Tapestry integration (seeded via `tapestry init`)
+
+- **Project slug / `LOOM_PROJECT_ID`:** `{slug}` (in gitignored `.env`) — this is
+  the scope gate that turns the tapestry-discipline hooks on for this repo, and
+  it tags memory + telemetry to this project.
+- **loom-memory MCP** is wired in `.mcp.json`.
+- The `tapestry-discipline` + `tapestry-patterns` plugins apply here when enabled.
+
+### CORE DIRECTIVE 1 — loom-memory access is mandatory
+
+Every session MUST have the `loom-memory` MCP server reachable (`memory_read`,
+`memory_write`, `memory_recall`, `memory_search`, `memory_list`, `memory_delete`).
+If it is unavailable, or SessionStart reports a concrete-rule violation, **halt
+substantive work and report to the operator** — do not proceed silently on
+in-session context alone.
+
+## How to work here
+
+- **PROBE before asserting.** Read the actual file/source before claiming how
+  something works; cite `file:line`.
+- **Recall memory** at the start of substantive work; **write memory** when the
+  operator teaches you something durable or corrects course.
+- **Your own skills live in `skills/`** — see `skills/README.md`. Capture a
+  repeated workflow there instead of re-deriving it.
+- **Decisions worth preserving** go in `docs/adr/`; architecture notes in
+  `docs/architecture/`.
+
+## Tone — no marketing voice
+
+Describe what *is*, not what it *isn't*. Plain, direct, descriptive. Applies to
+docs, commit messages, PR bodies, and error messages.
+"""
+
+_GITIGNORE_LINES = [
+    "# Secrets / env — never commit. init writes .env with telemetry credentials.",
+    ".env",
+    ".env.local",
+    "*.env",
+    "!.env.example",
+    "",
+    "# Python",
+    "__pycache__/",
+    "*.py[cod]",
+    ".pytest_cache/",
+    ".venv/",
+    "",
+    "# OS / editor junk",
+    ".DS_Store",
+    "Thumbs.db",
+    "desktop.ini",
+    "*~",
+    "*.swp",
+    "",
+    "# Node (if this project grows a JS toolchain)",
+    "node_modules/",
+    "",
+    "# Per-machine Claude Code state",
+    ".claude/logs/",
+    ".claude/settings.local.json",
+    "",
+    "# MCP config — references a secret env var by name; per-machine, not committed",
+    ".mcp.json",
+    "",
+    "# Architecture snapshots — auto-written by the tapestry-discipline SessionStart",
+    "# hook every session. Local feedback, not repo history. .gitkeep preserves the dir.",
+    "docs/architecture-snapshots/*",
+    "!docs/architecture-snapshots/.gitkeep",
+]
+
+_DOCS_ARCHITECTURE_README = """# Architecture
+
+Human-authored notes on how this project is put together — the shape of the
+system, the main components, and how they fit. Start with a single overview file
+and add focused notes as the design settles. Describe what *is*; keep it current.
+
+Machine-generated architecture *snapshots* live in `../architecture-snapshots/`
+(written by the tapestry-discipline hook each session) — those are feedback, not
+authored docs. This directory is for the durable, human-authored picture.
+"""
+
+_DOCS_ADR_README = """# Decision records (ADRs)
+
+One file per decision: `NNNN-short-slug.md`, sequential numbering.
+
+## When to record a decision
+
+- A choice that affects multiple parts of the project
+- A choice that reverses an earlier one
+- A naming or boundary decision worth preserving for a future agent reading this repo
+
+## Template
+
+    # NNNN — <short-slug>
+
+    **Date:** YYYY-MM-DD
+    **Status:** Proposed / Accepted / Superseded by NNNN
+    **Decision by:** <who approved + when>
+
+    ## Context
+    Why this decision is being made; the current situation and the pressure.
+
+    ## Decision
+    The decision itself, plainly stated.
+
+    ## Consequences
+    What this makes easier, what it makes harder, what it locks in or rules out.
+
+    ## Related
+    Linked memory writes (loom-memory keys), PRs, prior decisions.
+"""
+
+_SKILLS_README = """# skills/
+
+Your own skills, scoped to this project. A skill is a short, reusable procedure
+you (or Claude) can invoke by name instead of re-deriving it each time.
+
+## Layout
+
+    skills/
+      <skill-name>/
+        SKILL.md     # frontmatter (name, description) + the procedure
+
+One directory per skill. Keep each SKILL.md tight and action-oriented.
+
+## Where skills live — three homes, don't confuse them
+
+- **`skills/` (here)** — skills specific to *this* project, authored by hand.
+- **`.project-intelligence/local-skills/`** — skill *candidates* the agency
+  optimizer emits automatically during use. Raw material, not curated.
+- **`tapestry-patterns` plugin** — canonical patterns reused across *all*
+  projects, one name / one home. If a skill here proves useful everywhere,
+  promote it to the plugin rather than copying it into other repos.
+
+## The skills-audit / upskilling loop
+
+1. **Notice friction** — a workflow you repeat, or a correction made twice.
+2. **Capture it** as a skill here, or as a candidate in `.project-intelligence/`.
+3. **Audit at session end** — the upskilling report surfaces promotion candidates.
+4. **Promote** the winners to the `tapestry-patterns` plugin; retire the ones
+   that stopped earning use.
+
+This is how a project gets sharper over time instead of re-deriving the same
+procedures every session.
+"""
+
+
+def _write_if_absent(path: Path, content: str) -> None:
+    """Write content to path only if it doesn't already exist (idempotent)."""
+    if path.exists():
+        return
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(content, encoding="utf-8")
+    print(f"  wrote {path}")
+
+
+def _write_project_skeleton(
+    project_dir: Path, slug: str, name: str, description: str
+) -> None:
+    """Seed the full project skeleton: CLAUDE.md, .gitignore, docs/ tree, skills/.
+
+    Every write is idempotent (never clobbers an existing file). None of these
+    contain secrets. See docs/plans/2026-08-20-seed-and-hook-fix-plan.md.
+    """
+    # CLAUDE.md — inlines CORE DIRECTIVE 1 (a fresh repo has no CORE_DIRECTIVES.md).
+    _write_if_absent(
+        project_dir / "CLAUDE.md",
+        _CLAUDE_MD_TEMPLATE.format(
+            slug=slug, name=name, description=description or "_(describe this project)_"
+        ),
+    )
+
+    # .gitignore — create if absent, else append any missing lines (no dupes).
+    gi_path = project_dir / ".gitignore"
+    if not gi_path.exists():
+        gi_path.write_text("\n".join(_GITIGNORE_LINES) + "\n", encoding="utf-8")
+        print(f"  wrote {gi_path}")
+    else:
+        existing = gi_path.read_text(encoding="utf-8")
+        existing_set = {ln.strip() for ln in existing.splitlines()}
+        to_add = [
+            ln for ln in _GITIGNORE_LINES
+            if ln and not ln.startswith("#") and ln not in existing_set
+        ]
+        if to_add:
+            sep = "" if existing.endswith("\n") else "\n"
+            gi_path.write_text(
+                existing + sep + "\n# Added by `tapestry init`\n"
+                + "\n".join(to_add) + "\n",
+                encoding="utf-8",
+            )
+            print(f"  appended {len(to_add)} lines to {gi_path}")
+
+    # docs/ tree.
+    _write_if_absent(
+        project_dir / "docs" / "architecture-snapshots" / ".gitkeep", ""
+    )
+    _write_if_absent(
+        project_dir / "docs" / "architecture" / "README.md", _DOCS_ARCHITECTURE_README
+    )
+    _write_if_absent(project_dir / "docs" / "adr" / "README.md", _DOCS_ADR_README)
+
+    # skills/ home (new convention — a place for this project's own skills).
+    _write_if_absent(project_dir / "skills" / "README.md", _SKILLS_README)
+
+
 def add_arguments(p: argparse.ArgumentParser) -> None:
     """Attach the init subcommand's args to a parser. Used by cli.py dispatch."""
     p.add_argument("--slug", required=True,
@@ -356,9 +573,6 @@ def add_arguments(p: argparse.ArgumentParser) -> None:
                    help="One-sentence project description.")
     p.add_argument("--kind", default="dev", choices=["dev", "archived", "paused"],
                    help="Project lifecycle state (default: dev).")
-    p.add_argument("--loom-repo", default=None,
-                   help="Path to the-loom repo (defaults to LOOM_REPO env var, "
-                        "then $HOME/the-loom or %%USERPROFILE%%/the-loom).")
     p.add_argument("--registry-url", default=DEFAULT_REGISTRY_URL,
                    help=f"Project Registry base URL (default: {DEFAULT_REGISTRY_URL}).")
     p.add_argument("--token", default=None,
@@ -372,21 +586,12 @@ def run(args: argparse.Namespace) -> int:
     project_dir = Path.cwd()
     name = args.name or args.slug
 
-    # Locate the-loom repo
-    loom_repo_str = args.loom_repo or os.environ.get("LOOM_REPO") or str(Path.home() / "the-loom")
-    loom_repo = Path(loom_repo_str).expanduser().resolve()
-    if not (loom_repo / "render.yaml").is_file():
-        print(f"error: --loom-repo path doesn't look like the-loom (no render.yaml at {loom_repo}).", file=sys.stderr)
-        print(f"       Pass --loom-repo /path/to/the-loom explicitly, or set LOOM_REPO env var.", file=sys.stderr)
-        return 1
-
-    print(f"==> loom init")
+    print(f"==> tapestry init")
     print(f"    project dir:  {project_dir}")
     print(f"    slug:         {args.slug}")
     print(f"    name:         {name}")
     print(f"    description:  {args.description or '(none)'}")
     print(f"    kind:         {args.kind}")
-    print(f"    loom repo:    {loom_repo}")
     print(f"    registry:     {args.registry_url}")
     print(f"    auth:         {'Bearer token (hosted)' if args.token else 'self-host fallback (no token)'}")
     print()
@@ -399,7 +604,7 @@ def run(args: argparse.Namespace) -> int:
             print(f"       Pass --force to override.", file=sys.stderr)
             return 1
 
-    print(f"--> [1/4] Check Project Registry for existing slug '{args.slug}'...")
+    print(f"--> [1/6] Check Project Registry for existing slug '{args.slug}'...")
     _warm_registry(args.registry_url)
 
     try:
@@ -414,7 +619,7 @@ def run(args: argparse.Namespace) -> int:
         print(f"  Skipping Registry POST; proceeding with local file setup.")
         project_uuid = existing.get("id")
     else:
-        print(f"--> [2/4] Register '{args.slug}' with the Project Registry...")
+        print(f"--> [2/6] Register '{args.slug}' with the Project Registry...")
         try:
             row = _register_project(
                 args.registry_url, args.slug, name, args.description, args.kind, args.token,
@@ -425,36 +630,44 @@ def run(args: argparse.Namespace) -> int:
         project_uuid = row.get("id")
         print(f"  registered. UUID: {project_uuid}")
 
-    loom_env = _read_loom_env(loom_repo)
-    if not loom_env.get("OTEL_EXPORTER_OTLP_HEADERS"):
-        print(f"  WARN: {loom_repo}/.env didn't have OTEL_EXPORTER_OTLP_HEADERS;")
-        print(f"        the generated .env won't have telemetry credentials. Fix manually.")
+    # Guard: the observer requires a real 36-char UUID in project-context.json.
+    # If registration didn't return one, refuse to seed an invalid project
+    # rather than write "unknown" (which the observer silently rejects).
+    if not project_uuid:
+        print("error: the Project Registry did not return a project UUID; cannot",
+              file=sys.stderr)
+        print("       seed a valid .project-intelligence/project-context.json.",
+              file=sys.stderr)
+        print(f"       Check --registry-url ({args.registry_url}) and registry health,",
+              file=sys.stderr)
+        print("       then re-run. No local files were written.", file=sys.stderr)
+        return 1
 
-    print(f"--> [3/5] Create .env in {project_dir}...")
-    _write_env_file(project_dir, args.slug, loom_env)
+    print(f"--> [3/6] Create .env in {project_dir} (LOOM_PROJECT_ID + OTel from env)...")
+    _write_env_file(project_dir, args.slug)
 
-    if not _gitignore_has_env(project_dir):
-        print(f"  WARN: .gitignore does NOT contain '.env'. Add it to prevent")
-        print(f"        committing OTel credentials.")
-
-    print(f"--> [4/5] Wire loom-memory MCP server (concrete-rule Layer 5)...")
+    print(f"--> [4/6] Wire loom-memory MCP server (concrete-rule Layer 5)...")
     _write_mcp_config(project_dir)
 
-    print(f"--> [5/5] Initialize .project-intelligence/...")
-    _write_project_intelligence(project_dir, args.slug, project_uuid or "unknown", name)
+    print(f"--> [5/6] Initialize .project-intelligence/...")
+    _write_project_intelligence(project_dir, args.slug, project_uuid, name)
+
+    print(f"--> [6/6] Seed project skeleton (CLAUDE.md, .gitignore, docs/, skills/)...")
+    _write_project_skeleton(project_dir, args.slug, name, args.description)
 
     print()
     print(f"==> Done.")
-    print(f"    Project '{args.slug}' is now registered with the-loom.")
+    print(f"    Project '{args.slug}' is registered and seeded.")
     print(f"    UUID: {project_uuid}")
     print()
     print(f"Next steps:")
-    print(f"  1. If you don't already have the tapestry-discipline plugin installed,")
-    print(f"     see docs/howto/onboard-a-project.md Part 2.")
-    print(f"  2. Start a Claude Code session in this directory. The SessionStart")
-    print(f"     hook (v0.1.7+) will auto-recall relevant memories for this project.")
-    print(f"  3. Hook events from this project will flow to Grafana tagged with")
-    print(f"     project_id={args.slug}.")
-    print(f"  4. If .env doesn't exist or is missing OTel creds, copy from")
-    print(f"     {loom_repo}/.env manually.")
+    print(f"  1. If you don't already have the tapestry plugins installed:")
+    print(f"       /plugin marketplace add Lizo-RoadTown/tapestry")
+    print(f"       /plugin install tapestry-discipline@tapestry")
+    print(f"       /plugin install tapestry-patterns@tapestry")
+    print(f"  2. Start a Claude Code session here. The SessionStart hook auto-recalls")
+    print(f"     relevant memories and writes architecture snapshots to")
+    print(f"     docs/architecture-snapshots/.")
+    print(f"  3. To enable telemetry, set the OTEL_* vars in .env (or export them);")
+    print(f"     hook events then flow tagged with project_id={args.slug}.")
     return 0

@@ -132,8 +132,8 @@ LOCAL_RECORD_SCHEMA_VERSION = 1
 _SLUG_INVALID = re.compile(r"[^a-zA-Z0-9_-]+")
 
 
-# Upskilling-report parser. Each line looks like one of these (per
-# skills_private/agentic-upskilling/SKILL.md:92-113):
+# Upskilling-report parser. Each line looks like one of these (per the
+# report format in docs/CORE_DIRECTIVES.md, "Report format (Directive 3)"):
 #
 #     - layered-explanation       (15+ uses)
 #     - layered-explanation (15 uses)
@@ -235,7 +235,7 @@ def parse_upskilling_report(raw: str) -> dict[str, int]:
     """Find the most recent upskilling-report block in the transcript
     and parse out "Skills invoked: ... (N uses)" lines.
 
-    The report block per skills_private/agentic-upskilling/SKILL.md:92-113
+    The report block (per docs/CORE_DIRECTIVES.md "Report format (Directive 3)")
     has the marker "Skills invoked this session" followed by indented lines.
     This function:
       1. Locates the LATEST assistant text containing the marker.
@@ -269,7 +269,7 @@ def parse_upskilling_report(raw: str) -> dict[str, int]:
             if block.get("type") != "text":
                 continue
             text = block.get("text") or ""
-            if "skills invoked this session" in text.lower():
+            if "skills invoked" in text.lower():
                 latest_report_text = text
 
     if not latest_report_text:
@@ -278,7 +278,8 @@ def parse_upskilling_report(raw: str) -> dict[str, int]:
     # Extract just the "Skills invoked" subsection. Look for the marker,
     # then capture until the next section marker or end-of-text.
     lower = latest_report_text.lower()
-    start = lower.find("skills invoked this session")
+    _skills_anchor = "skills invoked"
+    start = lower.find(_skills_anchor)
     if start < 0:
         return {}
     # Find next section marker after start.
@@ -286,7 +287,7 @@ def parse_upskilling_report(raw: str) -> dict[str, int]:
                    "recommendations")
     end = len(latest_report_text)
     for m in end_markers:
-        idx = lower.find(m, start + len("skills invoked this session"))
+        idx = lower.find(m, start + len(_skills_anchor))
         if idx > 0 and idx < end:
             end = idx
     section = latest_report_text[start:end]

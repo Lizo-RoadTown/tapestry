@@ -119,17 +119,15 @@ SUBSTANTIVE_GIT_ACTION_REGEX = re.compile(
     r"\bgit\s+(?:commit|push|merge|tag)\b", re.IGNORECASE
 )
 
-# Phrases an agent must emit when running the upskilling pass per
-# skills_private/agentic-upskilling/SKILL.md:92-113. ALL must appear in
-# the same session transcript for the report to be considered "run".
-UPSKILLING_REPORT_MARKERS = (
-    re.compile(r"skills?\s+invoked\s+this\s+session", re.IGNORECASE),
-    re.compile(r"promotion\s+candidates", re.IGNORECASE),
-)
-
-# Or: a memory_write tool call whose `name` arg starts with "upskilling_report_".
-UPSKILLING_MEMORY_WRITE_REGEX = re.compile(
-    r'memory_write[^"]*"name"\s*:\s*"upskilling_report_', re.IGNORECASE
+# The report counts as emitted IFF the session contains a memory_write tool
+# call that persists the report record. Gate on the actual tool block, never on
+# prose phrases: the old markers ("skills invoked this session", "promotion
+# candidates") are the report's own section headers, so merely reading or
+# discussing the report/observer/spec tripped them — a false positive in 163 of
+# 166 in-scope sessions. Canonical record name per docs/CORE_DIRECTIVES.md
+# "Report format (Directive 3)".
+UPSKILLING_REPORT_NAME_REGEX = re.compile(
+    r"^upskilling_report_session_\d{4}_\d{2}_\d{2}$"
 )
 
 UPSKILLING_WARNING = (
@@ -138,10 +136,9 @@ UPSKILLING_WARNING = (
     "assistant turns and/or git actions) but no agentic-upskilling end-of-"
     "session report was emitted.\n"
     "\n"
-    "CORE DIRECTIVE 2 (docs/CORE_DIRECTIVES.md): every substantive session ends "
-    "with the structured report per skills_private/agentic-upskilling/"
-    "SKILL.md:92-113 — Skills invoked, Tools called, Promotion candidates, "
-    "Demotion candidates, Recommendations.\n"
+    "CORE DIRECTIVE 3 (docs/CORE_DIRECTIVES.md, 'Report format'): every "
+    "substantive session ends with the structured report — Skills invoked, "
+    "Tools called, Promotion candidates, Demotion candidates, Recommendations.\n"
     "\n"
     "Recovery:\n"
     "  1. Emit the report in your next response, then\n"
@@ -170,7 +167,7 @@ def _scan_session_metrics(raw: str) -> dict:
     assistant_turns = 0
     tool_calls = 0
     git_action_seen = False
-    text_concat_for_marker_scan = []
+    upskilling_report_seen = False
 
     for line in raw.splitlines():
         line = line.strip()
@@ -198,18 +195,25 @@ def _scan_session_metrics(raw: str) -> dict:
                         git_action_seen = True
                 elif btype == "tool_use":
                     tool_calls += 1
-                    # Also detect git via bash tool calls + memory_write upskilling reports.
+                    # Detect git via bash tool calls, and the upskilling report
+                    # via the memory_write tool block that persists it. Gate on
+                    # the TOOL name (must be a memory_write, not a read/delete of
+                    # a prior report) AND the anchored record name — never on
+                    # prose, which false-positives on discussion of the report.
+                    tool_name = block.get("name") or ""
                     tool_input = block.get("input") or {}
                     if isinstance(tool_input, dict):
                         cmd = tool_input.get("command") or ""
                         if isinstance(cmd, str) and SUBSTANTIVE_GIT_ACTION_REGEX.search(cmd):
                             git_action_seen = True
-                        name_arg = tool_input.get("name") or ""
-                        if isinstance(name_arg, str) and name_arg.startswith("upskilling_report_"):
-                            # Detected via tool-input inspection (most reliable).
-                            text_concat_for_marker_scan.append(
-                                f'memory_write "name": "{name_arg}"'
-                            )
+                        record_name = tool_input.get("name") or ""
+                        if (
+                            isinstance(tool_name, str)
+                            and "memory_write" in tool_name
+                            and isinstance(record_name, str)
+                            and UPSKILLING_REPORT_NAME_REGEX.match(record_name)
+                        ):
+                            upskilling_report_seen = True
         elif isinstance(content, str):
             text_parts.append(content)
             if SUBSTANTIVE_GIT_ACTION_REGEX.search(content):
@@ -217,13 +221,6 @@ def _scan_session_metrics(raw: str) -> dict:
 
         joined = "\n".join(text_parts)
         last_assistant_text = joined  # overwritten each iteration -> last one wins
-        text_concat_for_marker_scan.append(joined)
-
-    full_text = "\n".join(text_concat_for_marker_scan)
-    upskilling_report_seen = (
-        all(p.search(full_text) for p in UPSKILLING_REPORT_MARKERS)
-        or bool(UPSKILLING_MEMORY_WRITE_REGEX.search(full_text))
-    )
 
     return {
         "last_assistant_text": last_assistant_text,

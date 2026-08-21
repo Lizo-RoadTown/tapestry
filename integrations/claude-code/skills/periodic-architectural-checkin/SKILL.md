@@ -121,13 +121,13 @@ Cross-tag the memory with EVERY project the decision affects, so future agents i
 - The check-in MESSAGE goes to the operator in the conversation
 - The DECISIONS that come out of it go to loom-memory as a `decision` record
 - If the check-in surfaces a new gap that needs a doc, route to `docs/proposals/<date>-<topic>.md`
-- If the check-in surfaces a recurring pattern, add to `skills_private/` (this skill itself was promoted this way)
+- If the check-in surfaces a recurring pattern, capture it as a skill (project `skills/` or, if cross-project, promote to the `tapestry-patterns` plugin — this skill itself was promoted this way)
 
 ## Related
 
 - [[skills/agentic-skill-design]] — PROBE → DECIDE → ACT → REPORT methodology this skill follows
-- [[skills_private/agentic-upskilling]] — the broader upskilling loop this check-in is one move within
-- [[skills_private/lessons-learned]] — friction-as-memory; check-in is "drift-as-conversation"
+- [[tapestry-patterns:agentic-upskilling]] — the broader upskilling loop this check-in is one move within
+- [[tapestry-patterns:lessons-learned]] — friction-as-memory; check-in is "drift-as-conversation"
 - [[skills/layered-explanation]] — output formatting (ELI5 → quick ref → depth → mental model)
 - `docs/architecture/UMBRELLA.md` — the doc check-ins read drift relative to
 - `docs/proposals/2026-06-12-promotion-categorization.md` — the criteria framework the check-in uses for the "categorization gaps" section

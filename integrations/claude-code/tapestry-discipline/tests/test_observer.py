@@ -61,7 +61,7 @@ def _jsonl(*entries: dict) -> str:
     return "\n".join(json.dumps(e) for e in entries) + "\n"
 
 
-# Sample upskilling report matching the SKILL.md:92-113 format.
+# Sample upskilling report matching the docs/CORE_DIRECTIVES.md "Report format" spec.
 SAMPLE_REPORT_TEXT = """Agentic-upskilling pass — session 2026-06-12
 
 Skills invoked this session:

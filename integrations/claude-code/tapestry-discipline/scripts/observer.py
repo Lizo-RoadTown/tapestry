@@ -552,16 +552,34 @@ def _registry_url() -> str:
     return url
 
 
+def _memory_auth_headers() -> dict[str, str]:
+    """Bearer header for the shared memory secret when configured, else {}.
+    Mode-agnostic: sends the credential only when TAPESTRY_MEMORY_API_KEY (or
+    the LOOM_MEMORY_API_KEY alias) is set, so the same code works before and
+    after the memory endpoint requires auth. Applied ONLY to memory-endpoint
+    calls, never to the architecture-registry."""
+    key = (
+        os.environ.get("TAPESTRY_MEMORY_API_KEY")
+        or os.environ.get("LOOM_MEMORY_API_KEY")
+        or ""
+    ).strip()
+    return {"Authorization": f"Bearer {key}"} if key else {}
+
+
 def _http_json(
     method: str, url: str, body: dict[str, Any], timeout: float = 6.0,
+    extra_headers: Optional[dict[str, str]] = None,
 ) -> Optional[dict[str, Any]]:
     """POST/PATCH a JSON body. Returns the parsed response dict or None
     on any failure. Never raises — observer is best-effort."""
     data = json.dumps(body).encode("utf-8")
+    headers = {"Content-Type": "application/json"}
+    if extra_headers:
+        headers.update(extra_headers)
     req = urllib.request.Request(
         url=url,
         data=data,
-        headers={"Content-Type": "application/json"},
+        headers=headers,
         method=method,
     )
     try:
@@ -635,7 +653,10 @@ def write_candidate_memory(
     if project_tag:
         body["project_tags"] = [project_tag]
 
-    _http_json("POST", _MEMORY_URL + _MEMORY_WRITE_PATH, body, timeout=4.0)
+    _http_json(
+        "POST", _MEMORY_URL + _MEMORY_WRITE_PATH, body, timeout=4.0,
+        extra_headers=_memory_auth_headers(),
+    )
 
 
 def post_candidate(

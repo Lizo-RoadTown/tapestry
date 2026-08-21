@@ -231,10 +231,21 @@ def _try_recall(cwd_lower: str, n: int = 5, timeout: float = 6.0) -> list[str]:
 
         url = _agent_context_base_url().rstrip("/") + "/v1/recall"
 
+        # Mode-agnostic memory auth: send the shared secret only when it is
+        # configured, so this works before and after the endpoint requires it.
+        _headers = {"Content-Type": "application/json"}
+        _mem_key = (
+            os.environ.get("TAPESTRY_MEMORY_API_KEY")
+            or os.environ.get("LOOM_MEMORY_API_KEY")
+            or ""
+        ).strip()
+        if _mem_key:
+            _headers["Authorization"] = f"Bearer {_mem_key}"
+
         req = urllib.request.Request(
             url=url,
             data=body,
-            headers={"Content-Type": "application/json"},
+            headers=_headers,
             method="POST",
         )
         with urllib.request.urlopen(req, timeout=timeout) as resp:

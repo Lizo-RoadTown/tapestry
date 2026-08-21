@@ -170,8 +170,15 @@ class SelfHostFallbackAuthMiddleware:
                 break
 
         # Parse the bearer token. token stays None for an absent header;
-        # becomes "" for a "Bearer " with an empty value. A non-Bearer
-        # Authorization header (e.g. "Basic ...") is rejected outright.
+        # becomes "" for a Bearer scheme with no value. A Bearer scheme with
+        # an empty/missing token is NOT malformed — it is treated as no token
+        # (falls through to the anonymous gate below). This is deliberate:
+        # a static .mcp.json header "Bearer ${TAPESTRY_MEMORY_API_KEY}" whose
+        # var is unset expands to "Bearer " (and any trailing whitespace is
+        # stripped in transit by proxies/clients, leaving a bare "Bearer"), so
+        # the empty-token case MUST NOT lock the client out — it must behave
+        # exactly like no header at all. Only a non-Bearer scheme (e.g.
+        # "Basic ...") is rejected as malformed.
         token: str | None = None
         if auth_header is not None:
             try:
@@ -179,12 +186,14 @@ class SelfHostFallbackAuthMiddleware:
             except UnicodeDecodeError:
                 await _send_401(send, "Malformed Authorization header")
                 return
-            parts = auth_str.split(" ", 1)
-            if len(parts) == 2 and parts[0].lower() == "bearer":
-                token = parts[1].strip()
-            else:
+            parts = auth_str.strip().split(" ", 1)
+            scheme = parts[0].lower() if parts and parts[0] else ""
+            if scheme != "bearer":
+                # Non-Bearer scheme (or empty/garbage) → reject outright.
                 await _send_401(send, "Malformed Authorization header")
                 return
+            # Bearer scheme. token is "" when no value is present.
+            token = parts[1].strip() if len(parts) == 2 else ""
 
         # Case 1: no token (absent header, or empty "Bearer ") → anonymous
         # gate. An empty Bearer is treated as anonymous, not malformed, so a

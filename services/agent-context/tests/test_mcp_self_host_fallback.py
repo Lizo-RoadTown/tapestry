@@ -211,6 +211,40 @@ async def test_empty_bearer_token_treated_as_anonymous(middleware, monkeypatch):
     assert not captured
 
 
+@pytest.mark.asyncio
+async def test_bare_bearer_no_space_treated_as_anonymous(middleware, monkeypatch):
+    """REGRESSION: `Authorization: Bearer` with NO trailing space (a single
+    token after split) must ALSO be anonymous, not malformed. This is the
+    real wire case: a static "Bearer ${TAPESTRY_MEMORY_API_KEY}" whose var is
+    unset sends "Bearer " but the trailing whitespace is stripped in transit
+    by clients/proxies (curl, httpx, uvicorn, Render's edge), so the server
+    actually receives a bare "Bearer". Prior code hit the malformed branch on
+    this and 401'd — locking out a client that should have fallen through to
+    the open anonymous gate. See auth_bridge whitespace-edge-probe lesson."""
+    from mcp_self_host_middleware import SELF_HOST_TENANT_ID
+
+    monkeypatch.delenv("LOOM_ALLOW_ANONYMOUS_SELF_HOST", raising=False)
+    scope = _scope(authorization=b"Bearer")  # no trailing space
+    send, captured = _capture_send()
+    await middleware(scope, _noop_receive, send)
+
+    assert middleware._test_downstream_calls, "downstream not reached"
+    assert middleware._test_downstream_calls[0]["tenant_in_ctx"] == SELF_HOST_TENANT_ID
+    assert not captured
+
+
+@pytest.mark.asyncio
+async def test_bare_bearer_no_space_anon_disabled_returns_401(middleware, monkeypatch):
+    """The bare-`Bearer` path still honors the anonymous gate: 401 when off."""
+    monkeypatch.setenv("LOOM_ALLOW_ANONYMOUS_SELF_HOST", "0")
+    scope = _scope(authorization=b"Bearer")
+    send, captured = _capture_send()
+    await middleware(scope, _noop_receive, send)
+
+    assert captured[0]["status"] == 401
+    assert not middleware._test_downstream_calls
+
+
 # ---------------------------------------------------------------------------
 # Anonymous gate (2026-08-08): LOOM_ALLOW_ANONYMOUS_SELF_HOST
 # ---------------------------------------------------------------------------

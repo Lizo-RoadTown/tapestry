@@ -216,11 +216,14 @@ async def test_empty_project_tags_passes_none_to_storage(http_client):
 # ---------------------------------------------------------------------------
 # Memory-auth gate (2026-08-08) — anonymous flag + shared secret
 #
-# NOTE ON EMPTY BEARER: the REST path (main.py:_resolve_tenant_for_rest) does
-# NOT treat an empty `Bearer ` as anonymous — it rejects it as malformed
-# (main.py:72-74). This differs from the MCP middleware, which routes empty
-# `Bearer ` through the anonymous gate (mcp_self_host_middleware.py:189-199).
-# The tests below pin the REST path's ACTUAL behavior.
+# NOTE ON EMPTY BEARER: the REST path (main.py:_resolve_tenant_for_rest) now
+# treats an empty/missing-token Bearer (`Bearer ` or a bare `Bearer` after the
+# trailing space is stripped in transit) EXACTLY like no header — it falls
+# through to the anonymous gate, same as the MCP middleware. This is
+# deliberate lockout-safety: a static config's "Bearer ${TAPESTRY_MEMORY_API_KEY}"
+# whose var is unset must never hard-fail, and the SessionStart hook is itself
+# a REST client. Only a non-Bearer scheme (Basic, etc.) is malformed. The tests
+# below pin that behavior.
 # ---------------------------------------------------------------------------
 
 
@@ -305,15 +308,33 @@ async def test_wrong_shared_secret_returns_401(http_client, monkeypatch):
 
 
 @pytest.mark.asyncio
-async def test_empty_bearer_rest_returns_401(http_client, monkeypatch):
-    """(e) REST path: empty `Bearer ` → 401 malformed. Unlike the MCP
-    middleware, the REST path does NOT route empty Bearer through the
-    anonymous gate — see the NOTE at the top of this section."""
+@pytest.mark.parametrize("header", ["Bearer ", "Bearer"])
+async def test_empty_bearer_rest_treated_as_anonymous(http_client, monkeypatch, header):
+    """(e) REST path: an empty/missing-token Bearer (`Bearer ` OR a bare
+    `Bearer` after the trailing space is stripped in transit) is treated as
+    anonymous — with anon ON (default) it resolves to the self-host tenant and
+    the request succeeds. Matches the MCP middleware; see the NOTE above."""
     monkeypatch.delenv("LOOM_ALLOW_ANONYMOUS_SELF_HOST", raising=False)
     with patch("storage.search", return_value=[]) as mock_search:
         resp = await http_client.post(
             "/v1/recall",
-            headers={"Authorization": "Bearer "},
+            headers={"Authorization": header},
+            json={"context": "empty bearer", "n": 1},
+        )
+    assert resp.status_code == 200
+    mock_search.assert_called()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("header", ["Bearer ", "Bearer"])
+async def test_empty_bearer_rest_anon_disabled_returns_401(http_client, monkeypatch, header):
+    """The empty-Bearer REST path still honors the anonymous gate: 401 when
+    anon is off (the escape hatch closed)."""
+    monkeypatch.setenv("LOOM_ALLOW_ANONYMOUS_SELF_HOST", "0")
+    with patch("storage.search", return_value=[]) as mock_search:
+        resp = await http_client.post(
+            "/v1/recall",
+            headers={"Authorization": header},
             json={"context": "empty bearer", "n": 1},
         )
     assert resp.status_code == 401

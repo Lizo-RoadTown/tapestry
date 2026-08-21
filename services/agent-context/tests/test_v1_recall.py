@@ -65,6 +65,35 @@ async def http_client() -> AsyncIterator[httpx.AsyncClient]:
 
 
 # ---------------------------------------------------------------------------
+# /health — liveness + deployed-commit probe
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_health_reports_commit_and_version(http_client, monkeypatch):
+    """/health echoes the deployed git SHA (RENDER_GIT_COMMIT) so a deploy can
+    be confirmed by reading the live version, not by behavioral edge-probes."""
+    monkeypatch.setenv("RENDER_GIT_COMMIT", "deadbeefcafe")
+    resp = await http_client.get("/health")
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["status"] == "ok"
+    assert body["service"] == "loom-agent-context"
+    assert body["commit"] == "deadbeefcafe"
+    assert "version" in body
+
+
+@pytest.mark.asyncio
+async def test_health_commit_unknown_when_env_absent(http_client, monkeypatch):
+    """With no commit env var (local run), commit falls back to 'unknown'."""
+    monkeypatch.delenv("RENDER_GIT_COMMIT", raising=False)
+    monkeypatch.delenv("GIT_COMMIT", raising=False)
+    resp = await http_client.get("/health")
+    assert resp.status_code == 200
+    assert resp.json()["commit"] == "unknown"
+
+
+# ---------------------------------------------------------------------------
 # Auth + routing tests (don't touch the DB; storage.search is mocked)
 # ---------------------------------------------------------------------------
 

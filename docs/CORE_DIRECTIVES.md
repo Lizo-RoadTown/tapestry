@@ -26,22 +26,27 @@ SessionStart additionalContext shows `*** CONCRETE-RULE VIOLATION DETECTED ***`,
 halt all substantive work and report to the operator. Do not proceed silently
 using only in-session context.
 
-## Directive 2 — parallel-build, not pause-and-migrate
+## Directive 2 — Tapestry is the live system; the-loom and Make_Skills are retired sources
 
-Tapestry is being built **in parallel** with active prototype repos (`the-loom`,
-`Make_Skills`, `loom-platform`, consuming projects). It is **NOT** a destination
-for active work yet.
+Tapestry is the live system. `the-loom` and `Make_Skills` are **retired legacy
+source repos**, not active parallel prototypes. Some capabilities already cut over
+and run from Tapestry (the loom-memory MCP at `services/agent-context/`, and
+`services/project-registry/`). Others still exist only as working code in the
+retired the-loom — observer, telemetry-ingestion, policy, architecture-registry,
+self-observer — with README-only stubs in Tapestry.
 
-- **Do NOT migrate code from prototype repos to Tapestry unless the operator has
-  explicitly approved that piece for migration.**
-- **Do NOT pause work in prototype repos to "wait for Tapestry"** — work continues
-  in its current home until stable enough for curated import.
-- **Do NOT treat slot READMEs in Tapestry as commitments to current architecture**
-  — they are targets for future import, not authoritative descriptions of working
-  code.
-- New Tapestry work in this phase is limited to: docs (architecture, ADRs,
-  migration), schemas (if no canonical version exists elsewhere), and skeleton
-  placeholders.
+- **Bringing a retired-source capability home into Tapestry is the normal work
+  now** — not something to avoid. When a service you need still lives only in
+  the-loom, migrate or rebuild it into its Tapestry home. Do NOT treat the-loom as
+  a live place to build.
+- **A slot README is a target, not working code** — before assuming a capability
+  exists in Tapestry, check whether the real implementation still lives in
+  the-loom.
+- **Do NOT add any new runtime dependency on the-loom or Make_Skills.** The end
+  state is Tapestry standing alone, with no runtime dependency on either as a
+  separate system.
+- **Scope each migration with the operator** — Lift / Refactor / Rewrite / Retire
+  per piece; no big-bang lift-and-shift.
 
 See [`docs/migration/README.md`](migration/README.md) for the migration approach.
 

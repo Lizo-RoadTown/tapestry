@@ -9,6 +9,8 @@ Endpoints:
   GET  /health                                  — Render liveness probe
   POST /skill-used                              — bridge telemetry receiver
                                                   (PR D); HMAC auth
+  POST /hook-events (and POST /hook-event)      — discipline-hook ingest
+                                                  (Phase 0 task 4); HMAC auth
   GET  /telemetry/invocations                   — read API: invocations_30d
                                                   (0-vs-None contract)
   GET  /telemetry/counts                        — read API: grouped counts
@@ -20,16 +22,24 @@ the Postgres substrate inside db.tenant_transaction so RLS scopes every query.
 """
 from __future__ import annotations
 
+import json
 from contextlib import asynccontextmanager
-from typing import AsyncIterator, Optional
+from typing import Any, AsyncIterator, Optional
 
 from fastapi import FastAPI, Header, HTTPException, Request
 
 import bridge_hmac
 import bridge_models
 import db
+import hook_event_handler
 import read_api
 import skill_usage_handler
+
+# Discipline-hook ingest (Phase 0 task 4). Secret is SEPARATE from the engine's
+# LOOM_SKILL_BRIDGE_SECRET so the hook emitter (task 5) authenticates with its
+# own shared secret. Batch cap mirrors the skill-usage 1000/batch contract.
+_HOOK_SECRET_ENV = "LOOM_HOOK_BRIDGE_SECRET"
+_MAX_HOOK_EVENTS = 1000
 
 
 @asynccontextmanager
@@ -121,3 +131,90 @@ async def receive_skill_usage_batch(
     # Step 4: persist to the telemetry substrate (telemetry_events INSERT +
     # telemetry_rollup_daily UPSERT, RLS-scoped) and return the ack.
     return await skill_usage_handler.apply_batch(batch)
+
+
+# ---------------------------------------------------------------------------
+# Discipline-hook ingest — bare-entry receiver (Phase 0 task 4)
+# ---------------------------------------------------------------------------
+
+
+def _coerce_hook_entries(parsed: Any) -> Optional[list[dict[str, Any]]]:
+    """Normalize the accepted request bodies to a list of entry dicts.
+
+    Accepts three shapes so task 5's emitter and task 7's backfill can use
+    whichever is convenient:
+      - a single entry object                     -> [entry]
+      - a bare JSON array of entries              -> entries
+      - an envelope {"events": [ ...entries ]}    -> entries
+
+    Returns None if the shape is not one of these (caller -> 400).
+    """
+    if isinstance(parsed, list):
+        return parsed if all(isinstance(e, dict) for e in parsed) else None
+    if isinstance(parsed, dict):
+        events = parsed.get("events")
+        if isinstance(events, list):
+            return events if all(isinstance(e, dict) for e in events) else None
+        # A bare single entry (must at least look like a hook entry).
+        return [parsed]
+    return None
+
+
+@app.post("/hook-events", status_code=202)
+@app.post("/hook-event", status_code=202)
+async def receive_hook_events(
+    request: Request,
+    x_loom_hook_signature: Optional[str] = Header(None),
+) -> dict:
+    """Receive discipline-hook telemetry entries and persist them (project-
+    attributed) into the telemetry substrate.
+
+    `/hook-events` is the canonical (batch) route; `/hook-event` is an alias
+    for a single entry. Both accept a single entry, a JSON array, or an
+    `{"events": [...]}` envelope (see `_coerce_hook_entries`).
+
+    Auth mirrors /skill-used: HMAC-SHA256 (bridge_hmac) verified on the RAW body
+    BEFORE parsing, using the SEPARATE `LOOM_HOOK_BRIDGE_SECRET` in the
+    `X-Loom-Hook-Signature: t=<unix>,v1=<hex>` header. Works self-host now and
+    hosted later (same mechanism, per-deployment secret; tenant scoping happens
+    at the write layer, not here).
+
+    Status codes:
+      - 202: accepted; body = {events_processed: N} (duplicates excluded)
+      - 400: malformed JSON, or a body that is not entry/array/envelope
+      - 401: HMAC missing / malformed / outside window / mismatch
+      - 413: batch exceeds _MAX_HOOK_EVENTS
+    """
+    # Step 1: raw body before parsing (signature covers exact bytes).
+    raw_body = (await request.body()).decode("utf-8")
+
+    # Step 2: HMAC verify with the hook-events secret.
+    try:
+        bridge_hmac.verify_signature(
+            raw_body, x_loom_hook_signature, secret_env=_HOOK_SECRET_ENV
+        )
+    except bridge_hmac.BridgeAuthError:
+        raise HTTPException(401, "Invalid signature")
+
+    # Step 3: parse + normalize to a list of entries.
+    try:
+        parsed = json.loads(raw_body)
+    except json.JSONDecodeError as e:
+        raise HTTPException(400, f"Malformed body: {e}")
+    entries = _coerce_hook_entries(parsed)
+    if entries is None:
+        raise HTTPException(
+            400,
+            'Body must be a hook entry, a JSON array of entries, or '
+            '{"events": [...]}.',
+        )
+    if not entries:
+        return {"events_processed": 0}
+    if len(entries) > _MAX_HOOK_EVENTS:
+        raise HTTPException(
+            413, f"Too many events in one request (max {_MAX_HOOK_EVENTS})."
+        )
+
+    # Step 4: map bare keys -> 005 columns and persist (RLS-scoped). The mapper
+    # fails closed per-entry when no tenant resolves.
+    return await hook_event_handler.apply_hook_events(entries)

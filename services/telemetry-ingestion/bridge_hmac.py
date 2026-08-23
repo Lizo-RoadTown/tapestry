@@ -65,16 +65,25 @@ class BridgeAuthError(Exception):
 TIMESTAMP_WINDOW_SECONDS = 5 * 60
 
 
-def _get_secret() -> bytes:
-    """Read LOOM_SKILL_BRIDGE_SECRET at call time so env updates take effect
-    in tests + redeploys without restart. Raises RuntimeError if unset —
+DEFAULT_SECRET_ENV = "LOOM_SKILL_BRIDGE_SECRET"
+
+
+def _get_secret(secret_env: str = DEFAULT_SECRET_ENV) -> bytes:
+    """Read the shared secret from `secret_env` at call time so env updates take
+    effect in tests + redeploys without restart. Raises RuntimeError if unset —
     that's a configuration error worth surfacing loud.
+
+    `secret_env` defaults to `LOOM_SKILL_BRIDGE_SECRET` (the skill-making
+    bridge). The /hook-event endpoint (Phase 0 task 4) passes
+    `LOOM_HOOK_BRIDGE_SECRET` so the discipline-hook emitter authenticates with
+    its own secret without sharing the engine's. The HMAC mechanism, header
+    shape, and replay window are identical either way.
     """
-    raw = os.environ.get("LOOM_SKILL_BRIDGE_SECRET")
+    raw = os.environ.get(secret_env)
     if not raw:
         raise RuntimeError(
-            "LOOM_SKILL_BRIDGE_SECRET is unset. Set the shared secret in env "
-            "on both the-loom AND Make_Skills (same value)."
+            f"{secret_env} is unset. Set the shared secret in env on both the "
+            "sender AND the receiver (same value)."
         )
     return raw.encode("utf-8")
 
@@ -84,7 +93,9 @@ def _now_unix() -> int:
     return int(time.time())
 
 
-def sign(body: str, *, timestamp: int | None = None) -> str:
+def sign(
+    body: str, *, timestamp: int | None = None, secret_env: str = DEFAULT_SECRET_ENV
+) -> str:
     """Produce the X-Loom-Signature / X-MakeSkills-Signature header value
     for the given JSON body string.
 
@@ -97,13 +108,15 @@ def sign(body: str, *, timestamp: int | None = None) -> str:
     signature on the verifier side.
     """
     ts = timestamp if timestamp is not None else _now_unix()
-    secret = _get_secret()
+    secret = _get_secret(secret_env)
     payload = f"{ts}.{body}".encode("utf-8")
     digest = hmac.new(secret, payload, hashlib.sha256).hexdigest()
     return f"t={ts},v1={digest}"
 
 
-def verify_signature(body: str, header_value: str | None) -> None:
+def verify_signature(
+    body: str, header_value: str | None, *, secret_env: str = DEFAULT_SECRET_ENV
+) -> None:
     """Verify the signature on an incoming request. Raises BridgeAuthError
     on any failure; returns None on success.
 
@@ -125,7 +138,7 @@ def verify_signature(body: str, header_value: str | None) -> None:
     ts, sig = _parse_header(header_value)
     _check_timestamp(ts)
 
-    secret = _get_secret()
+    secret = _get_secret(secret_env)
     payload = f"{ts}.{body}".encode("utf-8")
     expected = hmac.new(secret, payload, hashlib.sha256).hexdigest()
 

@@ -62,6 +62,7 @@ from typing import Any
 
 import bridge_models
 import db
+import persist
 
 logger = logging.getLogger("loom.telemetry.skill_usage")
 
@@ -147,65 +148,27 @@ def _artifact_ref(skill_id: uuid.UUID) -> str:
     return f"skill/{skill_id}"
 
 
-# One statement per event: insert the fact row (dedup on id), then upsert the
-# daily rollup FROM the row that was actually inserted. The CTE guarantees the
-# rollup increments ONLY when the fact INSERT was not a duplicate — so under
-# at-least-once retries the rollup and the fact table stay consistent. The
-# final INSERT's rowcount is 1 when the event was newly persisted, 0 when the
-# id already existed (duplicate) — that is how events_processed is counted.
-_WRITE_SQL = """
-WITH ins AS (
-    INSERT INTO telemetry_events (
-        id, tenant_id, event_kind, skill_id, artifact_ref,
-        outcome, elapsed_ms, tokens_in, tokens_out, model,
-        ts, batch_id, attrs
-    )
-    VALUES (
-        %(id)s, %(tenant_id)s, 'skill_usage', %(skill_id)s, %(artifact_ref)s,
-        %(outcome)s, %(elapsed_ms)s, %(tokens_in)s, %(tokens_out)s, %(model)s,
-        %(ts)s, %(batch_id)s, %(attrs)s::jsonb
-    )
-    ON CONFLICT (id) DO NOTHING
-    RETURNING id, tenant_id, ts, project_slug, artifact_ref,
-              tool_name, event_kind, elapsed_ms, outcome
-)
-INSERT INTO telemetry_rollup_daily (
-    tenant_id, bucket_day, project_slug, artifact_ref, tool_name, event_kind,
-    invocation_count, error_count, sum_elapsed_ms, last_seen_ts
-)
-SELECT
-    tenant_id,
-    (to_timestamp(ts) AT TIME ZONE 'UTC')::date,
-    COALESCE(project_slug, ''),
-    COALESCE(artifact_ref, ''),
-    COALESCE(tool_name, ''),
-    event_kind,
-    1,
-    -- error_count is strictly outcome='error'; a 'timeout' is counted as an
-    -- invocation but NOT as a failure (there is no separate timeout tally yet).
-    CASE WHEN outcome = 'error' THEN 1 ELSE 0 END,
-    COALESCE(elapsed_ms, 0),
-    ts
-FROM ins
-ON CONFLICT (tenant_id, bucket_day, project_slug, artifact_ref, tool_name, event_kind)
-DO UPDATE SET
-    invocation_count = telemetry_rollup_daily.invocation_count + EXCLUDED.invocation_count,
-    error_count      = telemetry_rollup_daily.error_count      + EXCLUDED.error_count,
-    sum_elapsed_ms   = telemetry_rollup_daily.sum_elapsed_ms   + EXCLUDED.sum_elapsed_ms,
-    last_seen_ts     = GREATEST(telemetry_rollup_daily.last_seen_ts, EXCLUDED.last_seen_ts)
-RETURNING invocation_count
-"""
+# The fact-INSERT + rollup-UPSERT SQL now lives in persist.persist_events, the
+# shared low-level write path both /skill-used and /hook-event (task 4) call —
+# same CTE `INSERT ... ON CONFLICT (id) DO NOTHING RETURNING` feeding the
+# telemetry_rollup_daily UPSERT that this handler was verified with in task 3.
+# _event_row below builds the skill-usage fact row (column -> value); the
+# literal `event_kind='skill_usage'` and the exact column set are preserved so
+# the write is unchanged from the inlined _WRITE_SQL.
 
 
-def _event_params(
+def _event_row(
     batch: bridge_models.TelemetryBatch,
     index: int,
     event: bridge_models.TelemetryEvent,
     tenant_id: str,
 ) -> dict[str, Any]:
-    """Map one bridge_models event → the _WRITE_SQL bind params.
+    """Map one bridge_models event → a persist_events fact row (column->value).
 
-    Fields without a typed 005 column (thread_id, trigger_context,
+    The column set + values match the task-3 _WRITE_SQL exactly: the same
+    columns are set, `event_kind` is the literal 'skill_usage', and every other
+    column (project_slug, tool_name, coordination_state, ...) is left to its 005
+    default. Fields without a typed 005 column (thread_id, trigger_context,
     schema_version, the raw invoked_at string) are carried in `attrs`.
     """
     attrs = {
@@ -217,6 +180,7 @@ def _event_params(
     return {
         "id": _event_id(batch.batch_id, index),
         "tenant_id": tenant_id,
+        "event_kind": "skill_usage",
         "skill_id": str(event.skill_id),
         "artifact_ref": _artifact_ref(event.skill_id),
         "outcome": event.outcome,
@@ -269,31 +233,32 @@ async def apply_batch(batch: bridge_models.TelemetryBatch) -> dict[str, Any]:
 
     persisted = 0
     for tenant_id, items in groups.items():
+        # Build the fact rows first; a single event with an unparseable
+        # invoked_at is skipped (not persisted) rather than aborting the whole
+        # tenant group — same behavior as the task-3 inline loop.
+        rows: list[dict[str, Any]] = []
+        for index, event in items:
+            try:
+                rows.append(_event_row(batch, index, event, tenant_id))
+            except ValueError:
+                skipped += 1
+                logger.warning(
+                    json.dumps(
+                        {
+                            "event": "telemetry_event_skipped_bad_timestamp",
+                            "batch_id": str(batch.batch_id),
+                            "index": index,
+                            "invoked_at": event.invoked_at,
+                        },
+                        separators=(",", ":"),
+                    )
+                )
+        if not rows:
+            continue
         async with db.tenant_transaction(tenant_id) as conn:
-            async with conn.cursor() as cur:
-                for index, event in items:
-                    try:
-                        params = _event_params(batch, index, event, tenant_id)
-                    except ValueError:
-                        # Unparseable invoked_at — skip this one event rather
-                        # than aborting the whole tenant group's transaction.
-                        skipped += 1
-                        logger.warning(
-                            json.dumps(
-                                {
-                                    "event": "telemetry_event_skipped_bad_timestamp",
-                                    "batch_id": str(batch.batch_id),
-                                    "index": index,
-                                    "invoked_at": event.invoked_at,
-                                },
-                                separators=(",", ":"),
-                            )
-                        )
-                        continue
-                    await cur.execute(_WRITE_SQL, params)
-                    # rowcount is 1 when the fact row was newly inserted (the
-                    # rollup upsert ran on it), 0 when the id already existed.
-                    persisted += cur.rowcount
+            # persist_events returns the count ACTUALLY persisted (duplicates
+            # excluded via ON CONFLICT (id) DO NOTHING).
+            persisted += await persist.persist_events(conn, rows)
 
     if skipped:
         logger.info(

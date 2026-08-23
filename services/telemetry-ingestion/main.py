@@ -6,8 +6,17 @@ RLS-scoped by tenant (Phase 0 task 3). Grafana Cloud stays an optional
 export target, never a read dependency.
 
 Endpoints:
-  GET  /health          — Render liveness probe
-  POST /skill-used      — bridge telemetry receiver (PR D); HMAC auth
+  GET  /health                                  — Render liveness probe
+  POST /skill-used                              — bridge telemetry receiver
+                                                  (PR D); HMAC auth
+  GET  /telemetry/invocations                   — read API: invocations_30d
+                                                  (0-vs-None contract)
+  GET  /telemetry/counts                        — read API: grouped counts
+  GET  /telemetry/signals                       — read API: coordination signals
+  GET  /telemetry/episode/{ctx_id}              — read API: one episode
+
+The `/telemetry/*` read routes live in read_api.py (Phase 0 task 6); they read
+the Postgres substrate inside db.tenant_transaction so RLS scopes every query.
 """
 from __future__ import annotations
 
@@ -19,6 +28,7 @@ from fastapi import FastAPI, Header, HTTPException, Request
 import bridge_hmac
 import bridge_models
 import db
+import read_api
 import skill_usage_handler
 
 
@@ -34,6 +44,11 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
 
 app = FastAPI(title="loom-telemetry-ingestion", version="0.1.0", lifespan=lifespan)
+
+# Telemetry READ API (Phase 0 task 6) — GET /telemetry/{invocations,counts,
+# signals,episode}. Each route resolves the self-host tenant and reads inside
+# db.tenant_transaction so the 005 RLS policies scope every query.
+app.include_router(read_api.router)
 
 
 @app.get("/health")

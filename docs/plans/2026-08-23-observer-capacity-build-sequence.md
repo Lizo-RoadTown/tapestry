@@ -41,13 +41,13 @@ flowchart LR
     R -.gated by.- P3
 ```
 
-Each phase lands at its ADR-0001 home, design-first, on operator approval — **nothing is built in the-loom** (the proposal explicitly forbids a sibling runtime-observer there).
+Each phase lands at its ADR-0001 home in Tapestry. The working implementations that still live only in the retired the-loom are brought home — migrated or rebuilt — as part of their phase; nothing is built or extended in the-loom (it is retired).
 
 ## Phase 0 — Telemetry read-substrate + one project identity (the first unblock)
 
 The whole capacity is blocked here; this is the recommended first increment.
 
-- **Home:** `services/telemetry-ingestion/` (+ a new telemetry migration under `infra/migrations/`, next free number — coordinate with the `architecture-registry` migration so the two don't contend for the same slot).
+- **Home:** `services/telemetry-ingestion/` (+ `infra/migrations/005_init_telemetry.sql` — 005 because 003/004 are reserved by ratified proposals for candidates/policy).
 - **Today:** the-loom receiver logs to Loki via stdout only — "no DB layer today" (`the-loom/services/telemetry-ingestion/skill_usage_handler.py:21-23`); persistence is stdout→Loki (`:68-87`); no read API. Tapestry side is a README stub.
 - **Build:**
   1. **Postgres telemetry schema** — a greenfield migration modeled on the memory schema (`infra/migrations/001_init_memory.sql`): an event/rollup table carrying `tenant_id` + row-level tenant scoping, a **`project_id` dimension**, plus session/tool/hook/timing fields and a rollup for invocation counts by (repo, file, project, window).
@@ -102,17 +102,31 @@ Per ADR-0001 "Deferred" and the proposal's three sub-component caveats — each 
 
 ## What this plan does NOT do
 
-- No runtime code yet — this is the sequence for approval.
-- Nothing is built in the-loom (no sibling runtime-observer cron; the proposal forbids it).
+- Nothing is built or extended in the-loom — it is retired; code that lives only there is brought home to Tapestry.
 - No extension of the 9-value candidate enum (observation signals go in the existing `signals` JSONB).
 - Nothing here is called "auto-promotion" — the system is observation + decomposition + policy-gated promotion + staged activation + rollback; the "auto" label is earned only when all of those exist.
 
-## Open questions for the operator
+## Decisions locked (2026-08-23)
 
-1. **Timing vs. v1.** The proposal deferred these to Tapestry and none are in the current v1 scope. Starting now un-defers that. Confirm we're bringing it forward.
-2. **First increment.** Approve Phase 0 (telemetry substrate + identity reconciliation) as the first thing built? It unblocks everything and is self-contained.
-3. **Migrate vs. rebuild per service.** For architecture-registry, policy, self-observer, and the telemetry receiver — migrate the working the-loom code into the Tapestry home, or rebuild? (Migration needs your per-piece approval under CORE DIRECTIVE 2; the migration machinery in `docs/migration-cicd/` + the runbook pattern already exists to do it.)
-4. **Design-gate order.** Run the three design-gate passes (observation_kind, risk classifier, skill-vs-agent) up front as a batch, or each just-in-time before its phase?
+The operator settled the plan's open questions:
+
+1. **Timing** — bring it forward now; the v1 deferral is lifted for this build.
+2. **First increment** — Phase 0 (telemetry substrate + identity), approved. Task 1 (`005_init_telemetry.sql`) is built, verified, and merged.
+3. **Migrate vs. rebuild** — **migrate what works, build what's new.** Migrate `architecture-registry`, `policy`, `self-observer`, and the telemetry receiver (`bridge_hmac` / `bridge_models` / receiver skeleton verbatim); build the pieces that don't exist or must change (the Postgres substrate, the read API, `project-observatory`'s read layer, `runtime-observer`, `observation-decomposer`).
+4. **Design-gates** — just-in-time: `observation_kind`, the risk classifier, and skill-vs-agent are settled right before Phases 2 and 3 (Phase 0 doesn't need them).
+
+**Project identity** — the **slug** is the canonical wire identity (memory `project_tags`, telemetry `project_id`, candidate `project_id` all speak the slug); the UUID stays the registry's private surrogate, resolved from the slug at the candidate boundary only. The registry already holds the slug↔UUID map (`projects.id` + unique `slug`, `GET /projects/by-slug`). Phase 0 needs only the canonical-slug rule + a guard rejecting a UUID-shaped `LOOM_PROJECT_ID` + keying the substrate by slug; the candidate / `synthesis.py` fixes ride along when those services come home.
+
+**Phase 0 task breakdown** (each an independently shippable PR):
+
+1. `005_init_telemetry.sql` — event table + daily rollup, RLS. **(done, merged)**
+2. Scaffold `services/telemetry-ingestion/` — migrate `bridge_hmac` + `bridge_models` + receiver skeleton; add DB pool.
+3. Replace the log-only `apply_batch` with the Postgres write + rollup upsert.
+4. `POST /hook-event` + bare-key→contract mapper.
+5. Third best-effort sink in the discipline hooks (jsonl + OTLP untouched).
+6. Read API — `/telemetry/invocations` (the 0-vs-None contract) first, then counts / signals / episode.
+7. `flush-hooks-jsonl` backfill (offline self-host durability).
+8. Retire the self-observer `None` stub → real HTTP call.
 
 ## Sources
 

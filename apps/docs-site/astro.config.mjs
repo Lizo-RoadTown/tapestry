@@ -80,6 +80,7 @@ export default defineConfig({
           items: [
             { label: "What Tapestry is", slug: "start/what-stays-on-track" },
             { label: "The observer", slug: "explanation/the-observer" },
+            { label: "The memory", slug: "explanation/the-memory" },
             { label: "The Observatory", slug: "observatory/about" },
             { label: "What Tapestry is not", slug: "start/what-tapestry-is-not" },
           ],
@@ -127,6 +128,7 @@ export default defineConfig({
             { label: "Docs MCP", slug: "systems/docs-mcp" },
             { label: "The plugins", slug: "explanation/plugins" },
             { label: "The memory MCP", slug: "explanation/memory-mcp" },
+            { label: "Why the memory is built this way", slug: "explanation/why-memory-is-built-this-way" },
             { label: "The discipline stack (orientation)", slug: "explanation/discipline-stack" },
             { label: "Architecture snapshots", slug: "explanation/architecture-snapshots" },
           ],

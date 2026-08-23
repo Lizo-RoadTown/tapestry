@@ -40,6 +40,8 @@ Never raises. If everything fails, the hook continues silently.
 """
 from __future__ import annotations
 
+import hashlib
+import hmac
 import json
 import os
 import time
@@ -361,6 +363,105 @@ def _log_otel_error(err: Exception) -> None:
 
 
 # ---------------------------------------------------------------------------
+# Telemetry-ingestion push — THIRD best-effort sink (observer Phase 0 task 5)
+# ---------------------------------------------------------------------------
+#
+# Same shape as _push_otlp, same discipline: env-gated, raw urllib, short
+# timeout, ANY failure caught + logged to hook-otel-errors.log + swallowed.
+# Never raises, never touches the local jsonl write or the OTLP push.
+#
+# This routes the SAME `entry` dict — the bare hook keys (project_id,
+# session_id, tool_name, hook, phase, exit_code, elapsed_ms, note, ...) — to
+# the loom-telemetry-ingestion `/hook-events` endpoint (services/telemetry-
+# ingestion/main.py:163). That endpoint's mapper (hook_event_handler.py) reads
+# those bare keys directly, so we POST the entry unwrapped as a single JSON
+# object (main.py:_coerce_hook_entries accepts a single entry, an array, or an
+# {"events": [...]} envelope; a single entry is the simplest shape).
+#
+# Auth is HMAC-SHA256 in the `X-Loom-Hook-Signature: t=<unix>,v1=<hex>` header,
+# reproduced from services/telemetry-ingestion/bridge_hmac.py:sign — the digest
+# is HMAC-SHA256 over `f"{ts}.{raw_body}"` using LOOM_HOOK_BRIDGE_SECRET (the
+# SAME secret bridge_hmac reads via secret_env=LOOM_HOOK_BRIDGE_SECRET at
+# main.py:41). We do NOT import bridge_hmac (it lives in the service, not on the
+# hook's import path); we reimplement its exact wire format with stdlib
+# hmac/hashlib so any signature we emit passes verify_signature unchanged.
+#
+# Env gating (two-mode):
+#   LOOM_INGEST_ENDPOINT   — full URL of the /hook-events route. Unset -> silent
+#                            no-op (pure offline self-host must never error).
+#                            Self-host points it at the local service; a hosted
+#                            deployment points it elsewhere. No other config.
+#   LOOM_HOOK_BRIDGE_SECRET — shared HMAC secret (same value the endpoint reads).
+#                            If the endpoint URL is set but the secret is unset,
+#                            we log to hook-otel-errors.log and no-op (no raise).
+
+_INGEST_ENDPOINT_ENV = "LOOM_INGEST_ENDPOINT"
+_HOOK_BRIDGE_SECRET_ENV = "LOOM_HOOK_BRIDGE_SECRET"
+_INGEST_SIGNATURE_HEADER = "X-Loom-Hook-Signature"
+
+
+def _hook_signature(raw_body: str, secret: str, ts: int) -> str:
+    """Reproduce bridge_hmac.sign's header value: 't=<unix>,v1=<hex>'.
+
+    Signs `f"{ts}.{raw_body}"` with HMAC-SHA256 (bridge_hmac.py:96-114). The
+    verifier recomputes the identical digest over the RAW body it received, so
+    the exact bytes we sign must be the exact bytes we POST (no re-serialization
+    between sign + send).
+    """
+    payload = f"{ts}.{raw_body}".encode("utf-8")
+    digest = hmac.new(secret.encode("utf-8"), payload, hashlib.sha256).hexdigest()
+    return f"t={ts},v1={digest}"
+
+
+def _push_ingest(entry: dict[str, Any]) -> None:
+    """Push entry to the telemetry-ingestion /hook-events endpoint. Never raises.
+
+    Silently skips if LOOM_INGEST_ENDPOINT is unset (offline self-host). If the
+    endpoint IS set but LOOM_HOOK_BRIDGE_SECRET is unset, logs to
+    hook-otel-errors.log and no-ops (a misconfig worth surfacing, but never a
+    hook crash). Independent of the local jsonl write and the OTLP push — a
+    failure here cannot touch either.
+    """
+    endpoint = os.environ.get(_INGEST_ENDPOINT_ENV)
+    if not endpoint:
+        return
+    secret = os.environ.get(_HOOK_BRIDGE_SECRET_ENV)
+    if not secret:
+        _log_otel_error(
+            RuntimeError(
+                f"{_INGEST_ENDPOINT_ENV} is set but {_HOOK_BRIDGE_SECRET_ENV} is "
+                "unset; skipping /hook-events push"
+            )
+        )
+        return
+
+    try:
+        # Serialize ONCE; sign + POST the identical bytes so the verifier's
+        # HMAC over the raw body it receives matches ours.
+        raw_body = json.dumps(entry)
+        ts = int(time.time())
+        http_headers = {
+            "Content-Type": "application/json",
+            _INGEST_SIGNATURE_HEADER: _hook_signature(raw_body, secret, ts),
+        }
+        req = urllib.request.Request(
+            url=endpoint,
+            data=raw_body.encode("utf-8"),
+            headers=http_headers,
+            method="POST",
+        )
+        # 2s (tighter than the OTLP sink's 5s): this fires on every hook, so a
+        # slow/unhealthy endpoint should be dropped fast rather than stall a
+        # tool call. Best-effort — a dropped event is fine (Task 7 backfills).
+        with urllib.request.urlopen(req, timeout=2) as resp:
+            status = resp.status
+            if status >= 400:
+                raise RuntimeError(f"ingest endpoint returned {status}")
+    except Exception as e:  # noqa: BLE001
+        _log_otel_error(e)
+
+
+# ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
 
@@ -431,6 +532,11 @@ def log_event(
 
     # 2. Remote OTel push (best-effort; never raises).
     _push_otlp(entry)
+
+    # 3. Telemetry-ingestion /hook-events push (best-effort; never raises).
+    #    Third sink, purely additive: env-gated, swallows every failure, and
+    #    cannot affect sinks 1 and 2 above.
+    _push_ingest(entry)
 
 
 # Wall-clock helper for elapsed_ms.

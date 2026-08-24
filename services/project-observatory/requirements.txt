@@ -1,0 +1,13 @@
+# loom-project-observatory (runtime-observer) — Phase 1 scaffold.
+# Versions matched to the sibling service services/telemetry-ingestion/
+# so the shared FastAPI + RLS/pool pattern stays in lockstep across services.
+
+fastapi==0.115.4
+uvicorn[standard]==0.32.0
+
+# Postgres + connection pool (db.py). project-observatory reads the SAME
+# loom-postgres substrate telemetry-ingestion writes (005 telemetry_events /
+# telemetry_rollup_daily in, 006 observation_signals out), so the pool + RLS
+# mechanism — and its dep versions — are identical to the sibling service.
+psycopg[binary]==3.2.3
+psycopg-pool==3.2.4

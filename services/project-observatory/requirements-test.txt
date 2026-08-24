@@ -1,0 +1,14 @@
+# Test-only deps for services/project-observatory/tests/.
+# Install ON TOP of requirements.txt:
+#   pip install -r requirements.txt -r requirements-test.txt
+#
+# Production deploy (Render) does NOT install these — they're test-only;
+# render.yaml's buildCommand only references requirements.txt.
+#
+# The Phase 1 task-3 signal classifiers are PURE functions (no DB, no I/O), so
+# their tests need only pytest — no pytest-asyncio, no Postgres. pytest-asyncio
+# is pinned here anyway for the task-4/5 data-access + route tests that will
+# land alongside these.
+
+pytest>=8.0,<9
+pytest-asyncio>=0.24

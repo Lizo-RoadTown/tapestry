@@ -9,16 +9,17 @@ window, and writes them to observation_signals
 serves. A Render cron triggers the compute pass; this process serves health +
 (later) the read endpoint.
 
-This is the SCAFFOLD (Phase 1 task 2): the DB pool (db.py), thresholds
-(config.py), the self-host tenant resolver (tenant.py), and this /health app.
-The signal computation (task 3), the materialization entrypoint (task 4), and
-the read endpoint (task 5) are NOT here yet.
+The DB pool (db.py), thresholds (config.py), the self-host tenant resolver
+(tenant.py), the signal computation (task 3, signals.py), the write path
+(task 4, writes.py), and the read endpoint (task 5, read_api.py) are all
+present. The read routes live in read_api.py and read the 006 substrate inside
+db.tenant_transaction so RLS scopes every query — mirroring how
+services/telemetry-ingestion/main.py includes its read_api.
 
 Endpoints:
   GET /health                    — Render liveness probe
-
-Later (not this scaffold):
-  GET /signals                   — read layer over observation_signals (task 5)
+  GET /observations/signals      — latest observation-signals snapshot (task 5)
+  GET /observations/signals/runs — snapshot history (task 5)
 """
 from __future__ import annotations
 
@@ -28,6 +29,7 @@ from typing import AsyncIterator
 from fastapi import FastAPI
 
 import db
+import read_api
 
 
 @asynccontextmanager
@@ -42,6 +44,11 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
 
 app = FastAPI(title="loom-project-observatory", version="0.1.0", lifespan=lifespan)
+
+# Observation-signals READ API (Phase 1 task 5) — GET /observations/signals[/runs].
+# Each route resolves the self-host tenant and reads inside db.tenant_transaction
+# so the 006 RLS policies scope every query. Mirrors telemetry-ingestion/main.py.
+app.include_router(read_api.router)
 
 
 @app.get("/health")

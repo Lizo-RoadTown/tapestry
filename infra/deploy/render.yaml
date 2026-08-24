@@ -84,6 +84,59 @@ services:
         sync: false                  # raw connection string to a STAGING Postgres (NOT prod)
 
   # --------------------------------------------------------------------------
+  # STAGING — project-observatory (Phase 1: the runtime-observer + read API).
+  # Two deploy shapes from services/project-observatory:
+  #   (a) a CRON running compute_signals.py --once every 6h — reads the 005
+  #       telemetry substrate, computes hot_path/orphaned/degrading, and writes
+  #       one observation_signals snapshot (006). Cron pattern lifted from the
+  #       self-observer (the-loom/render.yaml:292-302).
+  #   (b) a WEB service serving main.py — GET /observations/signals (the read
+  #       layer over the snapshots) + /health.
+  # Both reuse the existing loom-postgres via a sync:false LOOM_DB_URL, and both
+  # REQUIRE SELF_HOST_TENANT_ID (they fail closed on the nil tenant): it MUST be
+  # the SAME value the rest of the deployment uses, or RLS scopes them to a
+  # different, empty tenant. Staging-first: autoDeploy:false, distinct -staging
+  # names, staging DB. No prod block until a runbook clears the gates.
+  # --------------------------------------------------------------------------
+  - type: cron
+    name: tapestry-project-observatory-cron-staging
+    runtime: python
+    schedule: "0 */6 * * *"          # every 6h — matches the self-observer cadence
+    plan: starter                    # free rejects cron jobs
+    region: oregon
+    branch: main
+    rootDir: services/project-observatory
+    buildCommand: pip install -r requirements.txt
+    startCommand: python compute_signals.py --once
+    autoDeploy: false
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12"
+      - key: LOOM_DB_URL
+        sync: false                  # raw connection string to a STAGING copy of loom-postgres (NOT prod)
+      - key: SELF_HOST_TENANT_ID
+        sync: false                  # MUST match the deployment's tenant, or RLS returns empty
+
+  - type: web
+    name: tapestry-project-observatory-staging
+    runtime: python
+    plan: free
+    region: oregon
+    branch: main
+    rootDir: services/project-observatory
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    autoDeploy: false
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12"
+      - key: LOOM_DB_URL
+        sync: false                  # raw connection string to a STAGING copy of loom-postgres (NOT prod)
+      - key: SELF_HOST_TENANT_ID
+        sync: false                  # MUST match the deployment's tenant, or RLS returns empty
+
+  # --------------------------------------------------------------------------
   # PRODUCTION re-source of loom-agent-context — DISABLED.
   # Enable ONLY at the runbook's `parity-verified → prod-rolling` gate, AFTER:
   #   (1) parity check green, (2) operator written authorization,

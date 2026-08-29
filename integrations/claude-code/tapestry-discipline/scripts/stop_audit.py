@@ -168,6 +168,8 @@ def _scan_session_metrics(raw: str) -> dict:
     tool_calls = 0
     git_action_seen = False
     upskilling_report_seen = False
+    report_content = ""
+    report_name = ""
 
     for line in raw.splitlines():
         line = line.strip()
@@ -214,6 +216,12 @@ def _scan_session_metrics(raw: str) -> dict:
                             and UPSKILLING_REPORT_NAME_REGEX.match(record_name)
                         ):
                             upskilling_report_seen = True
+                            # v0.1.19: capture the report body (the memory_write
+                            # `content`) so the Stop hook can persist it on disk.
+                            _rc = tool_input.get("content")
+                            if isinstance(_rc, str) and _rc.strip():
+                                report_content = _rc
+                                report_name = record_name
         elif isinstance(content, str):
             text_parts.append(content)
             if SUBSTANTIVE_GIT_ACTION_REGEX.search(content):
@@ -228,6 +236,8 @@ def _scan_session_metrics(raw: str) -> dict:
         "tool_calls": tool_calls,
         "git_action_seen": git_action_seen,
         "upskilling_report_seen": upskilling_report_seen,
+        "report_content": report_content,
+        "report_name": report_name,
     }
 
 
@@ -286,6 +296,80 @@ def _in_scope(cwd) -> bool:
     if os.environ.get("LOOM_PROJECT_ID", "").strip():
         return True
     return False
+
+
+# ---------------------------------------------------------------------------
+# Permanent report persistence (v0.1.19)
+# ---------------------------------------------------------------------------
+#
+# The upskilling report is written to loom-memory by the agent. That record is
+# remote and ephemeral for documentation purposes. This persists the SAME report
+# body to a committed on-disk Markdown file so it can be sifted for docs and
+# post-mortems from the repo itself. Best-effort; NEVER raises (Stop-hook contract).
+
+_REPORT_DATE_RE = re.compile(r"(\d{4})_(\d{2})_(\d{2})")
+
+
+def _autocommit_report(cwd, path, msg):
+    """Pathspec-commit ONLY the report file, leaving any staged agent work
+    untouched. Best-effort; never raises."""
+    import subprocess
+    try:
+        inside = subprocess.run(
+            ["git", "-C", str(cwd), "rev-parse", "--is-inside-work-tree"],
+            capture_output=True, text=True, timeout=10,
+        )
+        if inside.returncode != 0 or inside.stdout.strip() != "true":
+            return
+        subprocess.run(
+            ["git", "-C", str(cwd), "add", "--", str(path)],
+            capture_output=True, timeout=10,
+        )
+        # `git commit -- <path>` is a pathspec commit: only this path is committed,
+        # regardless of what else is staged in the index.
+        subprocess.run(
+            ["git", "-C", str(cwd), "commit", "-m", msg, "--", str(path)],
+            capture_output=True, timeout=15,
+        )
+    except Exception:  # noqa: BLE001
+        pass
+
+
+def _persist_report_to_disk(cwd_str, session_id, content, record_name):
+    """Write the emitted upskilling report to
+    <cwd>/docs/session-reports/<YYYY-MM-DD>-<session8>.md and best-effort commit
+    it. Idempotent (identical content = no-op). Returns the path str or None.
+    NEVER raises."""
+    try:
+        if not content or not content.strip():
+            return None
+        cwd = Path(cwd_str) if cwd_str else Path.cwd()
+        m = _REPORT_DATE_RE.search(record_name or "")
+        date = f"{m.group(1)}-{m.group(2)}-{m.group(3)}" if m else time.strftime("%Y-%m-%d")
+        sid8 = re.sub(r"[^a-zA-Z0-9]+", "", session_id or "")[:8] or "session"
+        reports_dir = cwd / "docs" / "session-reports"
+        reports_dir.mkdir(parents=True, exist_ok=True)
+        path = reports_dir / f"{date}-{sid8}.md"
+        header = (
+            "---\n"
+            f"session: {session_id}\n"
+            f"project: {os.environ.get('LOOM_PROJECT_ID', '')}\n"
+            f"memory_record: {record_name}\n"
+            "generated_by: tapestry-discipline Stop hook\n"
+            "---\n\n"
+        )
+        body = header + content.rstrip() + "\n"
+        if path.exists():
+            try:
+                if path.read_text(encoding="utf-8") == body:
+                    return None  # identical — nothing to do
+            except OSError:
+                pass
+        path.write_text(body, encoding="utf-8")
+        _autocommit_report(cwd, path, f"chore(session-report): {path.name} [tapestry-discipline]")
+        return str(path)
+    except Exception:  # noqa: BLE001
+        return None
 
 
 def main() -> int:
@@ -384,6 +468,16 @@ def main() -> int:
             }
         }
         print(json.dumps(payload))
+
+    # v0.1.19: persist the emitted upskilling report to a committed on-disk file
+    # (docs/session-reports/), in addition to the memory write. Best-effort.
+    if metrics["upskilling_report_seen"]:
+        _rp = _persist_report_to_disk(
+            cwd, session_id,
+            metrics.get("report_content", ""), metrics.get("report_name", ""),
+        )
+        if _rp:
+            notes.append("report_persisted=1")
 
     # v0.1.10 Phase 2 observer. Only invoke when the agent emitted the
     # upskilling report (so the bookkeeping operates on real data). The

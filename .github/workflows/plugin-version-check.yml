@@ -1,0 +1,24 @@
+name: Plugin version alignment
+
+# Fails a PR when a plugin's marketplace.json version drifts from its own
+# .claude-plugin/plugin.json version. See scripts/check_plugin_versions.py.
+# Stdlib-only Python; no dependencies to install.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check plugin version alignment
+        run: python scripts/check_plugin_versions.py

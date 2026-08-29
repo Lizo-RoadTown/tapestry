@@ -332,6 +332,19 @@ def _resolve_patterns_scripts_dir(cwd: Path) -> Path | None:
         # integrations/claude-code/tapestry-discipline/scripts/session_start.py
         Path(__file__).resolve().parents[2] / "tapestry-patterns" / "scripts",
     ])
+    # Version-globbed candidates (bugfix v0.1.19): the plugin cache install carries
+    # a version segment (.../tapestry-patterns/<version>/scripts) that the literal
+    # cache path above misses, so architecture snapshots silently never ran on
+    # installed repos (patterns_scripts_unresolved). Glob the segment; the loop
+    # below takes the first with architecture_snapshot.py (highest version first).
+    glob_bases = [home / ".claude" / "plugins" / "cache" / "tapestry" / "tapestry-patterns"]
+    if plugin_root:
+        glob_bases.append(Path(plugin_root).parent.parent / "tapestry-patterns")
+    for base in glob_bases:
+        try:
+            candidates.extend(sorted(base.glob("*/scripts"), reverse=True))
+        except OSError:
+            pass
     for cdir in candidates:
         if (cdir / "architecture_snapshot.py").exists():
             return cdir

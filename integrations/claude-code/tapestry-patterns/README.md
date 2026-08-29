@@ -34,9 +34,12 @@ Previously these patterns lived as duplicated copies across `docs-agent/skills/`
 | `design-evaluation` | Evaluates a design question with multiple options across the dimensions that matter. Produces a tradeoff matrix. |
 | `document-parsing` | Decision tree for picking the right parser (LlamaParse vs pdfplumber vs pypandoc) when converting PDFs / Word / PowerPoint / Excel / scanned images into LLM-friendly markdown. |
 | `documentation` | Plan, write, and audit documentation using the Diátaxis framework + ADRs + docs-as-code workflow. |
+| `id-rename-blast-radius` | Before renaming an id that is at once a registry key, a folder name, and a persisted namespace, enumerates what derives from it. Catches prefix checks and path joins that break silently. |
 | `layered-explanation` | Structures every technical explanation as ELI5 → quick-reference → depth (with file:line) → mental model. |
 | `open-source-documentation` | OSS-specific documentation patterns. |
 | `proposal-authoring` | Authors a design proposal in the project's house style. |
+| `seed-leftover-audit` | Sweeps a scaffolded or forked repo for strings inherited from the template or the previous instance. Triages by blast radius: blocking / misleading / cosmetic. |
+| `template-inheritance-check` | After forking a WORKING instance, finds the domain assumptions the source's data satisfied and the new instance's data breaks. Catches what a string grep cannot. |
 
 ## Exceptions to "one home"
 

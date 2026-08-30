@@ -81,6 +81,7 @@ export default defineConfig({
             { label: "What Tapestry is", slug: "start/what-stays-on-track" },
             { label: "The observer", slug: "explanation/the-observer" },
             { label: "The memory", slug: "explanation/the-memory" },
+            { label: "Shared language", slug: "explanation/shared-language" },
             { label: "The Observatory", slug: "observatory/about" },
             { label: "What Tapestry is not", slug: "start/what-tapestry-is-not" },
           ],

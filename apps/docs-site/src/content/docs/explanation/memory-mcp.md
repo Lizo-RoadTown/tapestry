@@ -3,7 +3,7 @@ title: The memory MCP and your project's memory
 description: What the loom-memory MCP is, what gets stored in it, how the memory for your project stays scoped and organized, and what you can do as the operator to keep it healthy.
 ---
 
-The loom-memory MCP is the cross-session, cross-agent memory store for everything on the Tapestry platform. Every Tapestry-consuming project shares one hosted instance; each project gets its own slice via the `project_tags` scoping mechanism.
+The loom-memory [MCP](/explanation/shared-language/#mcp-model-context-protocol) is the cross-session, cross-agent memory store for everything on the Tapestry platform. Every Tapestry-consuming project shares one hosted instance; each project gets its own slice via the `project_tags` scoping mechanism.
 
 This page explains what's stored there, how it gets organized, what behavior you should see from the agent when memory is wired correctly, and what you can do to keep your project's memory clean over time.
 
@@ -17,7 +17,7 @@ For how the MCP gets wired into your project, see [The plugins](/explanation/plu
 https://your-memory-host.example.com/mcp/memory/
 ```
 
-It runs as a Render web service backed by Postgres + pgvector. The Postgres rows ARE the memories. The pgvector index enables semantic search via embeddings of memory content.
+It runs as a Render web service backed by Postgres + [pgvector](/explanation/shared-language/#pgvector-and-embeddings). The Postgres rows ARE the memories. The pgvector index enables semantic search via embeddings of memory content.
 
 It is not one-MCP-per-project — every project shares the same hosted MCP instance, and the project scoping happens at the row level via `project_tags`.
 
@@ -94,7 +94,7 @@ curl -X POST https://your-memory-host.example.com/v1/write \
   -d '{"name": "...", "record_type": "fact", "content": "...", "project_tags": ["your-project-id"]}'
 ```
 
-In self-host mode (no Authorization header), the tenant resolves to a deterministic UUID — every consuming project lands in one tenant envelope. In hosted-multitenant mode, a Bearer JWT is required; the `tenant_id` claim drives row-level scoping.
+In [self-host mode](/explanation/shared-language/#self-host-vs-hosted) (no Authorization header), the tenant resolves to a deterministic UUID — every consuming project lands in one tenant envelope. In hosted-multitenant mode, a Bearer JWT is required; the `tenant_id` claim drives row-level scoping.
 
 ## How to keep your project's memory healthy
 

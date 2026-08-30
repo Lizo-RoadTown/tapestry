@@ -24,7 +24,7 @@ Lives at `services/agent-context/` (Render service `memory-mcp`).
 
 ## Why it exists
 
-Without persistent memory, every session starts cold. Operators have to re-explain context; agents make the same mistakes; corrections evaporate. The cost is paid every conversation.
+Without persistent memory, every session starts cold. [Operators](/explanation/shared-language/#operator) have to re-explain context; agents make the same mistakes; corrections evaporate. The cost is paid every conversation.
 
 Memory turns those costs into [one-time learnings](/explanation/shared-language/#one-time-learning). A [correction](/explanation/shared-language/#correction) saved once becomes guidance forever after. A project's accumulated context auto-[recalls](/explanation/shared-language/#recall) at SessionStart. The Observer's synthesis memos compound over time.
 

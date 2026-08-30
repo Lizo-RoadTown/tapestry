@@ -56,6 +56,6 @@ The store keeps the durable things and overwrites them in place as they change �
 
 ## Related
 
-- [Shared language](/explanation/shared-language/) — the eight words these pages use, defined once.
+- [Shared language](/explanation/shared-language/) — the words these pages use, defined once.
 - [The observer](/explanation/the-observer/) — whose recurring-pattern memos are written into this same memory.
 - [What Tapestry is](/start/what-stays-on-track/) — the other mechanisms that turn recurring friction into structure.

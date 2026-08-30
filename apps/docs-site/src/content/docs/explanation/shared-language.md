@@ -71,7 +71,7 @@ These name the moving pieces of the platform. You meet them on the systems and e
 
 The part of Tapestry that watches your work for patterns that keep *recurring* and flags them for a closer look — trends, not single events.
 
-Two observers run, and both are plain scripts, not an AI reading your code: a **session observer** at the end of each session (which skills you used, what the session's upskilling report flagged) and a **repo observer** on a schedule (every few hours) that scans your repos for structure that has drifted. What either one flags is called a *candidate*. The observer surfaces; it never decides — promoting a candidate is your call.
+It runs as plain scripts, not an AI reading your code. The one that runs in your own setup is the **session observer**, at the end of each session (which skills you used, what the session's upskilling report flagged). A second, repo-wide observer — a scheduled job that scans your repos for structure that has drifted — is part of the design, but it runs as a platform service, not something a fresh project setup starts on its own. What either flags is called a *candidate*. The observer surfaces; it never decides — promoting a candidate is your call.
 
 ### Discipline (the discipline stack)
 
@@ -83,19 +83,19 @@ It ships as a Claude Code plugin (`tapestry-discipline`) that installs four *hoo
 
 A script Claude Code runs automatically at a fixed moment — not something you call yourself.
 
-The discipline plugin uses four: `SessionStart` (pull your memories into a new chat), `UserPromptSubmit` (add the PROBE reminder to each message you send), `PreToolUse` (a check before an edit), and `Stop` (the end-of-turn upskilling audit). Hooks bind when a session opens, which is why enabling a plugin only takes effect after you restart Claude Code in that project.
+The discipline plugin uses four: `SessionStart` (pull your memories into a new chat), `UserPromptSubmit` (add the PROBE reminder to each message you send), `PreToolUse` (a check before an edit), and `Stop` (the end-of-session upskilling check). Hooks bind when a session opens, which is why enabling a plugin only takes effect after you restart Claude Code in that project.
 
 ### MCP (Model Context Protocol)
 
 The standard way an outside tool or server plugs into Claude Code so the agent can call it.
 
-The memory store you are setting up *is* an MCP server — `loom-memory`, reached over HTTP — and the discipline plugin that wires it in is what gives the agent its `memory_recall` / `memory_write` tools. Because every project shares the one store, it also acts as a *cross-agent channel*: here "channel" means shared memory that agents in other projects can read, not a chat channel.
+The memory store you are setting up *is* an MCP server — `loom-memory`, reached over HTTP — and it provides the agent's `memory_recall` / `memory_write` tools; the discipline plugin is what wires it in (and adds the automatic recall). Because every project shares the one store, it also acts as a *cross-agent channel*: here "channel" means shared memory that agents in other projects can read, not a chat channel.
 
 ### Signal, interpretation, pattern
 
 The three stages by which raw events become something worth acting on: a *signal* is one raw event a hook emits; *interpretation* is the observer reading many signals together; a *pattern* is the recurring shape it finds.
 
-The docs write it as "signal → interpretation → pattern," and the slogan "signals are not patterns" means one event proves nothing — only the trend across many does. Telemetry produces the signals; everything downstream is interpretation.
+The docs write it as "signal → interpretation → pattern." The principle behind it: one event proves nothing — only the trend across many does. Telemetry produces the signals; everything downstream is interpretation.
 
 ### Candidate and promotion
 

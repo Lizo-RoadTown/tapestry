@@ -59,6 +59,6 @@ The store is tuned for one person with thousands of memories — that's *why* it
 
 ## Related
 
-- [Shared language](/explanation/shared-language/) — the eight words these pages use, defined once.
+- [Shared language](/explanation/shared-language/) — the words these pages use, defined once.
 - [The memory](/explanation/the-memory/) — the concept, in brief, if you want the shorter version first.
 - [The observer](/explanation/the-observer/) — whose synthesis memos are just more records in this same box.

@@ -26,7 +26,7 @@ Lives at `services/agent-context/` (Render service `memory-mcp`).
 
 Without persistent memory, every session starts cold. Operators have to re-explain context; agents make the same mistakes; corrections evaporate. The cost is paid every conversation.
 
-Memory turns those costs into one-time learnings. A correction saved once becomes guidance forever after. A project's accumulated context auto-recalls at SessionStart. The Observer's synthesis memos compound over time.
+Memory turns those costs into [one-time learnings](/explanation/shared-language/#one-time-learning). A [correction](/explanation/shared-language/#correction) saved once becomes guidance forever after. A project's accumulated context auto-[recalls](/explanation/shared-language/#recall) at SessionStart. The Observer's synthesis memos compound over time.
 
 Memory is the substrate of the shared multi-agent memory model — hierarchical scopes, provenance chains, visibility tiers, reinforcement model.
 
@@ -101,6 +101,7 @@ See [Platform dependencies](/reference/platform-dependencies/) for the full Rend
 
 ## Related
 
+- [Shared language](/explanation/shared-language/) — the eight words the memory pages use, defined once
 - [The memory MCP (explanation)](/explanation/memory-mcp/) — the conceptual page
 - [Load-bearing files](/reference/load-bearing-files/) — the `.mcp.json` contract is documented there
 - [Observer](/systems/observer/), [Observatory](/systems/observatory/) — the components that read Memory most heavily

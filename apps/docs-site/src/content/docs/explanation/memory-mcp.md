@@ -137,6 +137,7 @@ You should expect to see the agent loudly surface MCP unavailability rather than
 
 ## Related
 
+- [Shared language](/explanation/shared-language/) — the eight words the memory pages use, defined once
 - [Why the memory is built this way](/explanation/why-memory-is-built-this-way/) — the reasons behind the shape: why one table, why recall stays cheap, how user/project/machine scope differ, and why the observer's schedule shares the same service
 - [The discipline stack](/explanation/discipline-stack/) — how the MCP fits with the plugins, the observer, and the recursive miscommunication-becomes-architecture loop
 - [The plugins](/explanation/plugins/) — `tapestry-discipline` is what wires the MCP into your project

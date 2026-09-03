@@ -137,7 +137,7 @@ services:
         sync: false                  # MUST match the deployment's tenant, or RLS returns empty
 
   # --------------------------------------------------------------------------
-  # STAGING — self-observer (migrated from the-loom; CORE DIRECTIVE 2).
+  # self-observer (migrated from the-loom; CORE DIRECTIVE 2) — writes to the LIVE registry.
   # A CRON running `python main.py --once` every 6h from services/self-observer:
   # it discovers scan targets (static core + every project-registry repo), scans
   # them via the GitHub contents API, classifies category-drift, and POSTs
@@ -150,11 +150,15 @@ services:
   # sync:false (operator sets them in the Render dashboard):
   #   GITHUB_TOKEN  — read the PRIVATE consuming repos (else public-only scan)
   #   OBSERVER_JWT  — Bearer to the Tapestry services (unset => self-host tenant)
-  # Staging-first: autoDeploy:false, distinct -staging name. Do NOT trigger it
-  # until a runbook clears the gates.
+  # Unlike the observatory cron above (which targets a staging DB), this one
+  # writes candidates to the LIVE architecture-registry BY DESIGN — that is the
+  # point: it appends to your existing data + dashboard. So there is no "staging"
+  # data path. Its safety is structural instead: autoDeploy:false + the two
+  # required secrets mean it does NOTHING until the operator provisions
+  # GITHUB_TOKEN/OBSERVER_JWT and manually enables the cron in the Render dashboard.
   # --------------------------------------------------------------------------
   - type: cron
-    name: tapestry-self-observer-cron-staging
+    name: tapestry-self-observer-cron
     runtime: python
     schedule: "0 */6 * * *"          # every 6h — matches the observer cadence
     plan: starter                    # free rejects cron jobs

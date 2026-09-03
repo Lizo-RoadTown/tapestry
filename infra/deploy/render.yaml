@@ -137,6 +137,46 @@ services:
         sync: false                  # MUST match the deployment's tenant, or RLS returns empty
 
   # --------------------------------------------------------------------------
+  # STAGING — self-observer (migrated from the-loom; CORE DIRECTIVE 2).
+  # A CRON running `python main.py --once` every 6h from services/self-observer:
+  # it discovers scan targets (static core + every project-registry repo), scans
+  # them via the GitHub contents API, classifies category-drift, and POSTs
+  # candidates to architecture-registry. No DB — it is a pure HTTP client, so
+  # no LOOM_DB_URL. Cron shape lifted from the project-observatory cron above.
+  #
+  # Endpoint defaults point at the EXISTING deployed services so restored data
+  # appends to what's already there and the dashboard keeps working; override
+  # via the TAPESTRY_* / LOOM_* env vars to retarget. Secrets are declared
+  # sync:false (operator sets them in the Render dashboard):
+  #   GITHUB_TOKEN  — read the PRIVATE consuming repos (else public-only scan)
+  #   OBSERVER_JWT  — Bearer to the Tapestry services (unset => self-host tenant)
+  # Staging-first: autoDeploy:false, distinct -staging name. Do NOT trigger it
+  # until a runbook clears the gates.
+  # --------------------------------------------------------------------------
+  - type: cron
+    name: tapestry-self-observer-cron-staging
+    runtime: python
+    schedule: "0 */6 * * *"          # every 6h — matches the observer cadence
+    plan: starter                    # free rejects cron jobs
+    region: oregon
+    branch: main
+    rootDir: services/self-observer
+    buildCommand: pip install -r requirements.txt
+    startCommand: python main.py --once
+    autoDeploy: false
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12"
+      - key: GITHUB_TOKEN
+        sync: false                  # read private consuming repos; absent => public-only
+      - key: OBSERVER_JWT
+        sync: false                  # Bearer to Tapestry services; unset => self-host tenant
+      - key: TAPESTRY_ARCHITECTURE_REGISTRY_URL
+        value: https://loom-architecture-registry.onrender.com  # existing deployed service
+      - key: TAPESTRY_REGISTRY_URL
+        value: https://loom-project-registry.onrender.com       # existing deployed service
+
+  # --------------------------------------------------------------------------
   # PRODUCTION re-source of loom-agent-context — DISABLED.
   # Enable ONLY at the runbook's `parity-verified → prod-rolling` gate, AFTER:
   #   (1) parity check green, (2) operator written authorization,

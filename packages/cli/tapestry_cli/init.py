@@ -153,6 +153,52 @@ def _register_project(
         raise RuntimeError(f"Registry POST /projects returned HTTP {e.code}: {err_body}")
 
 
+def _git_remote_url(project_dir: Path) -> Optional[str]:
+    """Return project_dir's `origin` remote URL, or None if it's not a git repo or
+    has no origin. Best-effort; never raises."""
+    import subprocess
+    try:
+        r = subprocess.run(
+            ["git", "-C", str(project_dir), "remote", "get-url", "origin"],
+            capture_output=True, text=True, timeout=10,
+        )
+        url = (r.stdout or "").strip()
+        return url if r.returncode == 0 and url else None
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def _register_repo(
+    registry_url: str,
+    project_id: str,
+    url: str,
+    token: Optional[str],
+    default_branch: str = "main",
+    timeout: float = 30.0,
+) -> bool:
+    """POST /projects/{id}/repos so the self-observer can discover and scan this
+    repo. Returns True if registered now or already present (409). Never raises —
+    the project is already registered, so a repo-registration failure must not
+    abort init."""
+    # The deployed registry's RepoCreate requires project_id IN THE BODY (as well
+    # as the path); send both so this works against the currently-deployed service.
+    body = json.dumps(
+        {"project_id": project_id, "url": url, "default_branch": default_branch}
+    ).encode("utf-8")
+    endpoint = registry_url.rstrip("/") + f"/projects/{project_id}/repos"
+    headers = {"Content-Type": "application/json"}
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    req = urllib.request.Request(url=endpoint, data=body, headers=headers, method="POST")
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            return resp.status in (200, 201)
+    except urllib.error.HTTPError as e:
+        return e.code == 409  # already registered under this project — fine
+    except (urllib.error.URLError, TimeoutError, ConnectionError, OSError):
+        return False
+
+
 def _write_env_file(project_dir: Path, slug: str) -> None:
     """Create .env with LOOM_PROJECT_ID + OTel propagation. Does NOT overwrite.
 
@@ -642,6 +688,23 @@ def run(args: argparse.Namespace) -> int:
               file=sys.stderr)
         print("       then re-run. No local files were written.", file=sys.stderr)
         return 1
+
+    # Register the project's git repo so the self-observer can discover and scan
+    # it (GET /projects/{id}/repos is how the observer finds targets). Best-effort:
+    # the project is already registered above, so a missing remote or a failed POST
+    # must not abort local setup.
+    print(f"--> Register the project's git repo (so the self-observer can scan it)...")
+    repo_url = _git_remote_url(project_dir)
+    if repo_url:
+        if _register_repo(args.registry_url, project_uuid, repo_url, args.token):
+            print(f"  repo registered: {repo_url}")
+        else:
+            print(f"  WARN: could not register repo {repo_url}; register it later via "
+                  f"POST {args.registry_url.rstrip('/')}/projects/{project_uuid}/repos")
+    else:
+        print("  NOTE: no git 'origin' remote found — skipping repo registration. "
+              "Add a remote and re-run (or register it later) so the self-observer "
+              "can discover this repo.")
 
     print(f"--> [3/6] Create .env in {project_dir} (LOOM_PROJECT_ID + OTel from env)...")
     _write_env_file(project_dir, args.slug)

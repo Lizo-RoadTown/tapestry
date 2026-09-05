@@ -183,6 +183,64 @@ services:
         value: 777f7bfa-1d02-466f-a20d-e3af7434c27e             # tapestry's own project row (registered 2026-09-05) so its self-candidates don't file under the-loom's id
 
   # --------------------------------------------------------------------------
+  # PRODUCTION re-point of loom-architecture-registry — DISABLED (repoint gate).
+  # ============================================================================
+  # This is a REPOINT of the EXISTING, LOAD-BEARING `loom-architecture-registry`
+  # Render service at the Tapestry repo (rootDir services/architecture-registry),
+  # NOT a new/duplicate service. Same name → same URL → both observers keep
+  # POSTing candidates and the dashboard keeps reading/writing, unchanged. It
+  # reuses the LIVE loom-postgres (candidates table already at the 9-kind CHECK;
+  # see infra/migrations/007_init_candidates.sql) via a sync:false LOOM_DB_URL —
+  # NO `databases:` block, NO fromDatabase (that would spawn a new empty DB).
+  #
+  # Follows the agent-context cutover exactly (the-loom/render.yaml:73-85 removed
+  # its deploy; Render repointed the same service). autoDeploy:false: the
+  # operator performs the repoint per the runbook, and does NOTHING until then.
+  #
+  # ENABLE ONLY at the runbook's repoint gate, AFTER:
+  #   (1) VERIFY the live DB's candidates_type_check == models.py CANDIDATE_TYPE
+  #       (the 9 kinds) — see services/architecture-registry/README.md "Cutover".
+  #   (1b) VERIFY the live candidate_type column width >= 24 (007 widens it; the live
+  #        column was VARCHAR(16), too short for 'architecture_pattern').
+  #   (1c) VERIFY the live rows' tenant == SELF_HOST_TENANT_ID above (1d8ec1b3…),
+  #        else self-host reads scope to the nil tenant and return zero candidates.
+  #   (2) operator written authorization,
+  #   (3) the-loom blueprint stops deploying loom-architecture-registry
+  #       (ONE-BLUEPRINT invariant).
+  # ROLLBACK = re-point the Render service's repo back to the-loom (code
+  # byte-identical; the shared DB is untouched by a repoint).
+  # --------------------------------------------------------------------------
+  # - type: web
+  #   name: loom-architecture-registry   # SAME name → same URL → consumers unchanged
+  #   runtime: python
+  #   plan: starter                      # keep warm — load-bearing for both observers + dashboard
+  #   region: oregon
+  #   branch: main
+  #   rootDir: services/architecture-registry
+  #   buildCommand: pip install -r requirements.txt
+  #   startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+  #   autoDeploy: false                  # operator performs the repoint per the runbook
+  #   healthCheckPath: /health
+  #   envVars:
+  #     - fromGroup: tapestry-shared-secrets   # LOOM_JWT_PUBLIC_KEY (hosted-multitenant verify)
+  #     - key: PYTHON_VERSION
+  #       value: "3.12"
+  #     - key: LOOM_DB_URL
+  #       sync: false                    # raw connection string to the LIVE loom-postgres
+  #     - key: LOOM_SKILL_BRIDGE_SECRET
+  #       sync: false                    # HMAC shared secret — SAME value as the Make_Skills engine
+  #     - key: SELF_HOST_TENANT_ID
+  #       value: 1d8ec1b3-d62a-5fab-9a52-eb6a3e09f1c8   # tenant the LIVE candidate rows carry; unset => nil UUID => self-host reads see ZERO historical candidates
+  #     # Bridge callback/engine URLs have in-code defaults (promote_dispatcher.py);
+  #     # override only if the engine or callback hosts move:
+  #     # - key: LOOM_ENGINE_BASE_URL
+  #     #   sync: false
+  #     # - key: LOOM_REGISTRATION_ACK_URL
+  #     #   sync: false
+  #     # - key: LOOM_TELEMETRY_CALLBACK_URL
+  #     #   sync: false
+
+  # --------------------------------------------------------------------------
   # PRODUCTION re-source of loom-agent-context — DISABLED.
   # Enable ONLY at the runbook's `parity-verified → prod-rolling` gate, AFTER:
   #   (1) parity check green, (2) operator written authorization,

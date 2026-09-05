@@ -30,6 +30,7 @@ Previously these patterns lived as duplicated copies across `docs-agent/skills/`
 | Skill | What it does |
 |---|---|
 | `agentic-skill-design` | Meta-skill for designing skills that DECIDE and EXECUTE rather than ask permission. The PROBE → DECIDE → ACT → REPORT pattern. |
+| `concrete-rule` | Protects system invariants whose violation causes core project failure — forces failure-mode anticipation, defense-in-depth, and loud visibility so a single config drift or dropped service can't silently break the system. |
 | `deep-research-pattern` | Architectural pattern for multi-agent deep research with strict context isolation. |
 | `design-evaluation` | Evaluates a design question with multiple options across the dimensions that matter. Produces a tradeoff matrix. |
 | `document-parsing` | Decision tree for picking the right parser (LlamaParse vs pdfplumber vs pypandoc) when converting PDFs / Word / PowerPoint / Excel / scanned images into LLM-friendly markdown. |
@@ -37,6 +38,7 @@ Previously these patterns lived as duplicated copies across `docs-agent/skills/`
 | `id-rename-blast-radius` | Before renaming an id that is at once a registry key, a folder name, and a persisted namespace, enumerates what derives from it. Catches prefix checks and path joins that break silently. |
 | `layered-explanation` | Structures every technical explanation as ELI5 → quick-reference → depth (with file:line) → mental model. |
 | `open-source-documentation` | OSS-specific documentation patterns. |
+| `periodic-architectural-checkin` | The formal pause: audits drift between current project state and the original goal — surfaces work done, where it drifted, ownership/categorization gaps, and what to raise with the operator. |
 | `proposal-authoring` | Authors a design proposal in the project's house style. |
 | `seed-leftover-audit` | Sweeps a scaffolded or forked repo for strings inherited from the template or the previous instance. Triages by blast radius: blocking / misleading / cosmetic. |
 | `template-inheritance-check` | After forking a WORKING instance, finds the domain assumptions the source's data satisfied and the new instance's data breaks. Catches what a string grep cannot. |

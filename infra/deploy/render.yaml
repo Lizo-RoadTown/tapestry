@@ -200,6 +200,10 @@ services:
   # ENABLE ONLY at the runbook's repoint gate, AFTER:
   #   (1) VERIFY the live DB's candidates_type_check == models.py CANDIDATE_TYPE
   #       (the 9 kinds) — see services/architecture-registry/README.md "Cutover".
+  #   (1b) VERIFY the live candidate_type column width >= 24 (007 widens it; the live
+  #        column was VARCHAR(16), too short for 'architecture_pattern').
+  #   (1c) VERIFY the live rows' tenant == SELF_HOST_TENANT_ID above (1d8ec1b3…),
+  #        else self-host reads scope to the nil tenant and return zero candidates.
   #   (2) operator written authorization,
   #   (3) the-loom blueprint stops deploying loom-architecture-registry
   #       (ONE-BLUEPRINT invariant).
@@ -225,6 +229,8 @@ services:
   #       sync: false                    # raw connection string to the LIVE loom-postgres
   #     - key: LOOM_SKILL_BRIDGE_SECRET
   #       sync: false                    # HMAC shared secret — SAME value as the Make_Skills engine
+  #     - key: SELF_HOST_TENANT_ID
+  #       value: 1d8ec1b3-d62a-5fab-9a52-eb6a3e09f1c8   # tenant the LIVE candidate rows carry; unset => nil UUID => self-host reads see ZERO historical candidates
   #     # Bridge callback/engine URLs have in-code defaults (promote_dispatcher.py);
   #     # override only if the engine or callback hosts move:
   #     # - key: LOOM_ENGINE_BASE_URL

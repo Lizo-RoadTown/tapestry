@@ -50,10 +50,14 @@ Cutover is a **repoint of the EXISTING `loom-architecture-registry` Render servi
    WHERE conname = 'candidates_type_check';
    ```
    It must list: `skill, inline_tool, external_tool, architecture_pattern, service, machine_support, process, agent, orchestration`. If it does not match, STOP — do not repoint.
-2. Apply `007_init_candidates.sql` against the live DB if desired for parity — it is a safe no-op there (idempotent guards; live rows already satisfy the 9-kind CHECK).
+
+   Two more live-DB facts to verify at this same gate:
+   - **Column width** — `SELECT character_maximum_length FROM information_schema.columns WHERE table_name='candidates' AND column_name='candidate_type';` must be ≥ 24. The pre-existing live column is `VARCHAR(16)`, too short for `architecture_pattern` (20 chars); `007` widens it via `ALTER COLUMN` (metadata-only). If still 16, apply `007` (step 2) before repointing.
+   - **Tenant continuity** — `SELECT DISTINCT tenant_id FROM candidates;` must equal the `SELF_HOST_TENANT_ID` you set in step 5 (`1d8ec1b3-d62a-5fab-9a52-eb6a3e09f1c8`). If they differ, self-host reads scope to the nil UUID and return **zero** historical candidates. STOP and fix the env var first.
+2. Apply `007_init_candidates.sql` against the live DB if desired for parity — it is a safe no-op there (idempotent guards; live rows already satisfy the 9-kind CHECK; the `ALTER COLUMN` widen is metadata-only).
 3. Get written operator authorization.
 4. Ensure the-loom blueprint stops deploying `loom-architecture-registry` (ONE-BLUEPRINT invariant).
-5. Enable the block in `infra/deploy/render.yaml`, set `LOOM_DB_URL` (live loom-postgres) + `LOOM_SKILL_BRIDGE_SECRET` (same value as the engine) + `LOOM_JWT_PUBLIC_KEY`, and repoint the Render service.
+5. Enable the block in `infra/deploy/render.yaml`, set `LOOM_DB_URL` (live loom-postgres) + `LOOM_SKILL_BRIDGE_SECRET` (same value as the engine) + `LOOM_JWT_PUBLIC_KEY` + **`SELF_HOST_TENANT_ID=1d8ec1b3-d62a-5fab-9a52-eb6a3e09f1c8`** (the tenant the live rows carry — omitting it makes self-host reads return zero historical candidates), and repoint the Render service.
 6. Smoke: `/health`, a read `GET /candidates`, and a signed `/skill-registered` round-trip. **Do not POST test candidates to the live registry.**
 
 **Rollback:** re-point the Render service's repo back to the-loom (code byte-identical; the shared DB is untouched by a repoint).

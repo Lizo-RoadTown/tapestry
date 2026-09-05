@@ -145,6 +145,17 @@ CREATE TABLE IF NOT EXISTS candidates (
 
 
 -- ---------------------------------------------------------------------------
+-- Column width (R1) — widen candidate_type on a pre-existing (live) table
+-- ---------------------------------------------------------------------------
+-- the-loom's 003 created candidate_type VARCHAR(16); neither 005 nor 006 widened
+-- it, so the LIVE column is still VARCHAR(16). 'architecture_pattern' is 20 chars,
+-- so a live INSERT of that kind fails the column length BEFORE the CHECK (silent
+-- 500 / candidate loss). CREATE TABLE IF NOT EXISTS above skips the live table, so
+-- widen it explicitly. ALTER ... TYPE is metadata-only (no rewrite), safe/idempotent.
+ALTER TABLE candidates ALTER COLUMN candidate_type TYPE VARCHAR(24);
+
+
+-- ---------------------------------------------------------------------------
 -- Guarded constraint (re)assertion — parity safety net
 -- ---------------------------------------------------------------------------
 -- On a FRESH deploy the CREATE TABLE above already installed the 9-kind CHECK,

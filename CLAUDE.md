@@ -71,7 +71,7 @@ The canonical home for reusable agents + skills + tools is the `tapestry-pattern
 This makes the following available **by name in every project**, with one canonical implementation:
 
 - **Agents** (invoke via `Agent({subagent_type: "tapestry-patterns:<name>", ...})`):
-  `infrastructure-mapping`, `next-actions-planning`, `lessons-learned`, `orchestration-cataloging`, `eval-deep-research`, `web-app-scaffold`, `agentic-upskilling`, `drift-watcher`
+  `infrastructure-mapping`, `next-actions-planning`, `roadmap-maintenance`, `lessons-learned`, `orchestration-cataloging`, `eval-deep-research`, `web-app-scaffold`, `agentic-upskilling`, `drift-watcher`
 - **Skills** (invoke via Skill tool with `tapestry-patterns:<name>`):
   `agentic-skill-design`, `deep-research-pattern`, `design-evaluation`, `documentation`, `document-parsing`, `layered-explanation`, `open-source-documentation`, `proposal-authoring`
 

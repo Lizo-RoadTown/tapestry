@@ -23,8 +23,8 @@
     {
       "name": "tapestry-patterns",
       "source": "./integrations/claude-code/tapestry-patterns",
-      "description": "Canonical patterns library — ONE home for the reusable agents, skills, and tools that ship with the platform. Available in every Claude Code session so the same pattern means the same thing wherever invoked. Includes drift-watcher, infrastructure-mapping, next-actions-planning, lessons-learned, agentic-skill-design, deep-research-pattern, documentation, seed-leftover-audit, template-inheritance-check, id-rename-blast-radius, concrete-rule, periodic-architectural-checkin, and more. Renamed from liz-patterns.",
-      "version": "0.1.4",
+      "description": "Canonical patterns library — ONE home for the reusable agents, skills, and tools that ship with the platform. Available in every Claude Code session so the same pattern means the same thing wherever invoked. Includes drift-watcher, infrastructure-mapping, next-actions-planning, roadmap-maintenance, lessons-learned, agentic-skill-design, deep-research-pattern, documentation, seed-leftover-audit, template-inheritance-check, id-rename-blast-radius, concrete-rule, periodic-architectural-checkin, and more. Renamed from liz-patterns.",
+      "version": "0.1.5",
       "author": { "name": "Liz Osborn" },
       "license": "Apache-2.0",
       "category": "patterns-library",

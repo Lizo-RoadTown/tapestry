@@ -1,0 +1,34 @@
+name: Change trail entry (advisory)
+
+# Flags a PR that changes runtime (services/, engine/, infra/migrations/, apps/,
+# packages/, integrations/) but adds no docs/changelog/ entry. See
+# scripts/check_changelog.py and docs/changelog/README.md.
+#
+# ADVISORY: keep this OUT of branch protection's required checks. A red X here is
+# a code-review signal, not a merge block. Opt out of an entry with
+# `[skip changelog]` in the commit subject (first line). Stdlib-only Python.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Full history so the merge-base diff against the base branch resolves.
+          fetch-depth: 0
+      - name: Fetch base branch
+        run: git fetch --no-tags --depth=1 origin "${{ github.base_ref }}"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check for a change-trail entry
+        env:
+          CHANGELOG_BASE_REF: origin/${{ github.base_ref }}
+        run: python scripts/check_changelog.py

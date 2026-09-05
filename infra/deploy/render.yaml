@@ -241,6 +241,58 @@ services:
   #     #   sync: false
 
   # --------------------------------------------------------------------------
+  # PRODUCTION re-point of loom-policy — DISABLED (repoint gate).
+  # ============================================================================
+  # REPOINT of the EXISTING `loom-policy` Render service (loom-policy.onrender.com,
+  # shipped 2026-06-12) at the Tapestry repo (rootDir services/policy), NOT a new
+  # service. Same name → same URL → the dashboard + any policy-state readers keep
+  # working unchanged. Reuses the LIVE loom-postgres (policy_decisions table
+  # already exists via the-loom's 004; infra/migrations/004_init_policy.sql is a
+  # no-op replay there) via a sync:false LOOM_DB_URL — NO `databases:` block, NO
+  # fromDatabase (that would spawn a new empty DB).
+  #
+  # policy is SOFT / pure-audit: it records decisions and exposes policy-state,
+  # but does NOT call architecture-registry — so NO LOOM_SKILL_BRIDGE_SECRET and
+  # NO engine URLs here (contrast the architecture-registry block above).
+  #
+  # autoDeploy:false — the operator performs the repoint per the runbook, and it
+  # does NOTHING until then.
+  #
+  # ENABLE ONLY at the runbook's repoint gate, AFTER:
+  #   (1) VERIFY the live policy_decisions CHECK constraints == models.py
+  #       (kind: approve/reject/hold/demote; target_status: the 7 candidate
+  #       statuses) — see services/policy/README.md "Cutover".
+  #   (1b) VERIFY the live column widths (decision_kind >= 16, target_status
+  #        >= 24) — policy's 004 is the original creation migration, so this is
+  #        expected to already hold (no ALTER needed), but confirm.
+  #   (1c) VERIFY the live rows' tenant == SELF_HOST_TENANT_ID below (1d8ec1b3…),
+  #        else self-host reads scope to the nil tenant and return zero decisions.
+  #   (2) operator written authorization,
+  #   (3) the-loom blueprint stops deploying loom-policy (ONE-BLUEPRINT invariant).
+  # ROLLBACK = re-point the Render service's repo back to the-loom (code
+  # byte-parity; the shared DB is untouched by a repoint).
+  # --------------------------------------------------------------------------
+  # - type: web
+  #   name: loom-policy                 # SAME name → same URL → consumers unchanged
+  #   runtime: python
+  #   plan: starter
+  #   region: oregon
+  #   branch: main
+  #   rootDir: services/policy
+  #   buildCommand: pip install -r requirements.txt
+  #   startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+  #   autoDeploy: false                 # operator performs the repoint per the runbook
+  #   healthCheckPath: /health
+  #   envVars:
+  #     - fromGroup: tapestry-shared-secrets   # LOOM_JWT_PUBLIC_KEY (hosted-multitenant verify)
+  #     - key: PYTHON_VERSION
+  #       value: "3.12"
+  #     - key: LOOM_DB_URL
+  #       sync: false                   # raw connection string to the LIVE loom-postgres
+  #     - key: SELF_HOST_TENANT_ID
+  #       value: 1d8ec1b3-d62a-5fab-9a52-eb6a3e09f1c8   # tenant the LIVE decision rows carry; unset => nil UUID => self-host reads see ZERO historical decisions
+
+  # --------------------------------------------------------------------------
   # PRODUCTION re-source of loom-agent-context — DISABLED.
   # Enable ONLY at the runbook's `parity-verified → prod-rolling` gate, AFTER:
   #   (1) parity check green, (2) operator written authorization,

@@ -1,0 +1,9 @@
+# Test-only deps for services/policy/tests/.
+# Install ON TOP of requirements.txt:
+#   pip install -r requirements.txt -r requirements-test.txt
+#
+# Production deploy (Render) does NOT install these — render.yaml's buildCommand
+# only references requirements.txt.
+
+pytest>=8.0,<9
+pytest-asyncio>=0.24

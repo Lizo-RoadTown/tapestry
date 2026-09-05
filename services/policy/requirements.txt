@@ -1,0 +1,9 @@
+fastapi==0.115.4
+uvicorn[standard]==0.32.0
+
+# Postgres + connection pool (Phase 5 policy decisions)
+psycopg[binary]==3.2.3
+psycopg-pool==3.2.4
+
+# JWT signature verification (hosted-multitenant mode via auth_bridge)
+python-jose[cryptography]==3.3.0

@@ -179,6 +179,8 @@ services:
         value: https://loom-architecture-registry.onrender.com  # existing deployed service
       - key: TAPESTRY_REGISTRY_URL
         value: https://loom-project-registry.onrender.com       # existing deployed service
+      - key: TAPESTRY_PROJECT_ID
+        value: 777f7bfa-1d02-466f-a20d-e3af7434c27e             # tapestry's own project row (registered 2026-09-05) so its self-candidates don't file under the-loom's id
 
   # --------------------------------------------------------------------------
   # PRODUCTION re-source of loom-agent-context — DISABLED.

@@ -73,7 +73,7 @@ This makes the following available **by name in every project**, with one canoni
 - **Agents** (invoke via `Agent({subagent_type: "tapestry-patterns:<name>", ...})`):
   `infrastructure-mapping`, `next-actions-planning`, `roadmap-maintenance`, `lessons-learned`, `orchestration-cataloging`, `eval-deep-research`, `web-app-scaffold`, `agentic-upskilling`, `drift-watcher`
 - **Skills** (invoke via Skill tool with `tapestry-patterns:<name>`):
-  `agentic-skill-design`, `deep-research-pattern`, `design-evaluation`, `documentation`, `document-parsing`, `layered-explanation`, `open-source-documentation`, `proposal-authoring`
+  `agentic-skill-design`, `deep-research-pattern`, `design-evaluation`, `documentation`, `document-parsing`, `layered-explanation`, `open-source-documentation`, `proposal-authoring`, `changelog-entry`
 
 Per [MANIFESTO Pillar 1](MANIFESTO.md): every reusable pattern has ONE name, ONE home, available everywhere via reference, not copy. When Tapestry's `engine/` is built out, compiled-skill output will land in this plugin (auto-write loop closure is future scope per MANIFESTO Part 4.7).
 

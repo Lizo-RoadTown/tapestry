@@ -85,16 +85,21 @@ class CandidateClient:
         return headers
 
     async def fetch_open_candidates(self) -> set[str]:
-        """Pre-load existing open candidates' content hashes for dedup.
+        """Pre-load existing candidates' content hashes for dedup.
 
         Reads via GET /candidates (no trailing slash — endpoint redirects 307
         from /candidates/ to /candidates; explicit form avoids the round-trip).
+
+        No status filter: the registry's status values are draft / observed /
+        recurring / stable / promotion_requested / promoted / rejected — there is
+        no "open", so an earlier `?status=open` returned HTTP 422 and silently
+        disabled dedup entirely. Fetching ALL existing candidates and deduping
+        against them is correct — it also avoids re-surfacing a candidate the
+        operator already resolved (promoted/rejected).
         """
         url = f"{self.endpoints.candidate_registry_url}/candidates"
         async with httpx.AsyncClient(timeout=60.0, follow_redirects=True) as client:
-            resp = await client.get(
-                url, headers=self._headers(), params={"status": "open"}
-            )
+            resp = await client.get(url, headers=self._headers())
             if resp.status_code != 200:
                 # Soft-fail: if we can't fetch open candidates, proceed without dedup.
                 # Better to emit dupes than to fail the entire run.

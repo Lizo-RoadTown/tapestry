@@ -64,6 +64,7 @@ Newest first. (Older history predating the trail lives in `import-map.md` and gi
 
 | Date | Kind | Change | PRs |
 |---|---|---|---|
+| 2026-09-05 | chore | [Keeping-in-sync maintenance checklist](2026-09-05-keeping-in-sync-doc.md) | this PR |
 | 2026-09-05 | migration | [Policy service migrated from the-loom](2026-09-05-policy-service-migration.md) | #166 |
 | 2026-09-05 | feature | [roadmap-maintenance agent + agent-home ADR](2026-09-05-roadmap-maintenance-agent.md) | #165 |
 | 2026-09-05 | fix | [self-observer dedup repair + stub-slot labels](2026-09-05-self-observer-dedup-fix.md) | #164 |

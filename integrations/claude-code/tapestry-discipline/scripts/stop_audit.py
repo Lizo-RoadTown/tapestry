@@ -121,8 +121,14 @@ REMINDER = (
 SUBSTANTIVE_MIN_ASSISTANT_TURNS_ALONE = 30   # solo signal: long session
 SUBSTANTIVE_MIN_ASSISTANT_TURNS_PAIR = 3     # paired with tool count
 SUBSTANTIVE_MIN_TOOL_CALLS_PAIR = 10         # paired with assistant turns
+# A "shipped work" action: a git commit/push/merge/tag OR a `gh pr merge|create`.
+# Name kept for back-compat; it now covers the PR flow too, so shipping a PR is a
+# first-class upskilling boundary — not just incidentally via the commit/push that
+# preceded it. (Squash-merges done with `gh pr merge` have no local `git merge`.)
 SUBSTANTIVE_GIT_ACTION_REGEX = re.compile(
-    r"\bgit\s+(?:commit|push|merge|tag)\b", re.IGNORECASE
+    r"\bgit\s+(?:commit|push|merge|tag)\b"
+    r"|\bgh\s+pr\s+(?:merge|create)\b",
+    re.IGNORECASE,
 )
 
 # The report counts as emitted IFF the session contains a memory_write tool

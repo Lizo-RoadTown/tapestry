@@ -96,6 +96,22 @@ class TestScanSessionMetrics(unittest.TestCase):
         m = stop_audit._scan_session_metrics(raw)
         self.assertTrue(m["git_action_seen"])
 
+    def test_gh_pr_merge_detected_as_shipped_action(self):
+        # A PR squash-merge has no local `git merge`; detect the gh flow so
+        # shipping a PR is a first-class upskilling boundary.
+        raw = _jsonl(
+            _assistant_tool_use_entry("Bash", {"command": "gh pr merge 170 --squash --delete-branch"}),
+        )
+        m = stop_audit._scan_session_metrics(raw)
+        self.assertTrue(m["git_action_seen"])
+
+    def test_gh_pr_create_detected_as_shipped_action(self):
+        raw = _jsonl(
+            _assistant_tool_use_entry("Bash", {"command": "gh pr create --title x --body y"}),
+        )
+        m = stop_audit._scan_session_metrics(raw)
+        self.assertTrue(m["git_action_seen"])
+
     def test_git_action_detected_in_assistant_text(self):
         raw = _jsonl(
             _assistant_text_entry("Now running git push origin main"),

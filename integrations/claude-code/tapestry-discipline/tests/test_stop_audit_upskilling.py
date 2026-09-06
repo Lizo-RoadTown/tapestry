@@ -96,6 +96,22 @@ class TestScanSessionMetrics(unittest.TestCase):
         m = stop_audit._scan_session_metrics(raw)
         self.assertTrue(m["git_action_seen"])
 
+    def test_gh_pr_merge_detected_as_shipped_action(self):
+        # A PR squash-merge has no local `git merge`; detect the gh flow so
+        # shipping a PR is a first-class upskilling boundary.
+        raw = _jsonl(
+            _assistant_tool_use_entry("Bash", {"command": "gh pr merge 170 --squash --delete-branch"}),
+        )
+        m = stop_audit._scan_session_metrics(raw)
+        self.assertTrue(m["git_action_seen"])
+
+    def test_gh_pr_create_detected_as_shipped_action(self):
+        raw = _jsonl(
+            _assistant_tool_use_entry("Bash", {"command": "gh pr create --title x --body y"}),
+        )
+        m = stop_audit._scan_session_metrics(raw)
+        self.assertTrue(m["git_action_seen"])
+
     def test_git_action_detected_in_assistant_text(self):
         raw = _jsonl(
             _assistant_text_entry("Now running git push origin main"),
@@ -248,6 +264,113 @@ class TestMarkerFile(unittest.TestCase):
         # Empty / unknown session id should still produce a valid path.
         p = stop_audit._warned_marker_path("")
         self.assertIn("session-", str(p))
+
+
+# ---------------------------------------------------------------------------
+# Recurring trigger (v0.1.20): measure work SINCE the last report
+# ---------------------------------------------------------------------------
+
+
+def _report_entry(name: str) -> dict:
+    return _assistant_tool_use_entry(
+        "mcp__loom-memory__memory_write",
+        {"name": name, "record_type": "lesson", "content": "..."},
+    )
+
+
+class TestRecurringUpskilling(unittest.TestCase):
+    """The trigger measures work done SINCE the most recent upskilling report,
+    so it recurs in long-lived sessions instead of firing once per session."""
+
+    def test_scan_returns_recurring_watermark_keys(self):
+        m = stop_audit._scan_session_metrics("")
+        for k in ("report_count", "turns_at_last_report",
+                  "tools_at_last_report", "git_since_last_report"):
+            self.assertIn(k, m)
+        self.assertEqual(m["report_count"], 0)
+
+    def test_report_count_increments_per_report(self):
+        raw = _jsonl(
+            _report_entry("upskilling_report_session_2026_06_12"),
+            _assistant_text_entry("more"),
+            _report_entry("upskilling_report_session_2026_06_13"),
+        )
+        m = stop_audit._scan_session_metrics(raw)
+        self.assertEqual(m["report_count"], 2)
+
+    def test_watermark_snapshots_metrics_at_last_report(self):
+        # Two work turns, then a report (the 3rd assistant turn) -> snapshot 3.
+        raw = _jsonl(
+            _assistant_text_entry("work 1"),
+            _assistant_text_entry("work 2"),
+            _report_entry("upskilling_report_session_2026_06_12"),
+            _assistant_text_entry("after 1"),
+            _assistant_text_entry("after 2"),
+        )
+        m = stop_audit._scan_session_metrics(raw)
+        self.assertEqual(m["assistant_turns"], 5)
+        self.assertEqual(m["turns_at_last_report"], 3)
+
+    def test_git_before_report_does_not_count_as_since(self):
+        raw = _jsonl(
+            _assistant_tool_use_entry("Bash", {"command": "git commit -m a"}),
+            _report_entry("upskilling_report_session_2026_06_12"),
+            _assistant_text_entry("quiet after"),
+        )
+        m = stop_audit._scan_session_metrics(raw)
+        self.assertTrue(m["git_action_seen"])         # whole session: yes
+        self.assertFalse(m["git_since_last_report"])  # since the report: no
+
+    def test_git_after_report_counts_as_since(self):
+        raw = _jsonl(
+            _report_entry("upskilling_report_session_2026_06_12"),
+            _assistant_tool_use_entry("Bash", {"command": "git commit -m b"}),
+        )
+        m = stop_audit._scan_session_metrics(raw)
+        self.assertTrue(m["git_since_last_report"])
+
+    def test_since_report_metrics_are_deltas(self):
+        metrics = {
+            "assistant_turns": 40, "tool_calls": 25, "git_action_seen": True,
+            "turns_at_last_report": 30, "tools_at_last_report": 20,
+            "git_since_last_report": False,
+        }
+        since = stop_audit._since_report_metrics(metrics)
+        self.assertEqual(since["assistant_turns"], 10)
+        self.assertEqual(since["tool_calls"], 5)
+        self.assertFalse(since["git_action_seen"])
+
+    def test_no_rewarn_immediately_after_a_big_report(self):
+        # Whole session is substantive, but nothing has happened since the
+        # report -> since-boundary not crossed -> no re-warn yet.
+        metrics = {
+            "assistant_turns": 35, "tool_calls": 40, "git_action_seen": True,
+            "turns_at_last_report": 35, "tools_at_last_report": 40,
+            "git_since_last_report": False,
+        }
+        self.assertFalse(
+            stop_audit._is_substantive_boundary(
+                stop_audit._since_report_metrics(metrics)
+            )
+        )
+
+    def test_rewarn_after_new_work_since_report(self):
+        # A single git action since the report re-crosses the boundary.
+        metrics = {
+            "assistant_turns": 36, "tool_calls": 41, "git_action_seen": True,
+            "turns_at_last_report": 35, "tools_at_last_report": 40,
+            "git_since_last_report": True,
+        }
+        self.assertTrue(
+            stop_audit._is_substantive_boundary(
+                stop_audit._since_report_metrics(metrics)
+            )
+        )
+
+    def test_read_marker_absent_returns_none(self):
+        self.assertIsNone(
+            stop_audit._read_marker("no-such-session-xyz-987654321")
+        )
 
 
 if __name__ == "__main__":

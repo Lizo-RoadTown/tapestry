@@ -9,12 +9,16 @@ Fires at the end of the agent's turn. Runs two audits + one observer:
    accompanying file:line citation. Surfaces "Stop-audit detected an
    unsubstantiated stack claim" via additionalContext.
 
-2. **Agentic-upskilling audit** (v0.1.9, CORE DIRECTIVE 2). Walks the
-   FULL session transcript. If the session crossed a "substantive
-   boundary" heuristic (≥ 1 git commit/push action, OR ≥ 10 tool calls
-   AND ≥ 3 assistant turns, OR ≥ 30 assistant turns) AND NO upskilling
-   report has been emitted this session, surfaces
-   "*** UPSKILLING PASS NOT RUN ***" with recovery steps.
+2. **Agentic-upskilling audit** (v0.1.9, CORE DIRECTIVE 2; recurring since
+   v0.1.20). Walks the FULL session transcript. If a "substantive boundary"
+   (≥ 1 git commit/push action, OR ≥ 10 tool calls AND ≥ 3 assistant turns,
+   OR ≥ 30 assistant turns) has been crossed by work done SINCE the most
+   recent upskilling report — and we have not already warned for this window —
+   surfaces "*** UPSKILLING PASS NOT RUN ***" with recovery steps. Measuring
+   work SINCE the last report (not once per session) makes the prompt RECUR in
+   long-lived sessions: each emitted report resets the window, a fresh boundary
+   of new work re-arms it. Fixes weeks-long sessions where the end-of-session
+   trigger never arrives.
 
 3. **Phase 2 observer** (v0.1.10). If the upskilling report HAS been
    emitted (the agent did its job), invoke observer.scan_and_emit to
@@ -31,7 +35,9 @@ its side effects are visible only via GET /candidates and the local
 .project-intelligence/workflow-candidates/ files.
 
 The upskilling check uses a per-session marker file at
-~/.claude/cache/session-<id>-upskilling-warned to avoid repeated warnings.
+~/.claude/cache/session-<id>-upskilling-warned storing a JSON watermark
+(reports_at_warn + turns_at_warn) so it re-warns once per window of new work
+rather than once per session.
 
 Reference: docs/plans/2026-05-22-discipline-plugin-and-starter-capture.md
 in Lizo-RoadTown/Make_Skills.
@@ -170,6 +176,14 @@ def _scan_session_metrics(raw: str) -> dict:
     upskilling_report_seen = False
     report_content = ""
     report_name = ""
+    # v0.1.20 (recurring trigger): watermarks for "work since the last report".
+    # report_count = how many upskilling reports the transcript holds;
+    # turns/tools_at_last_report = the metric snapshot at the MOST RECENT report;
+    # git_since_last_report = a git action occurred AFTER the last report.
+    report_count = 0
+    turns_at_last_report = 0
+    tools_at_last_report = 0
+    git_since_last_report = False
 
     for line in raw.splitlines():
         line = line.strip()
@@ -195,6 +209,7 @@ def _scan_session_metrics(raw: str) -> dict:
                     text_parts.append(txt)
                     if SUBSTANTIVE_GIT_ACTION_REGEX.search(txt):
                         git_action_seen = True
+                        git_since_last_report = True
                 elif btype == "tool_use":
                     tool_calls += 1
                     # Detect git via bash tool calls, and the upskilling report
@@ -208,6 +223,7 @@ def _scan_session_metrics(raw: str) -> dict:
                         cmd = tool_input.get("command") or ""
                         if isinstance(cmd, str) and SUBSTANTIVE_GIT_ACTION_REGEX.search(cmd):
                             git_action_seen = True
+                            git_since_last_report = True
                         record_name = tool_input.get("name") or ""
                         if (
                             isinstance(tool_name, str)
@@ -216,6 +232,12 @@ def _scan_session_metrics(raw: str) -> dict:
                             and UPSKILLING_REPORT_NAME_REGEX.match(record_name)
                         ):
                             upskilling_report_seen = True
+                            # v0.1.20: snapshot watermarks at THIS report so the
+                            # recurring trigger measures work done AFTER it.
+                            report_count += 1
+                            turns_at_last_report = assistant_turns
+                            tools_at_last_report = tool_calls
+                            git_since_last_report = False
                             # v0.1.19: capture the report body (the memory_write
                             # `content`) so the Stop hook can persist it on disk.
                             _rc = tool_input.get("content")
@@ -226,6 +248,7 @@ def _scan_session_metrics(raw: str) -> dict:
             text_parts.append(content)
             if SUBSTANTIVE_GIT_ACTION_REGEX.search(content):
                 git_action_seen = True
+                git_since_last_report = True
 
         joined = "\n".join(text_parts)
         last_assistant_text = joined  # overwritten each iteration -> last one wins
@@ -238,6 +261,10 @@ def _scan_session_metrics(raw: str) -> dict:
         "upskilling_report_seen": upskilling_report_seen,
         "report_content": report_content,
         "report_name": report_name,
+        "report_count": report_count,
+        "turns_at_last_report": turns_at_last_report,
+        "tools_at_last_report": tools_at_last_report,
+        "git_since_last_report": git_since_last_report,
     }
 
 
@@ -260,11 +287,58 @@ def _is_substantive_boundary(metrics: dict) -> bool:
 
 
 def _warned_marker_path(session_id: str) -> Path:
-    """Per-session marker file. Presence = warning already fired this
-    session; skip to avoid noisy repeated warnings."""
+    """Per-session marker file storing the upskilling-warn watermark (JSON:
+    reports_at_warn + turns_at_warn). v0.1.20: content is a watermark, not a
+    boolean flag — so the trigger can recur per window of new work."""
     cache_dir = Path.home() / ".claude" / "cache"
     safe_id = re.sub(r"[^a-zA-Z0-9_-]+", "_", session_id or "unknown")[:64]
     return cache_dir / f"session-{safe_id}-upskilling-warned"
+
+
+# Re-prompt after this many NEW assistant turns even if no report was emitted, so
+# a session that ignores the warning still gets nudged again (not once-per-session).
+RE_WARN_TURN_INTERVAL = 30
+
+
+def _since_report_metrics(metrics: dict) -> dict:
+    """Metrics for work done SINCE the most recent upskilling report (or since
+    session start if none). Feeding _is_substantive_boundary this delta — rather
+    than whole-session totals — is what makes the trigger RECUR: each report
+    resets the window, and a fresh boundary of new work re-arms the warning.
+    Fixes weeks-long sessions where the end-of-session trigger never fires."""
+    return {
+        "assistant_turns": metrics["assistant_turns"] - metrics.get("turns_at_last_report", 0),
+        "tool_calls": metrics["tool_calls"] - metrics.get("tools_at_last_report", 0),
+        "git_action_seen": bool(metrics.get("git_since_last_report", False)),
+    }
+
+
+def _read_marker(session_id: str) -> dict | None:
+    """Read the JSON watermark, or None if absent/unreadable/legacy-plaintext.
+    A pre-v0.1.20 plaintext marker fails json.loads -> None -> treated as
+    'not yet warned this window' (warns once, then rewrites as JSON)."""
+    try:
+        data = json.loads(_warned_marker_path(session_id).read_text(encoding="utf-8"))
+        return data if isinstance(data, dict) else None
+    except (OSError, json.JSONDecodeError):
+        return None
+
+
+def _write_marker(session_id: str, reports_at_warn: int, turns_at_warn: int) -> None:
+    """Persist the watermark at the moment of a warning. Best-effort."""
+    path = _warned_marker_path(session_id)
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(
+            json.dumps({
+                "reports_at_warn": reports_at_warn,
+                "turns_at_warn": turns_at_warn,
+                "ts": int(time.time()),
+            }),
+            encoding="utf-8",
+        )
+    except OSError:
+        pass
 
 
 def _in_scope(cwd) -> bool:
@@ -423,11 +497,21 @@ def main() -> int:
     # on FULL session, gated by substantive-boundary heuristic + already-warned
     # marker (to avoid noisy repeated warnings on every turn after threshold).
     session_id = data.get("session_id") or ""
-    marker_path = _warned_marker_path(session_id)
+    # v0.1.20 recurring trigger: warn when a fresh substantive boundary of work
+    # has accumulated SINCE the last emitted report, unless we've already warned
+    # for this window (same report count) within RE_WARN_TURN_INTERVAL turns.
+    # Replaces the once-per-session gate so weeks-long sessions self-prompt.
+    _report_count = metrics.get("report_count", 0)
+    _marker = _read_marker(session_id)
+    if _marker is None:
+        _already_warned_window = False
+    else:
+        _same_window = _marker.get("reports_at_warn") == _report_count
+        _turns_since_warn = metrics["assistant_turns"] - int(_marker.get("turns_at_warn", 0) or 0)
+        _already_warned_window = _same_window and _turns_since_warn < RE_WARN_TURN_INTERVAL
     upskilling_violation = (
-        _is_substantive_boundary(metrics)
-        and not metrics["upskilling_report_seen"]
-        and not marker_path.exists()
+        _is_substantive_boundary(_since_report_metrics(metrics))
+        and not _already_warned_window
     )
 
     # Compose findings into one additionalContext if either fires.
@@ -446,19 +530,15 @@ def main() -> int:
     if upskilling_violation:
         context_blocks.append(f"[loom-discipline] {UPSKILLING_WARNING}")
         notes.append(
-            f"upskilling_boundary=True;assistant_turns={metrics['assistant_turns']};"
+            f"upskilling_boundary=True;report_count={_report_count};"
+            f"assistant_turns={metrics['assistant_turns']};"
             f"tool_calls={metrics['tool_calls']};git={metrics['git_action_seen']}"
         )
         action = "upskilling_warned" if not claim_violation else "combined_warned"
-        # Write the marker so we don't repeat on every subsequent Stop in this session.
-        try:
-            marker_path.parent.mkdir(parents=True, exist_ok=True)
-            marker_path.write_text(
-                f"upskilling-warned at session_id={session_id} ts={int(time.time())}\n",
-                encoding="utf-8",
-            )
-        except OSError:
-            pass
+        # Record the watermark (report count + turn count at this warning) so we
+        # don't repeat within the same window until RE_WARN_TURN_INTERVAL more
+        # turns pass or a new report is emitted.
+        _write_marker(session_id, _report_count, metrics["assistant_turns"])
 
     if context_blocks:
         payload = {

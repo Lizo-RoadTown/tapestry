@@ -135,20 +135,55 @@ async def test_discover_walks_projects_then_repos():
 
 @pytest.mark.asyncio
 async def test_discover_soft_fails_to_empty_on_projects_error():
-    with patch("registry_client.httpx.AsyncClient") as mock_client:
+    # A persistent 5xx is retried (cold-start shape) then soft-fails to [].
+    with patch("registry_client.httpx.AsyncClient") as mock_client, patch(
+        "registry_client.asyncio.sleep", new=AsyncMock()
+    ):
         instance = mock_client.return_value.__aenter__.return_value
         instance.get = AsyncMock(return_value=_resp(500, {"detail": "boom"}))
         targets = await registry_client.discover_dynamic_targets(_ENDPOINTS, _AUTH_NO_JWT)
+        assert instance.get.await_count == registry_client._COLD_START_ATTEMPTS
     assert targets == []
 
 
 @pytest.mark.asyncio
 async def test_discover_soft_fails_to_empty_on_transport_error():
-    with patch("registry_client.httpx.AsyncClient") as mock_client:
+    # A persistent transport error is retried then soft-fails to [].
+    with patch("registry_client.httpx.AsyncClient") as mock_client, patch(
+        "registry_client.asyncio.sleep", new=AsyncMock()
+    ):
         instance = mock_client.return_value.__aenter__.return_value
         instance.get = AsyncMock(side_effect=httpx.ConnectError("refused"))
         targets = await registry_client.discover_dynamic_targets(_ENDPOINTS, _AUTH_NO_JWT)
+        assert instance.get.await_count == registry_client._COLD_START_ATTEMPTS
     assert targets == []
+
+
+@pytest.mark.asyncio
+async def test_discover_retries_projects_on_cold_start_then_succeeds():
+    # First /projects call raises (registry asleep); the retry succeeds — the
+    # 6h-cron cold-start case that used to drop the pass to static-core only.
+    projects = {"projects": [{"id": "proj-1", "kind": "dev"}]}
+    repos = {"repos": [{"url": "https://github.com/Lizo-RoadTown/hub", "default_branch": "main"}]}
+    project_calls = {"n": 0}
+
+    async def fake_get(url, *a, **k):
+        if url.endswith("/projects"):
+            project_calls["n"] += 1
+            if project_calls["n"] == 1:
+                raise httpx.ConnectTimeout("cold start")
+            return _resp(200, projects)
+        return _resp(200, repos)
+
+    with patch("registry_client.httpx.AsyncClient") as mock_client, patch(
+        "registry_client.asyncio.sleep", new=AsyncMock()
+    ):
+        instance = mock_client.return_value.__aenter__.return_value
+        instance.get = AsyncMock(side_effect=fake_get)
+        targets = await registry_client.discover_dynamic_targets(_ENDPOINTS, _AUTH_NO_JWT)
+
+    assert [t.repo for t in targets] == ["Lizo-RoadTown/hub"]
+    assert project_calls["n"] == 2  # first attempt raised, second succeeded
 
 
 @pytest.mark.asyncio

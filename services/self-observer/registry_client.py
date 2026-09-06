@@ -24,6 +24,8 @@ scan less than to crash the whole pass.
 """
 from __future__ import annotations
 
+import asyncio
+
 import httpx
 
 from config import (
@@ -70,13 +72,42 @@ def repo_slug_from_url(url: str) -> str | None:
     return f"{parts[-2]}/{parts[-1]}"
 
 
+# Cold-start resilience: a free-tier registry sleeps after ~15 min idle, so on a
+# 6h cron it is reliably asleep at fire time — the first request times out, or
+# Render's edge returns a 5xx while the service wakes. Without a retry the pass
+# falls back to static-core every run (observed 2026-09-06). Mirror
+# memory_client's retry so discovery survives the wake-up; this also lets
+# loom-project-registry run on the free (sleeping) plan instead of a paid warm one.
+_COLD_START_ATTEMPTS = 3        # 1 initial + 2 retries
+_RETRY_DELAY_SECONDS = 5.0
+
+
 async def _fetch_projects(client: httpx.AsyncClient, endpoints: Endpoints) -> list[dict]:
+    """GET /projects, absorbing a cold-start with retries.
+
+    Retries on a transport error (timeout / connection refused) OR a 5xx
+    response — both are how a waking free-tier service presents. A 4xx is a real
+    contract error (not a cold start): logged, not retried. Raises the last
+    transport error if every attempt fails, so the caller soft-fails to
+    static-core.
+    """
     url = f"{endpoints.project_registry_url}/projects"
-    resp = await client.get(url)
-    if resp.status_code != 200:
+    for attempt in range(1, _COLD_START_ATTEMPTS + 1):
+        try:
+            resp = await client.get(url)
+        except httpx.HTTPError:
+            if attempt < _COLD_START_ATTEMPTS:
+                await asyncio.sleep(_RETRY_DELAY_SECONDS)
+                continue
+            raise
+        if resp.status_code == 200:
+            return resp.json().get("projects", [])
+        if resp.status_code >= 500 and attempt < _COLD_START_ATTEMPTS:
+            await asyncio.sleep(_RETRY_DELAY_SECONDS)
+            continue
         print(f"WARN: project-registry GET /projects {resp.status_code}: {resp.text[:200]}")
         return []
-    return resp.json().get("projects", [])
+    return []
 
 
 async def _fetch_repos(
@@ -104,7 +135,10 @@ async def discover_dynamic_targets(
         try:
             projects = await _fetch_projects(client, endpoints)
         except httpx.HTTPError as exc:
-            print(f"WARN: project-registry unreachable, static-core only: {exc}")
+            print(
+                f"WARN: project-registry unreachable after "
+                f"{_COLD_START_ATTEMPTS} attempts, static-core only: {exc!r}"
+            )
             return []
 
         for project in projects:

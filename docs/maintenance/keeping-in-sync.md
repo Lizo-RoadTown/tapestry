@@ -10,7 +10,7 @@ Plugins install **per machine** (user scope), not per repo. Credentials live in 
 
 | Change | What it affects | What to do |
 |---|---|---|
-| **Plugin version bump** (`tapestry-patterns`, `tapestry-discipline`) | Every machine's installed plugin is now behind | On **each machine**: run `scripts/catch-up-machine.ps1`, then **restart Claude Code**. New agents/skills aren't usable until then. |
+| **Plugin version bump** (`tapestry-patterns`, `tapestry-discipline`) | Every machine's installed plugin is now behind | On **each machine**: run `scripts/catch-up-machine.ps1`, then **restart Claude Code**. New agents/skills aren't usable until then. **Also update any project-scoped install** (see the project-scope drift point below) — the script only does user scope. |
 | **New machine** onboarded | Its machine-wide `~/.claude.json` may lack loom-memory, or carry a literal token | Ensure `~/.claude.json` → `mcpServers/loom-memory` → `Authorization` is `Bearer ${TAPESTRY_MEMORY_API_KEY}` (env-ref, never a literal JWT). Run `catch-up-machine.ps1` for plugins. |
 | **New skill or agent** in a plugin | Consumers can't invoke it until they update | Bump the plugin version (the CI guard requires `marketplace.json` == `plugin.json`), then propagate per "Plugin version bump". |
 | **Runtime PR** (`services/`, `engine/`, `infra/migrations/`, `apps/`, `packages/`, `integrations/`) | The change trail | Add a `docs/changelog/` entry in the same PR (the `changelog-entry` skill; the advisory `changelog-check.yml` nudges if missing). |
@@ -23,6 +23,7 @@ Plugins install **per machine** (user scope), not per repo. Credentials live in 
 - **Plugin versions across machines** — `scripts/catch-up-machine.ps1` is the one command that catches a machine up (it refreshes the marketplace catalog, updates both Tapestry plugins, then every other installed plugin). Run it on any machine that's been idle while the marketplace moved forward; restart after.
 - **`ROADMAP.md`** — kept current by the `tapestry-patterns:roadmap-maintenance` agent as work ships; reconcile it when it lags reality.
 - **Per-repo `.mcp.json`** — env-ref loom-memory header, valid JSON, no UTF-8 BOM (a BOM makes Claude Code fail to parse it, silently disabling every MCP server in that repo).
+- **Project-scoped plugin installs** — a plugin can be installed at BOTH user scope and project scope, and **project scope overrides user scope** for a session opened in that repo. `scripts/catch-up-machine.ps1` updates **user scope only**, so a repo with a project-scoped install can silently run an old version even after a catch-up. Check with `claude plugin list` (look for `Scope: project`). Fix per repo, run from inside it: `claude plugin update tapestry-patterns@tapestry --scope project` (and `tapestry-discipline`). To eliminate the drift permanently, `claude plugin uninstall <name>@tapestry --scope project` so the single user-scope install applies everywhere (enablement in `.claude/settings.json` is unversioned and stays). There is no flag to update all scopes at once; user and project scope are handled separately.
 
 ## The mechanisms (what does the propagating)
 

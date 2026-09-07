@@ -5,7 +5,7 @@ description: What the architecture-snapshot automation is, what it captures, whe
 
 The architecture-snapshot automation is one of the more invisible pieces of the discipline stack: it runs at session start, produces a structural picture of your repo, diffs it against the prior baseline, and quietly hands the result to the agent so the agent starts the conversation with a current map of what's been deployed and what changed since last session.
 
-You don't directly interact with it. But two scripts in your `scripts/` directory and one output directory under `docs/` are load-bearing, and if you delete or move them without knowing what they are, the agent loses its architecture awareness at session start.
+You don't directly interact with it. The load-bearing dependency is the `tapestry-patterns` plugin (which holds the canonical snapshot scripts the SessionStart hook runs) plus the output directory under `docs/architecture-snapshots/`. If the plugin isn't installed, the agent loses its architecture awareness at session start.
 
 ## What the diff is for
 
@@ -39,32 +39,25 @@ The snapshot pipeline is **deterministic and shape-agnostic** — it auto-detect
 
 ## Where the work actually happens
 
-The thing you have in your repo is NOT the real script. It's a thin wrapper:
-
-```
-your-project/scripts/architecture_snapshot.py  ← thin wrapper (~50 lines)
-your-project/scripts/architecture_diff.py       ← thin wrapper (~50 lines)
-```
-
-Each wrapper looks up the canonical implementation in the `tapestry-patterns` plugin and dispatches to it with your repo root as an argument. The canonical bodies live at:
+The SessionStart hook runs the **canonical** snapshot scripts straight from the `tapestry-patterns` plugin — it resolves them in the plugin (cache, sibling checkout, or monorepo) and runs them with your repo root passed as `--repo-root`. It does **not** run a per-repo script. The canonical bodies live at:
 
 ```
 ~/.claude/plugins/cache/tapestry/tapestry-patterns/<version>/scripts/architecture_snapshot.py
 ~/.claude/plugins/cache/tapestry/tapestry-patterns/<version>/scripts/architecture_diff.py
 ```
 
-This is the Pillar 1 discipline (ONE pattern, ONE home) applied to the snapshot scripts: every project shares the same canonical implementation, so when the canonical evolves, every project gets the improvement on next pull. The per-project wrappers exist only so existing callers (the SessionStart hook, CI, manual `python scripts/architecture_snapshot.py` invocation) keep working — they're a routing layer, not a copy.
+This is the Pillar 1 discipline (ONE pattern, ONE home): every project shares the same canonical implementation, so when it evolves, every project gets the improvement on next plugin update. A repo *may* also keep thin `scripts/architecture_*.py` wrappers for manual or CI runs, but the SessionStart hook does not need or use them — installing `tapestry-patterns` is the only requirement.
 
-If the canonical isn't found, the wrapper writes a clear error pointing you to install the patterns plugin: `/plugin install tapestry-patterns@tapestry`.
+If the plugin can't be resolved, the hook logs `patterns_scripts_unresolved` and proceeds without a snapshot. Install it with `/plugin install tapestry-patterns@tapestry`.
 
 ## When the snapshot fires
 
 The `tapestry-discipline` plugin's `SessionStart` hook does this on every new conversation:
 
-1. Looks for `scripts/architecture_snapshot.py` in your repo.
-2. If it's missing, logs `snapshot_script_absent` and silently no-ops on the snapshot piece. Session still proceeds. **You lose the architecture context but everything else works.**
-3. If it's present, runs `python scripts/architecture_snapshot.py`. If the script errors, logs the error and proceeds without the snapshot.
-4. If the snapshot succeeded, runs `python scripts/architecture_diff.py` against the most-recent prior snapshot. Diff failure is non-fatal — the new snapshot still exists.
+1. Resolves the canonical snapshot script from the `tapestry-patterns` plugin.
+2. If the plugin can't be resolved, logs `patterns_scripts_unresolved` (or `canonical_snapshot_script_absent` if the plugin is present but the script is missing) and no-ops on the snapshot piece. Session still proceeds. **You lose the architecture context but everything else works.**
+3. Otherwise runs `python <canonical_snapshot> --repo-root <your repo>`. On error it logs `snapshot_script_error` and proceeds without the snapshot.
+4. If the snapshot succeeded, runs the canonical diff script (also with `--repo-root`) against the most-recent prior snapshot. Diff failure is non-fatal — the new snapshot still exists.
 5. If both succeeded, the hook bundles the latest `-narrative.md` (if present) or the `-diff.md` as additional context for the conversation.
 
 The whole pipeline takes 1-3 seconds on a typical repo. It's bounded by a timeout in the hook so it can't hang your session indefinitely.
@@ -81,23 +74,17 @@ Two reasons:
 
 | If you delete or move | The pipeline... | The session... |
 |---|---|---|
-| `scripts/architecture_snapshot.py` | Detects absence, logs `snapshot_script_absent`, no-ops. | Loses snapshot + diff context. Proceeds normally otherwise. |
-| `scripts/architecture_diff.py` | Snapshot still runs; diff step is skipped. | Has the snapshot but no diff against prior baseline. |
 | `docs/architecture-snapshots/` directory | First post-deletion snapshot recreates the directory. Diff has nothing to compare against (treated as "first ever snapshot"). | Loses historical record. Going forward, the system rebuilds. |
-| The canonical scripts in the `tapestry-patterns` plugin cache | Wrapper falls through every fallback path and writes an error. | Hook logs the error and proceeds without snapshot context. |
-| The `tapestry-patterns` plugin uninstalled entirely | Wrapper can't find any canonical; errors. | Same as above. Install: `/plugin install tapestry-patterns@tapestry`. |
+| The `tapestry-patterns` plugin uninstalled (or its cache scripts deleted) | Hook can't resolve the canonical; logs `patterns_scripts_unresolved` / `canonical_snapshot_script_absent`. | Loses snapshot + diff context. Install: `/plugin install tapestry-patterns@tapestry`, then restart. |
+| Per-repo `scripts/architecture_*.py` wrappers (if you keep any) | No effect on the SessionStart hook (it uses the plugin canonical); only manual/CI calls to the wrapper break. | Session snapshot unaffected. |
 
 Each of these is a one-line silent loss. The agent doesn't crash. It just stops seeing the architecture.
 
 ## How to set it up
 
-Two thin wrappers + one output directory. Total: under 200 lines, all boilerplate.
-
-The canonical pattern is documented in a real consuming project's PR (commit `2325e67`). Copy the two wrapper files from any existing repo that has them — the reference implementations live in the platform beta repo's `scripts/architecture_*.py` — then commit the empty `docs/architecture-snapshots/` directory with a `.gitkeep`.
+There's nothing to add to your repo. Install the `tapestry-patterns` plugin (`/plugin install tapestry-patterns@tapestry`), enable `tapestry-discipline`, and restart — the SessionStart hook runs the canonical snapshot from the plugin against your repo root. Commit an empty `docs/architecture-snapshots/` (with a `.gitkeep`) if you want the output tracked from the first run.
 
 First run produces the first snapshot. From there, every session adds another and diffs against the prior.
-
-If you don't have the canonical scripts available (`tapestry-patterns` plugin not installed): `/plugin install tapestry-patterns@tapestry`, then restart the project's Claude Code session.
 
 ## How to verify it's working
 
@@ -109,14 +96,14 @@ ls docs/architecture-snapshots/ | tail -5
 
 You should see at least one set of `<timestamp>-snapshot.json/md` files dated to your current session. If they're missing, the SessionStart hook isn't running the pipeline. See [Recover from common failures](/how-to/recover-from-common-failures/) for the diagnosis.
 
-You can also run the snapshot manually any time:
+You can also run the snapshot manually any time — if your repo keeps the optional wrappers:
 
 ```sh
 python scripts/architecture_snapshot.py
 python scripts/architecture_diff.py
 ```
 
-If the wrapper exits 127 with "canonical architecture_snapshot.py not found", install the patterns plugin.
+If the wrapper reports "canonical architecture_snapshot.py not found", install the `tapestry-patterns` plugin. (The SessionStart hook doesn't use these wrappers — it runs the plugin's canonical directly.)
 
 ## Related
 

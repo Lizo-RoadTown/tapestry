@@ -25,7 +25,7 @@ It also serves as a **cross-agent channel**. A memory written by the agent in yo
 
 ## What ends up in memory
 
-Six categories of content accumulate over time. You don't author these directly — the agent writes them in response to specific events. Your role is to recognize what each type is when you see it surfaced at session start, and to flag the agent when something durable should be saved.
+Ten categories of content accumulate over time. You don't author these directly — the agent writes them in response to specific events. Your role is to recognize what each type is when you see it surfaced at session start, and to flag the agent when something durable should be saved.
 
 | Type | What goes here | Triggered by |
 |---|---|---|

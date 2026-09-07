@@ -64,6 +64,7 @@ Newest first. (Older history predating the trail lives in `import-map.md` and gi
 
 | Date | Kind | Change | PRs |
 |---|---|---|---|
+| 2026-09-06 | fix | [Upskilling audit re-prompts per window, not once per session](2026-09-06-periodic-upskilling-trigger.md) | this PR |
 | 2026-09-06 | fix | [self-observer: retry registry discovery through a cold start](2026-09-06-self-observer-registry-cold-start-retry.md) | this PR |
 | 2026-09-05 | chore | [Keeping-in-sync maintenance checklist](2026-09-05-keeping-in-sync-doc.md) | #168 |
 | 2026-09-05 | migration | [Policy service migrated from the-loom](2026-09-05-policy-service-migration.md) | #166 |

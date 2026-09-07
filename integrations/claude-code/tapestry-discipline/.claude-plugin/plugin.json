@@ -1,7 +1,7 @@
 {
   "name": "tapestry-discipline",
   "description": "Tapestry's Claude Code discipline plugin. Auto-injects PROBE-first behavior, file:line citation enforcement, dev-tooling-vs-runtime distinction, and friction-as-memory writing for Claude Code sessions in any Tapestry-consuming project. The 4 hooks (SessionStart, UserPromptSubmit, PreToolUse, Stop) cover the session lifecycle: SessionStart auto-recalls top-N memories from the loom-memory MCP and runs the architecture-snapshot pipeline; UserPromptSubmit injects PROBE reminders; PreToolUse audits write/edit args; Stop checks for the upskilling report and runs the Path A observer (parses transcripts + counts skill invocations + POSTs candidates to the architecture-registry as sessions_seen crosses thresholds). Scope gate honors LOOM_PROJECT_ID in .env (per-project opt-in) plus cwd-substring allowlist. Every hook emits an OTLP log to the configured Grafana Cloud endpoint; see the OTel coordination contract at https://tapestry-khaki.vercel.app/reference/otel-coordination-contract/ for the attribute schema.",
-  "version": "0.1.19",
+  "version": "0.1.20",
   "author": {
     "name": "Liz Osborn",
     "url": "https://github.com/Lizo-RoadTown"

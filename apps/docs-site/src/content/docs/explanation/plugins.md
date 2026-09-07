@@ -17,17 +17,17 @@ For the file-by-file reference, see [Load-bearing files](/reference/load-bearing
 
 You will likely enable all three for any non-trivial Tapestry-consuming project.
 
-The two `tapestry-*` plugins were consolidated into the tapestry monorepo 2026-06-22; the prior names + marketplaces (`tapestry-discipline@tapestry`, `tapestry-patterns@tapestry`) remain available during the transition window. New projects should use the `tapestry-*` names.
+The two `tapestry-*` plugins were consolidated into the tapestry monorepo 2026-06-22 (renamed from `loom-discipline@lizo-loom` and `liz-patterns@lizo-skills`). The prior install names still work during the transition window; new projects should use the `tapestry-*` names.
 
 ## `tapestry-discipline@tapestry` — the discipline source
 
 **What it does:**
-- Declares the `loom-memory` MCP server in its own `plugin.json`. Enabling the plugin = wiring the MCP.
+- Declares two MCP servers in its own `plugin.json` — `loom-memory` and `tapestry-docs`. Enabling the plugin = wiring both.
 - Installs four hooks that fire at specific Claude Code lifecycle events:
-  - `SessionStart` — calls the memory REST endpoint `/v1/recall` for top-N memories tagged for your project, injects them as `additionalContext`. Also runs the architecture-snapshot pipeline if your repo has the wrappers. See [Architecture snapshots](/explanation/architecture-snapshots/).
+  - `SessionStart` — calls the memory REST endpoint `/v1/recall` for top-N memories tagged for your project, injects them as `additionalContext`. Also runs the architecture-snapshot pipeline — the canonical script from the `tapestry-patterns` plugin (no per-repo script needed). See [Architecture snapshots](/explanation/architecture-snapshots/).
   - `UserPromptSubmit` — injects the PROBE-discipline reminder at the top of every one of your messages.
   - `PreToolUse` (matched against `Edit|Write|MultiEdit`) — runs a boundary check that asks the agent to confirm dual-mode semantics for edits to platform services.
-  - `Stop` — checks whether a substantive-work threshold was crossed (git action / 10+ tool calls / 30+ turns) without an upskilling report. If so, surfaces a loud warning.
+  - `Stop` — checks whether a substantive-work threshold was crossed (a git action, OR 10+ tool calls AND 3+ turns, OR 30+ turns) without an upskilling report. If so, surfaces a loud warning. (Since 0.1.20 it re-checks per window of new work, not once per session.)
 - Honors `LOOM_PROJECT_ID` as the scope gate (v0.1.12+) so hooks only fire in projects that explicitly opted in.
 
 **What you'd lose without it:** every behavior listed above. The agent reverts to default Claude Code with no memory, no PROBE reminder, no boundary check, no upskilling audit.
@@ -45,12 +45,12 @@ The two `tapestry-*` plugins were consolidated into the tapestry monorepo 2026-0
 ## `tapestry-patterns@tapestry` — the canonical patterns
 
 **What it does:**
-- Hosts the reusable agents and skills (`documentation`, `deep-research-pattern`, `next-actions-planning`, `infrastructure-mapping`, `agentic-skill-design`, `proposal-authoring`, and others).
-- Hosts the canonical implementations of the architecture-snapshot scripts that your project's `scripts/architecture_snapshot.py` thin wrappers dispatch to.
+- Hosts the reusable agents and skills (`documentation`, `deep-research-pattern`, `next-actions-planning`, `roadmap-maintenance`, `infrastructure-mapping`, `agentic-skill-design`, `proposal-authoring`, `changelog-entry`, and others).
+- Hosts the canonical architecture-snapshot scripts that the `tapestry-discipline` SessionStart hook runs directly (with `--repo-root`); no per-repo wrapper is involved.
 - Provides the `tapestry-patterns:<name>` invocation surface so any project can invoke a canonical pattern by name.
 
 **What you'd lose without it:**
-- The architecture-snapshot pipeline can't run (wrappers can't find the canonical → write an error → SessionStart hook proceeds without the snapshot).
+- The architecture-snapshot pipeline can't run (the SessionStart hook can't resolve the canonical script → logs `patterns_scripts_unresolved` → proceeds without the snapshot).
 - Canonical patterns aren't invokable by name. You'd have to copy-paste skill prompts manually.
 
 **Where it lives on disk:** `~/.claude/plugins/cache/tapestry/tapestry-patterns/<version>/`.
@@ -85,7 +85,7 @@ flowchart TB
 
   start --> ldsess["tapestry-discipline<br/>SessionStart hook"]
   ldsess --> recall["calls v1/recall on loom-memory MCP"]
-  ldsess --> snapshot["runs architecture_snapshot.py<br/>(wrapper to tapestry-patterns)"]
+  ldsess --> snapshot["runs canonical snapshot script<br/>from tapestry-patterns"]
   recall --> inject1["injects memories as additionalContext"]
   snapshot --> inject2["injects snapshot diff narrative as additionalContext"]
   inject1 --> ready["Agent ready with full context"]
@@ -142,10 +142,9 @@ Shows all plugins enabled for the current project. To see what's INSTALLED but m
 
 ```sh
 ls ~/.claude/plugins/cache/tapestry/
-ls ~/.claude/plugins/cache/tapestry/
 ```
 
-Each plugin directory contains version subdirectories (e.g., `tapestry-discipline/0.1.15/`). Multiple versions can coexist; Claude Code uses whichever the marketplace currently points at.
+Each plugin directory contains version subdirectories (e.g., `tapestry-discipline/<version>/`). Multiple versions can coexist; Claude Code uses whichever the marketplace currently points at.
 
 ### Updating
 

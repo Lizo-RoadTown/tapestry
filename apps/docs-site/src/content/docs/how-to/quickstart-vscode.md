@@ -26,17 +26,16 @@ Get a new project wired into Tapestry in about 5 minutes.
 **3. In the integrated terminal (or any terminal at your project root):**
 
 ```sh
-tapestry onboard my-project-name
+tapestry onboard --slug my-project-name --registry-url <your-project-registry-url>
 ```
 
-This single command writes:
+`--slug` is required. This single command **registers the project with the Project Registry first** — this is mandatory: if no registry is reachable it aborts and writes nothing, and the default registry URL is a placeholder, so pass `--registry-url` (or set `TAPESTRY_REGISTRY_URL`). Then it writes:
 
-- `.env` with `LOOM_PROJECT_ID=my-project-name` + shared OTel + API-key blocks
-- `.mcp.json` declaring the `loom-memory` MCP server
-- `.project-intelligence/my-project-name/` with `agent-profile.json`, `project-context.json`, `observatory-config.json`
+- `.env` with `LOOM_PROJECT_ID` (the registry-assigned id) + the shared `OTEL_*` block
+- `.mcp.json` declaring the `loom-memory` MCP server (with the `Bearer ${TAPESTRY_MEMORY_API_KEY}` header)
+- `.project-intelligence/` (flat) with `agent-profile.json`, `project-context.json`, `observatory-config.json` (plus `local-skills/` + `lessons-learned/` subdirs)
 - `.claude/settings.json` enabling both tapestry plugins
-
-It also registers the project with the Project Registry if it's reachable.
+- a starter `CLAUDE.md` skeleton, `.gitignore`, and a `docs/` + `skills/` tree
 
 **4. Reload VS Code:** `Cmd+Shift+P` → `Developer: Reload Window`.
 
@@ -54,8 +53,8 @@ If neither appears, see [Recover from common failures](/how-to/recover-from-comm
 - Install the Claude Code extension itself (do that from the VS Code marketplace)
 - Run the plugin installs (those happen inside Claude Code chat — step 2 above)
 - Reload VS Code (manual — step 4 above)
-- Write `CLAUDE.md` (recommended but project-specific; author it yourself)
-- Add `scripts/architecture_snapshot.py` wrappers (optional; the SessionStart hook silently skips the snapshot if they're absent)
+- Author your project-specific `CLAUDE.md` content (it seeds a starter skeleton — edit it to fit your project)
+- Add per-repo snapshot scripts (not needed — the SessionStart hook runs the canonical snapshot script from the `tapestry-patterns` plugin)
 
 For the comprehensive walkthrough including those items, see [Set up a new project](/how-to/set-up-a-new-project/).
 

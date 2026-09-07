@@ -10,9 +10,9 @@ The Observer is the component that produces patterns from signals. Nothing else 
 A component with two runtime modes:
 
 - **Scheduled cron** — runs every 6 hours, scans your repos for category drift, writes synthesis memos + candidate findings.
-- **On-demand subagent** — invoked from a Claude Code session via `Agent({subagent_type: "liz-patterns:drift-watcher"})` or `liz-patterns:agentic-upskilling` to interpret a single project's recent activity.
+- **On-demand subagent** — invoked from a Claude Code session via `Agent({subagent_type: "tapestry-patterns:drift-watcher"})` or `tapestry-patterns:agentic-upskilling` to interpret a single project's recent activity.
 
-Lives at `services/self-observer/` (Render cron `self-observer`).
+Lives at `services/self-observer/` (Render cron `tapestry-self-observer-cron` — `autoDeploy:false`, so it runs only after the operator provisions its secrets and enables it).
 
 ## Why it exists
 
@@ -25,9 +25,9 @@ The Observer is also why intent is observer-derived rather than emitted as a tel
 ```mermaid
 flowchart TB
     T[Telemetry pipeline<br/>OTLP/HTTP + hooks.jsonl]
-    M[Memory MCP<br/>memory-mcp]
+    M[Memory MCP<br/>loom-agent-context]
     O[Observer<br/>self-observer cron + subagent]
-    A[Architecture Registry<br/>durable structural facts]
+    A[Architecture Registry<br/>candidate store]
     C[Candidate Registry<br/>pre-promotion patterns]
     OBSY[Observatory<br/>lens-equipped surface]
     T -->|signals| O
@@ -45,26 +45,27 @@ The Observer reads from telemetry + memory and writes to the Architecture + Cand
 
 The Observer is platform-level. You stand it up as part of your deployment; your projects consume its output.
 
-**Consuming the existing deployment (default):** nothing to install. The Observer is already running as the `self-observer` Render cron. Patterns it produces show up in the Architecture + Candidate registries and surface in the Observatory.
+**Consuming the existing deployment (default):** nothing to install. The Observer runs as the `tapestry-self-observer-cron` Render cron (operator-enabled). Patterns it produces show up in the Architecture + Candidate registries and surface in the Observatory.
 
 **Self-hosting the Observer:**
 
 1. Copy `services/self-observer/` into your Tapestry deployment.
-2. Deploy as a Render cron — schedule from `render.yaml` (search for `self-observer`).
+2. Deploy as a Render cron — schedule from `render.yaml` (search for `tapestry-self-observer-cron`).
 3. Required env vars (see `services/self-observer/config.py`):
-   - `MEMORY_BASE_URL` — points to your Memory MCP
-   - `CANDIDATE_REGISTRY_URL` — points to your Candidate Registry
-   - `ARCHITECTURE_REGISTRY_URL` — points to your Architecture Registry
-   - `OTEL_EXPORTER_OTLP_ENDPOINT` + `OTEL_EXPORTER_OTLP_HEADERS` — for emitting the observer's own runtime telemetry
-   - `GITHUB_TOKEN` — for scanning your repos
+   - `LOOM_MEMORY_URL` — points to your Memory MCP
+   - `TAPESTRY_ARCHITECTURE_REGISTRY_URL` (or `LOOM_ARCHITECTURE_REGISTRY_URL`) — where it POSTs candidates
+   - `TAPESTRY_REGISTRY_URL` — the project-registry, for fleet discovery
+   - `TAPESTRY_PROJECT_ID` — the project row its own candidates file under
+   - `OBSERVER_JWT` — Bearer to the Tapestry services (leave empty for self-host)
+   - `GITHUB_TOKEN` — for scanning your (private) repos
 4. The cron's signal-rule definitions live in `services/self-observer/signal_rules.py`; tune them to your project set.
 
 See [Platform dependencies](/reference/platform-dependencies/) for the full Render + Grafana setup.
 
 ## Verify
 
-- **The cron ran recently:** Render dashboard → `self-observer` → Logs → look for a synthesis memo emission within the last 6h.
-- **The Observer is producing candidates:** query the Candidate Registry — `curl https://your-registry-host.example.com/candidates?limit=5` should return recent entries with `derivation_method` set to `observer`.
+- **The cron ran recently:** Render dashboard → `tapestry-self-observer-cron` → Logs → look for a `scan complete: ...` line within the last 6h.
+- **The Observer is producing candidates:** query the registry — `curl https://your-registry-host.example.com/candidates?limit=5` should return recent entries with `source_path` set to `path_b` (evidence `kind: self_observation`).
 - **Memory contains synthesis memos:** call `memory_recall` with the platform's standard observer tag (e.g., `["self-observer-synthesis"]`); recent memos should return.
 - **The Observatory surfaces Observer findings:** open the Observatory console; the Observer lens should show non-zero findings if the cron has run.
 
@@ -72,8 +73,8 @@ See [Platform dependencies](/reference/platform-dependencies/) for the full Rend
 
 | Symptom | Likely cause | Where to look |
 |---|---|---|
-| Observatory cards look empty | Cron hasn't run since the last reset, or no signals to interpret | Render logs for `self-observer`; if cron is fine, check that telemetry is flowing (see [Telemetry](/systems/telemetry/)) |
-| Candidates not appearing in registry | Cron is running but registry POST is failing | Check the `self-observer` cron's stdout for HTTP errors against `CANDIDATE_REGISTRY_URL` |
+| Observatory cards look empty | Cron hasn't run since the last reset, or no signals to interpret | Render logs for `tapestry-self-observer-cron`; if cron is fine, check that telemetry is flowing (see [Telemetry](/systems/telemetry/)) |
+| Candidates not appearing in registry | Cron is running but registry POST is failing | Check the `tapestry-self-observer-cron` stdout for HTTP errors against `TAPESTRY_ARCHITECTURE_REGISTRY_URL` |
 | Synthesis memo missing | Memory MCP unreachable | See [Memory](/systems/memory/) troubleshoot table |
 | On-demand subagent never returns | `liz-patterns` or `tapestry-patterns` plugin not installed | `/plugin list` in Claude Code; reinstall if missing |
 | Cron firing but no findings | `signal_rules.py` thresholds too high for the project's signal volume | Lower the thresholds; re-run; check whether findings appear |

@@ -3,20 +3,19 @@ title: Your first project
 description: What `tapestry onboard` actually did, what files appeared in your repo, and what to expect when you start your first Claude Code session. Run this page after the Quickstart and before Verify it worked.
 ---
 
-You ran `tapestry onboard my-project`. Here's what landed and what comes next.
+You ran `tapestry onboard --slug my-project`. Here's what landed and what comes next.
 
 ## Files written
 
-`tapestry onboard` is idempotent and writes (or merges into) four files:
+`tapestry onboard` **registers your project with the Project Registry first** — this is mandatory: if no registry is reachable it aborts and writes nothing (the default registry URL is a placeholder, so pass `--registry-url` or set `TAPESTRY_REGISTRY_URL`). Then, idempotently, it writes (or merges into) several files:
 
 | File | What it holds | Why |
 |---|---|---|
-| `.env` | `LOOM_PROJECT_ID=my-project` + shared OTel + API-key blocks | The project's identity tag — everything memory and telemetry scope by this. |
-| `.mcp.json` | The `loom-memory` MCP server declaration | Wires the [Memory](/systems/memory/) MCP into every Claude Code session in this repo. |
-| `.project-intelligence/my-project/` | `agent-profile.json`, `project-context.json`, `observatory-config.json` | Per-project intelligence files the Observer + Observatory read. |
+| `.env` | `LOOM_PROJECT_ID` (the registry-assigned id) + the shared `OTEL_*` block | The project's identity tag — everything memory and telemetry scope by this. |
+| `.mcp.json` | The `loom-memory` MCP server declaration (with the `Bearer ${TAPESTRY_MEMORY_API_KEY}` header) | Wires the [Memory](/systems/memory/) MCP into every Claude Code session in this repo. |
+| `.project-intelligence/` (flat) | `agent-profile.json`, `project-context.json`, `observatory-config.json` + `local-skills/` + `lessons-learned/` | Per-project intelligence files the Observer + Observatory read. |
 | `.claude/settings.json` | Both `tapestry-discipline` + `tapestry-patterns` plugins enabled | So the discipline plugin auto-loads its hooks and `tapestry-patterns` auto-loads its agents + skills. |
-
-It also registers your project with the Project Registry if the registry is reachable. If it isn't, the local files still write — registration retries on the next `tapestry onboard` run.
+| `CLAUDE.md`, `.gitignore`, `docs/`, `skills/` | A starter skeleton | So the project has the standard shape from day one; edit `CLAUDE.md` to fit. |
 
 ## What changes in Claude Code
 
@@ -36,7 +35,7 @@ Onboarding makes your project **observable**. It does not install a per-project 
 
 1. [Verify it worked](/start/verify-it-worked/) — four quick checks that the wiring landed.
 2. [First Observatory visit](/start/first-observatory-visit/) — open the dashboard and learn what to look for.
-3. (Optional) Write a `CLAUDE.md` in your project root. Onboarding does not author one — it's project-specific. See the example in the project's CLAUDE.md.
+3. Edit the starter `CLAUDE.md` onboarding seeded in your project root to fit your project (it's a skeleton, not a contract).
 
 ## Related
 

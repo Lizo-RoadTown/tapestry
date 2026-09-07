@@ -1,6 +1,6 @@
 # `services/self-observer/`
 
-**Status:** Migrated into Tapestry from the-loom legacy source (CORE DIRECTIVE 2 Lift/Refactor). Stands alone — GitHub API scan + HTTP POST only, no runtime dependency on the-loom or Make_Skills. Not yet deployed from Tapestry; a staging cron block is drafted in `infra/deploy/render.yaml` (`tapestry-self-observer-cron-staging`, `autoDeploy: false`).
+**Status:** Migrated into Tapestry from the-loom legacy source (CORE DIRECTIVE 2 Lift/Refactor). Stands alone — GitHub API scan + HTTP POST only, no runtime dependency on the-loom or Make_Skills. **Deployed and live** as the operator-enabled Render cron `tapestry-self-observer-cron` (defined in `infra/deploy/render.yaml`, `autoDeploy: false` — created + enabled by the operator 2026-09-06; first live scan covered 12 repos).
 
 ## What this is
 

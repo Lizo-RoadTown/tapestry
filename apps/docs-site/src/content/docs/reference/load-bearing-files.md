@@ -22,13 +22,16 @@ For how the pieces fit together conceptually, see [The discipline stack](/explan
   "mcpServers": {
     "loom-memory": {
       "type": "http",
-      "url": "https://your-memory-host.example.com/mcp/memory/"
+      "url": "https://your-memory-host.example.com/mcp/memory/",
+      "headers": {
+        "Authorization": "Bearer ${TAPESTRY_MEMORY_API_KEY}"
+      }
     }
   }
 }
 ```
 
-**Why it exists:** explicit per-project MCP wiring. If the `tapestry-discipline` plugin's own MCP declaration fails to load for any reason, this file ensures the memory tools remain available.
+**Why it exists:** explicit per-project MCP wiring. The `Authorization` header is required — the memory server returns 401 without it (`TAPESTRY_MEMORY_API_KEY` is read from your environment). If the `tapestry-discipline` plugin's own MCP declaration fails to load for any reason, this file ensures the memory tools remain available.
 
 **If missing:** the agent has no `memory_recall`/`memory_write` tools UNLESS the discipline plugin successfully declares them (it usually does, but defense-in-depth fails when both layers fail).
 
@@ -86,16 +89,17 @@ LOOM_PROJECT_ID=your-project-id
 
 **Gitignore status:** ALWAYS gitignored. Never commit. Contains secrets.
 
-### `.project-intelligence/<project-id>/`
+### `.project-intelligence/`
 
-**Location:** `.project-intelligence/your-project-id/` at repo root.
+**Location:** `.project-intelligence/` at repo root — **flat**, no per-project-id subdirectory (`tapestry init` writes the files directly here).
 
 **What it is:** per-project agent configuration directory. Contains:
 - `agent-profile.json` — role, memory tag, discipline rules
 - `project-context.json` — what this project is about
 - `observatory-config.json` — what events to log, what triggers candidates
-- `workflow-candidates/` — local longitudinal state for skill candidates the agent surfaces
-- `promotion-candidates/` — outbox for items the agent thinks should become durable structure
+- `local-skills/` — local skill candidates (created by `tapestry init`)
+- `lessons-learned/` — captured lessons (created by `tapestry init`)
+- `workflow-candidates/` — local longitudinal state for skill candidates the observer surfaces
 
 **Why it exists:** the discipline plugin is generic across all projects. This directory tells it what specialization to apply for THIS project (role, observability, candidate triggers).
 
@@ -115,23 +119,21 @@ LOOM_PROJECT_ID=your-project-id
 
 **Gitignore status:** committed.
 
-### `scripts/architecture_snapshot.py` and `scripts/architecture_diff.py`
+### `scripts/architecture_snapshot.py` and `scripts/architecture_diff.py` (optional)
 
-**Location:** `scripts/` at repo root.
+**Location:** `scripts/` at repo root — **optional**.
 
-**What it is:** snapshot pipeline scripts that produce a structural snapshot of your repo and a diff against the prior baseline. For Tapestry-consuming projects, these should be thin wrappers that dispatch to the canonical implementations in the `tapestry-patterns` plugin.
+**What it is:** thin wrappers that dispatch to the canonical snapshot scripts in the `tapestry-patterns` plugin, for **manual or CI** runs. The `tapestry-discipline` SessionStart hook does **not** use them — it runs the plugin's canonical scripts directly (with `--repo-root`).
 
-**Why it exists:** the `tapestry-discipline` plugin's SessionStart hook runs these to inject the architecture context into the session's initial state. Without them, the hook silently no-ops on the snapshot piece.
+**Why it exists:** convenience for running the snapshot by hand outside a Claude Code session. Not required for the automated pipeline.
 
-**If missing:** SessionStart still fires (auto-recall still happens) but no architecture context is added. The agent loses structural awareness at session start.
+**If missing:** no effect on the SessionStart snapshot (that depends on the `tapestry-patterns` plugin, not these wrappers). Only manual/CI invocations that call the wrappers would break.
 
-**Gitignore status:** committed (they're code).
+**Gitignore status:** committed if present (they're code).
 
-**Reference:** the wrapper pattern as applied in a real consuming project.
+### `.project-intelligence/workflow-candidates/`
 
-### `.project-intelligence/<project-id>/workflow-candidates/`
-
-**Location:** `.project-intelligence/<project-id>/workflow-candidates/` at repo root.
+**Location:** `.project-intelligence/workflow-candidates/` at repo root (flat, not under a per-project-id subdirectory).
 
 **What it is:** per-project longitudinal state for the Path A observer (see [The observer](/explanation/the-observer/)). One JSON file per skill the observer has surfaced in any session; each file tracks cumulative `sessions_seen`, the most-recent `status`, and the prior session IDs where the skill appeared.
 
@@ -165,7 +167,7 @@ LOOM_PROJECT_ID=your-project-id
 
 **If down:** all memory operations fail. CORE DIRECTIVE 1 says the agent should HALT and report when the MCP is unavailable. In practice, sessions can still PROCEED but the operator should know they're degraded.
 
-**Health check:** `curl https://your-memory-host.example.com/health` returns `{"status":"ok","service":"memory-mcp"}`.
+**Health check:** `curl https://your-memory-host.example.com/health` returns `{"status":"ok","service":"loom-agent-context"}`.
 
 ### The `tapestry-discipline` plugin (cached locally per machine)
 
@@ -179,13 +181,13 @@ LOOM_PROJECT_ID=your-project-id
 
 **Install:** `/plugin marketplace add Lizo-RoadTown/tapestry`, then `/plugin install tapestry-discipline@tapestry`.
 
-**Current version:** check `~/.claude/plugins/cache/tapestry/tapestry-discipline/` for the latest cached version. v0.1.13+ honors `LOOM_PROJECT_ID` as the scope gate; v0.1.12+ added the explicit `mcpServers.loom-memory` declaration.
+**Current version:** check `~/.claude/plugins/cache/tapestry/tapestry-discipline/` for the latest cached version. Since v0.1.12 it honors `LOOM_PROJECT_ID` as the scope gate; it declares the `loom-memory` + `tapestry-docs` MCP servers.
 
 ### The `tapestry-patterns` plugin (cached locally per machine)
 
 **Location:** `~/.claude/plugins/cache/tapestry/tapestry-patterns/<version>/`.
 
-**What it is:** the canonical patterns plugin. Contains the reusable agents and skills (`documentation`, `deep-research-pattern`, `next-actions-planning`, `infrastructure-mapping`, etc.) AND the canonical architecture-snapshot scripts that consuming-project wrappers dispatch to.
+**What it is:** the canonical patterns plugin. Contains the reusable agents and skills (`documentation`, `deep-research-pattern`, `next-actions-planning`, `roadmap-maintenance`, `infrastructure-mapping`, `changelog-entry`, etc.) AND the canonical architecture-snapshot scripts the `tapestry-discipline` SessionStart hook runs directly.
 
 **Why it exists:** Pillar 1 of the MANIFESTO — "one pattern, one home, available everywhere via reference." Skills live in the plugin, not duplicated in every repo.
 
@@ -207,7 +209,7 @@ LOOM_PROJECT_ID=your-project-id
 
 **What it is:** the cross-repo drift scanner. Walks registered repos via GitHub API, applies signal rules (agent / tool / skill / orphan), emits drift candidates to the architecture-registry, writes a synthesis memo to the loom-memory MCP as `self_observer_synthesis_latest`. See [The observer](/explanation/the-observer/).
 
-**Health check:** read `self_observer_synthesis_latest` from the MCP. Should be within the last 6 hours. If older, check the Render dashboard for the `self-observer` service.
+**Health check:** read `self_observer_synthesis_latest` from the MCP. Should be within the last 6 hours. If older, check the Render dashboard for the `tapestry-self-observer-cron` service.
 
 **If down:** Pillar-1 violations (duplicates of canonical patterns in non-canonical homes) and cross-repo drift accumulate undetected.
 
@@ -278,7 +280,7 @@ test -f .claude/settings.json && echo "OK: .claude/settings.json" || echo "MISSI
 test -f .env && echo "OK: .env" || echo "MISSING: .env"
 test -d .project-intelligence && echo "OK: .project-intelligence/" || echo "MISSING: .project-intelligence/"
 test -f CLAUDE.md && echo "OK: CLAUDE.md" || echo "MISSING: CLAUDE.md"
-test -f scripts/architecture_snapshot.py && echo "OK: snapshot script" || echo "MISSING: snapshot script"
+test -d ~/.claude/plugins/cache/tapestry/tapestry-patterns && echo "OK: tapestry-patterns (snapshot canonical)" || echo "MISSING: tapestry-patterns plugin (snapshot won't run)"
 echo "=== LOOM_PROJECT_ID ==="
 grep LOOM_PROJECT_ID .env 2>/dev/null || echo "MISSING: LOOM_PROJECT_ID in .env"
 echo "=== Enabled plugins ==="

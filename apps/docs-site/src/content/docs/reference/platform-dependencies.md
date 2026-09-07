@@ -11,7 +11,7 @@ These are the services the Tapestry platform itself depends on. If you're standi
 
 | Service | What it hosts | Why required |
 |---|---|---|
-| **Render** | `memory-mcp` MCP server, `project-registry`, Postgres (`postgres`), the self-observer cron, future migrated services | The hosted-multitenant deployment target for every backend service. Postgres holds memory records + project registry + candidate registry. The cron emits the synthesis memo every 6h. |
+| **Render** | `loom-agent-context` (Memory MCP), `loom-project-registry`, `loom-architecture-registry`, `loom-policy`, Postgres (`loom-postgres`), the `tapestry-self-observer-cron` | The hosted-multitenant deployment target for every backend service. `loom-postgres` holds memory records + projects + candidates + policy decisions. The cron scans the fleet every 6h. |
 | **Vercel** | `apps/docs-site/` (this site, at [tapestry-khaki.vercel.app](https://tapestry-khaki.vercel.app/)) + `apps/web-dashboard/` (the Project Observatory console, when deployed) | The frontend deployment target. Static docs + the dashboard. |
 | **OpenTelemetry collector** | The OTel transport — receives OTLP traces/logs from the discipline plugin's hooks + future runtime services | The canonical telemetry transport per the [coordination contract](/reference/otel-coordination-contract/). Without it, hook events go to local `hooks.jsonl` only — no cross-machine observability. |
 | **Grafana Cloud** | The dashboards + Loki (logs) + Tempo (traces) + the OTLP gateway | The telemetry destination. Read by the observer (queried for coordination-quality signals); read by the operator (dashboards). |

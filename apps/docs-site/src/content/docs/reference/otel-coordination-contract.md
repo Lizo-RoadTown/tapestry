@@ -78,7 +78,7 @@ Intent. Intent is observer-derived, not telemetry-emitted. Adding intent attribu
 
 ## Source of truth
 
-This page is the operator-facing surface of the contract. The internal architecture spec lives at [`docs/reference/coordination-telemetry-contract.md`](https://github.com/Lizo-RoadTown/tapestry/blob/main/docs/reference/coordination-telemetry-contract.md) in the repo root (Tapestry-agent owned). If the two diverge, the repo-root spec is canonical.
+This page is the authority on the attribute contract. Its internal companion is the [coordination-episode model](https://github.com/Lizo-RoadTown/tapestry/blob/main/docs/reference/coordination-episode-model.md) (`docs/reference/coordination-episode-model.md`), which defines how these attributes roll up into coordination episodes — the meaning layer built on top of this contract.
 
 ## Related
 

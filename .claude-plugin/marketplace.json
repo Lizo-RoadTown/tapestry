@@ -13,7 +13,7 @@
       "name": "tapestry-discipline",
       "source": "./integrations/claude-code/tapestry-discipline",
       "description": "Auto-injects PROBE-first behavior, file:line citation enforcement, dev-tooling-vs-runtime distinction, and friction-as-memory writing for Claude Code sessions in any Tapestry-consuming project. 4 hooks cover the session lifecycle (SessionStart auto-recall + architecture snapshot; UserPromptSubmit PROBE injection; PreToolUse write audit; Stop upskilling check + Path A observer). Registers the loom-memory MCP. Emits OTel telemetry per the coordination contract. Renamed from loom-discipline.",
-      "version": "0.1.19",
+      "version": "0.1.20",
       "author": { "name": "Liz Osborn" },
       "license": "Apache-2.0",
       "category": "discipline",

@@ -26,14 +26,17 @@ Add the servers to a `.vscode/mcp.json` file. Put it in your workspace to share 
     },
     "loom-memory": {
       "type": "http",
-      "url": "https://your-memory-host.example.com/mcp/memory/"
+      "url": "https://your-memory-host.example.com/mcp/memory/",
+      "headers": {
+        "Authorization": "Bearer ${env:TAPESTRY_MEMORY_API_KEY}"
+      }
     }
   }
 }
 ```
 
 - **`tapestry-docs`** runs locally over stdio. If `python` doesn't resolve to the environment where you ran `pip install tapestry-docs-mcp`, use `python3` or an absolute interpreter path instead.
-- **`loom-memory`** is your own deployment. Replace the URL with yours. To use only the docs server, drop the `loom-memory` block entirely.
+- **`loom-memory`** is your own deployment. Replace the URL with yours. It needs a bearer token — set `TAPESTRY_MEMORY_API_KEY` in your environment (the `${env:...}` header reads it). To use only the docs server, drop the `loom-memory` block entirely.
 
 ## Verify
 
@@ -42,7 +45,7 @@ Add the servers to a `.vscode/mcp.json` file. Put it in your workspace to share 
 3. The Tapestry tools — `tapestry_docs_search`, and `memory_recall` / `memory_write` if you wired the memory server — appear in the tools list.
 4. Call `tapestry_docs_search` with a query like `observer`; it should return ranked results.
 
-If the memory tools return 401 or 404, check that your deployment is reachable from your machine and the URL is exact.
+If the memory tools return **401**, the `Authorization` header is missing or `TAPESTRY_MEMORY_API_KEY` isn't set in your environment. A **404** usually means the URL is wrong or the deployment is unreachable.
 
 ## Related
 

@@ -9,16 +9,16 @@ Estimated time: 20–40 minutes for first provisioning, mostly waiting on builds
 
 ## What you'll provision
 
-The Render side hosts five Python web services plus one Postgres instance plus one cron, declared in `render.yaml` (the platform's Blueprint file). The Blueprint is the source of truth — Render reads it and provisions everything declaratively.
+The Render side runs the Python services your projects connect to, declared in `infra/deploy/render.yaml` (the platform's Blueprint file). Two things to know before you start: the current Blueprint is **staging-first** (the production service blocks are commented-out repoint blocks with `autoDeploy:false`), and it does **not** provision Postgres — it **reuses an existing `loom-postgres`**, supplied to each service as a `LOOM_DB_URL` secret (there is no `databases:` block). For a fresh self-host, provision your own Postgres and set `LOOM_DB_URL`.
 
 | Resource | Purpose | Source |
 |---|---|---|
-| `postgres` (managed Postgres) | Backing store for memory records, project registry, candidate registry | `render.yaml` |
-| `memory-mcp` (web service) | The Memory MCP — `memory_read/write/recall/list/search/delete` over HTTP + MCP | `services/agent-context/` |
-| `architecture-registry` | Candidate + Architecture registry endpoints | `services/architecture-registry/` |
-| `policy-service` | Promotion policy evaluator | `services/policy/` |
-| `project-registry` | Project + repo + machine registration | `services/project-registry/` |
-| `self-observer` (cron) | 6-hour scan that interprets signals into candidates | `services/self-observer/` |
+| `loom-postgres` (managed Postgres) | Backing store for memory records, projects, candidates, policy decisions. **Reused, not provisioned by the Blueprint** — supplied via `LOOM_DB_URL`. | existing DB |
+| `loom-agent-context` (web service) | The Memory MCP — `memory_read/write/recall/list/search/delete` over HTTP + MCP | `services/agent-context/` |
+| `loom-architecture-registry` | Candidate + Architecture registry endpoints | `services/architecture-registry/` |
+| `loom-policy` | Promotion-decision audit (records decisions) | `services/policy/` |
+| `loom-project-registry` | Project + repo + machine registration | `services/project-registry/` |
+| `tapestry-self-observer-cron` | 6-hour scan that interprets signals into candidates | `services/self-observer/` |
 
 ## Prerequisites
 
@@ -56,7 +56,7 @@ If the file is valid, the command exits 0. If not, it prints the schema errors s
 
 1. In the Render dashboard, click **New** (top-right) → **Blueprint**. Render's [Infrastructure as Code](https://render.com/docs/infrastructure-as-code) page documents this workflow.
 2. Select the connected `your deployment repo` repo.
-3. Render reads `render.yaml` at the repo root and previews what it will create — five web services + one Postgres + one cron, matching the table above.
+3. Point the Blueprint at `infra/deploy/render.yaml` (it is **not** at the repo root). Render previews what it will create — note it does **not** create Postgres (the Blueprint reuses your existing `loom-postgres` via `LOOM_DB_URL`), and the production service blocks are commented out (staging-first), so a first apply brings up the staging services.
 4. Click **Apply**.
 
 Render builds each service in parallel. First builds take 3–8 minutes per service (the Postgres comes up faster, services have to install pip dependencies). Subsequent deploys are incremental.
@@ -65,9 +65,9 @@ Render builds each service in parallel. First builds take 3–8 minutes per serv
 
 The Blueprint declares which env vars each service needs but does not set their values (secrets are operator-supplied). Per the `render.yaml` comments, you need to set these in the dashboard.
 
-### Shared across services — `loom-shared-secrets` env group
+### Shared across services — `tapestry-shared-secrets` env group
 
-1. In the dashboard, click **Environment Groups** (left sidebar) → **New Environment Group** → name it `loom-shared-secrets`.
+1. In the dashboard, click **Environment Groups** (left sidebar) → **New Environment Group** → name it `tapestry-shared-secrets`.
 2. Add these key-value pairs:
 
    | Key | Source |
@@ -84,9 +84,11 @@ A few keys must be set on individual services (not shared):
 
 | Service | Key | Purpose |
 |---|---|---|
-| `memory-mcp` | `LOOM_JWT_PRIVATE_KEY` | RSA private key — only this service signs tokens |
-| `loom-project-observatory` (if deployed) | `GRAFANA_CLOUD_API_URL` | Server-side Grafana query endpoint |
-| `loom-project-observatory` (if deployed) | `GRAFANA_CLOUD_API_TOKEN` | Auth for the query endpoint |
+| **every service** | `LOOM_DB_URL` | Postgres connection string (your `loom-postgres`) — **required; the Blueprint does not inject it** |
+| **every service** | `SELF_HOST_TENANT_ID` | The tenant self-host rows carry — else RLS reads scope to the nil tenant and return nothing |
+| `loom-agent-context` | `LOOM_JWT_PRIVATE_KEY` | RSA private key — only this service signs tokens (hosted mode) |
+| `loom-architecture-registry` | `LOOM_SKILL_BRIDGE_SECRET` | HMAC shared secret for the engine bridge |
+| `loom-project-observatory` (if deployed) | `GRAFANA_CLOUD_API_URL` / `GRAFANA_CLOUD_API_TOKEN` | Server-side Grafana query endpoint + auth |
 
 Set these per-service: open the service → **Environment** → **Add Environment Variable**.
 
@@ -103,7 +105,7 @@ curl https://your-project-registry-host.example.com/health
 
 Each should return `{"status": "ok", "service": "<name>"}`.
 
-For the cron, open [`self-observer`](https://dashboard.render.com/) in the dashboard and check the **Logs** tab. The first run executes within 6 hours of deployment (or you can manually trigger it via **Manual Deploy** → **Trigger Job**).
+For the cron (`tapestry-self-observer-cron`), note it is `autoDeploy:false` and does **nothing** until you set its `GITHUB_TOKEN` + `OBSERVER_JWT` secrets and manually enable/trigger it. Once enabled, check the **Logs** tab for a `scan complete: ...` line (or **Trigger Run** to fire it now).
 
 ## Step 7 — Confirm the Memory MCP is reachable
 
@@ -115,9 +117,10 @@ From a Claude Code session in any test project:
    {
      "mcpServers": {
        "loom-memory": {
-         "transport": {
-           "type": "http",
-           "url": "https://your-memory-host.example.com/mcp/memory/"
+         "type": "http",
+         "url": "https://your-memory-host.example.com/mcp/memory/",
+         "headers": {
+           "Authorization": "Bearer ${TAPESTRY_MEMORY_API_KEY}"
          }
        }
      }

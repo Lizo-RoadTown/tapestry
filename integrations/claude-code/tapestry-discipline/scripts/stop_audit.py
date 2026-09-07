@@ -9,7 +9,7 @@ Fires at the end of the agent's turn. Runs two audits + one observer:
    accompanying file:line citation. Surfaces "Stop-audit detected an
    unsubstantiated stack claim" via additionalContext.
 
-2. **Agentic-upskilling audit** (v0.1.9, CORE DIRECTIVE 2; recurring since
+2. **Agentic-upskilling audit** (v0.1.9, CORE DIRECTIVE 3; recurring since
    v0.1.20). Walks the FULL session transcript. If a "substantive boundary"
    (≥ 1 git commit/push action, OR ≥ 10 tool calls AND ≥ 3 assistant turns,
    OR ≥ 30 assistant turns) has been crossed by work done SINCE the most
@@ -113,7 +113,7 @@ REMINDER = (
 )
 
 # ---------------------------------------------------------------------------
-# Upskilling-pass check (v0.1.9 / CORE DIRECTIVE 2)
+# Upskilling-pass check (v0.1.9 / CORE DIRECTIVE 3)
 # ---------------------------------------------------------------------------
 
 # Substantive-boundary thresholds. A session crosses the boundary if ANY hold.
@@ -499,7 +499,7 @@ def main() -> int:
     cited = bool(CITATION_REGEX.search(last_assistant_text))
     claim_violation = bool(claims and not cited)
 
-    # Check 2: agentic-upskilling audit (v0.1.9 / CORE DIRECTIVE 2). Operates
+    # Check 2: agentic-upskilling audit (v0.1.9 / CORE DIRECTIVE 3). Operates
     # on FULL session, gated by substantive-boundary heuristic + already-warned
     # marker (to avoid noisy repeated warnings on every turn after threshold).
     session_id = data.get("session_id") or ""

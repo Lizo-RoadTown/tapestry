@@ -20,7 +20,7 @@ An MCP server (HTTP transport) at `https://your-memory-host.example.com/mcp/memo
 
 Records are typed (`feedback`, `project`, `user`, `reference`, etc.), tagged with project scope (`["my-app"]`, `["tapestry"]`, `["example-project"]`), attributed to an actor (`claude-code`, the operator, the Observer), and chained via provenance links.
 
-Lives at `services/agent-context/` (Render service `memory-mcp`).
+Lives at `services/agent-context/` (Render service `loom-agent-context`).
 
 ## Why it exists
 
@@ -37,8 +37,8 @@ flowchart TB
     P[Plugin hooks<br/>SessionStart auto-recall<br/>friction-as-memory writes]
     O[Observer<br/>writes synthesis memos]
     OP[Operator<br/>feedback + decisions]
-    M[Memory MCP<br/>memory-mcp]
-    PG[(Postgres<br/>postgres)]
+    M[Memory MCP<br/>loom-agent-context]
+    PG[(Postgres<br/>loom-postgres)]
     OBSY[Observatory<br/>memory lens]
     P -->|write| M
     O -->|write| M
@@ -47,7 +47,7 @@ flowchart TB
     M -->|read| OBSY
 ```
 
-The Memory MCP is read-write to plugins (auto-recall at SessionStart, friction writes mid-session), the Observer (synthesis memos), and operators (typed records via memory_write). It backs onto Postgres (`postgres` on Render). The Observatory reads through it for the memory lens.
+The Memory MCP is read-write to plugins (auto-recall at SessionStart, friction writes mid-session), the Observer (synthesis memos), and operators (typed records via memory_write). It backs onto Postgres (`loom-postgres` on Render). The Observatory reads through it for the memory lens.
 
 ## Setup
 
@@ -57,9 +57,10 @@ The Memory MCP is read-write to plugins (auto-recall at SessionStart, friction w
 {
   "mcpServers": {
     "loom-memory": {
-      "transport": {
-        "type": "http",
-        "url": "https://your-memory-host.example.com/mcp/memory/"
+      "type": "http",
+      "url": "https://your-memory-host.example.com/mcp/memory/",
+      "headers": {
+        "Authorization": "Bearer ${TAPESTRY_MEMORY_API_KEY}"
       }
     }
   }
@@ -72,7 +73,7 @@ That's it. `tapestry onboard` writes this block for you. Each operator gets a fa
 
 1. Copy `services/agent-context/` into your Tapestry deployment.
 2. Provision a Render Postgres instance for record storage.
-3. Deploy as a Render Web Service from `render.yaml` (search `memory-mcp`).
+3. Deploy as a Render Web Service from `render.yaml` (search `agent-context`).
 4. Required env vars:
    - `DATABASE_URL` — Render Postgres connection string
    - `PLATFORM_MODE=hosted` (multi-tenant) or `=self_host` (single-tenant, default)
@@ -96,7 +97,7 @@ See [Platform dependencies](/reference/platform-dependencies/) for the full Rend
 | `memory_write` returns success but record absent on `memory_read` | Tag mismatch; you wrote to one tag but recalled with another | Check `project_tags` on the write call matches the `tags` filter on the read call |
 | `memory_write` returns 4xx with WAF block | Render WAF blocking content that looks like Python (`try`/`except`/`import` patterns) | Simplify the memo content; see `feedback_render_waf_blocks_python_looking_memory_writes` |
 | Auto-recall block empty in SessionStart | No records tagged for current project | Verify `LOOM_PROJECT_ID` in `.env` matches a tag you've written records with |
-| MCP tools missing from Claude Code | `.mcp.json` malformed or not loaded | Restart Claude Code; check JSON syntax; verify `transport.url` is reachable from your machine |
+| MCP tools missing from Claude Code | `.mcp.json` malformed or not loaded | Restart Claude Code; check JSON syntax; verify the `url` is reachable from your machine |
 | `[loom-memory · MCP UNREACHABLE: HTTP 404]` on localhost | Hook check is misconfigured for localhost; the actual hosted endpoint works | Confirm by calling `memory_list` directly — if it succeeds, the localhost check is stale and not load-bearing |
 
 ## Related

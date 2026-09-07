@@ -71,7 +71,7 @@ See [Platform dependencies](/reference/platform-dependencies/) for the full Graf
 ## Verify
 
 - **Local jsonl is writing:** trigger any tool call in Claude Code, then check `~/.claude/logs/hooks.jsonl` for a new line.
-- **OTel emission is succeeding:** in Grafana Cloud → Explore → Loki → query `{service_name="tapestry-discipline"}` → recent entries should appear within seconds.
+- **OTel emission is succeeding:** in Grafana Cloud → Explore → Loki → query `{service_name="tapestry-discipline"}` — or `{service_name="loom-discipline"}` if you did **not** set `OTEL_SERVICE_NAME` (that's the default emitted stream, a preserved-identity contract) → recent entries should appear within seconds.
 - **No silent failures:** check `~/.claude/logs/hook-otel-errors.log` — empty file (or absent) means OTel pushes are succeeding.
 - **Typed attributes are correct:** an emitted record should contain the typed fields from the [OTel coordination contract](/reference/otel-coordination-contract/) (e.g., `tapestry.coordination_context_id`, `tapestry.actor.role`).
 
@@ -83,7 +83,7 @@ See [Platform dependencies](/reference/platform-dependencies/) for the full Graf
 | Grafana shows old entries but nothing recent | Hook scripts crashing silently | Run a hook script directly: `python integrations/claude-code/tapestry-discipline/scripts/session_start.py` and check stderr |
 | `Authorization` header rejected | Token mismatch or quoting issue | Re-copy from Grafana Cloud → Access Policies; ensure `Basic%20` URL-encoding is preserved |
 | Local jsonl missing | `CLAUDE_PROJECT_DIR` set but log dir doesn't exist | `mkdir -p ${CLAUDE_PROJECT_DIR}/.claude/logs` or unset the var to fall back to `~/.claude/logs/` |
-| Signals reach Grafana but Observer doesn't see them | Observer's Grafana query path wrong | Check `services/self-observer/telemetry_client.py` for the Loki query template |
+| Signals reach Grafana but Observer doesn't see them | Telemetry-driven observation is a stub today | `services/self-observer/telemetry_client.py` returns no data yet (`invocations_30d` is a stub); the observer's current signals are structural (GitHub scan), not Loki queries |
 | Cross-machine signals fail | Operator hasn't been given OTel credentials | Your deployment shares from Grafana Cloud → Access Policies |
 
 ## Related

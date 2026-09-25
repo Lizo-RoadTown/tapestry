@@ -19,6 +19,7 @@ import sys
 
 from tapestry_cli import (
     __version__,
+    deploy as deploy_cmd,
     init as init_cmd,
     make_plugin as make_plugin_cmd,
     observatory as observatory_cmd,
@@ -46,6 +47,11 @@ SUBCOMMANDS: dict[str, dict] = {
         "help": "Scaffold a personalized Claude Code plugin to publish to your own marketplace.",
         "add_arguments": make_plugin_cmd.add_arguments,
         "run": make_plugin_cmd.run,
+    },
+    "deploy": {
+        "help": "Create a Render service for the current repo via the Render API (--dry-run to preview).",
+        "add_arguments": deploy_cmd.add_arguments,
+        "run": deploy_cmd.run,
     },
 }
 

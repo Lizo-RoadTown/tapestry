@@ -149,41 +149,126 @@ def _check_mcp_reachable(base_url: str, timeout: float = 3.0) -> tuple[bool, str
         return False, f"unreachable ({type(e).__name__})"
 
 
+def _check_auth(base_url: str, timeout: float = 4.0) -> tuple[str, str]:
+    """v0.1.21: verify the configured memory token is ACCEPTED, not just that the
+    host is up. `/health` requires no auth, so a healthy host with an EXPIRED or
+    wrong token still passes `_check_mcp_reachable` while every authenticated
+    memory_* call 401s — the exact failure mode that hid the Aug-2026 outage for
+    ~5 weeks. This makes an authenticated call (POST /v1/recall, same auth path
+    the MCP tools use) and reports whether the token was rejected.
+
+    Returns (state, detail):
+      "ok"           — authenticated call accepted (200) OR a non-auth error we
+                       won't blame on the token.
+      "unauthorized" — 401/403: the token is present but rejected (expired/invalid).
+      "no_token"     — no token configured; self-host fallback is legitimate, skip.
+      "skip"         — transient network/timeout; don't cry auth on a blip.
+    Never raises.
+    """
+    import json as _json
+    import urllib.error
+    import urllib.request
+
+    token = (
+        os.environ.get("TAPESTRY_MEMORY_API_KEY")
+        or os.environ.get("LOOM_MEMORY_API_KEY")
+        or ""
+    ).strip()
+    if not token:
+        return ("no_token", "no token configured (self-host fallback)")
+
+    url = base_url.rstrip("/") + "/v1/recall"
+    body = _json.dumps({"context": "session-start auth probe", "n": 1,
+                        "project_tags": []}).encode("utf-8")
+    req = urllib.request.Request(
+        url=url,
+        data=body,
+        headers={"Content-Type": "application/json",
+                 "Authorization": f"Bearer {token}"},
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            return ("ok", f"HTTP {resp.status}")
+    except urllib.error.HTTPError as e:
+        if e.code in (401, 403):
+            return ("unauthorized", f"HTTP {e.code}")
+        return ("ok", f"HTTP {e.code}")  # 4xx/5xx that isn't auth: not the token's fault
+    except (urllib.error.URLError, TimeoutError, ConnectionError, OSError) as e:
+        return ("skip", f"probe error ({type(e).__name__})")
+
+
 def _mcp_status_block(base_url: str) -> list[str]:
     """Concrete-rule Layer 6 visibility block. Always returns something;
-    silence is the failure mode we're guarding against."""
+    silence is the failure mode we're guarding against.
+
+    Two checks, because host-up != memory-usable:
+      1. `_check_mcp_reachable` — is the host responding at all (/health)?
+      2. `_check_auth` — is the configured token actually accepted? (/health does
+         NOT require auth, so an expired token passes check 1 but fails here.)
+    """
     reachable, status = _check_mcp_reachable(base_url)
     mcp_url = base_url.rstrip("/") + _MCP_PATH
-    if reachable:
+    if not reachable:
         return [
-            "[loom-memory · MCP transport]",
-            f"MCP reachable at {mcp_url} ({status}). memory_read / memory_write / "
-            f"memory_recall / memory_search / memory_list / memory_delete should be "
-            f"available as tools.",
+            "",
+            "*** CONCRETE-RULE VIOLATION DETECTED ***",
+            f"[loom-memory · MCP UNREACHABLE: {status}]",
+            f"The loom-memory MCP server at {mcp_url} did not respond.",
+            "",
+            "Consequences:",
+            "  - memory_read / memory_write / memory_recall MCP tool calls WILL FAIL",
+            "  - cross-project memory persistence is offline for this session",
+            "  - the platform's primary value proposition is degraded",
+            "",
+            "Recovery (in order):",
+            "  1. Wait 30-60s for Render cold-start, then restart Claude Code",
+            "  2. Check your hosting provider dashboard for the memory service",
+            "  3. If service is down, check recent deploys / logs / Postgres health",
+            "  4. Fallback: typed-file memory at ~/.claude/projects/<key>/memory/ still works "
+            "for this session but does NOT persist to the cross-project store",
+            "",
+            "Why this warning exists:",
+            "  loom-memory access is a concrete rule of this platform "
+            "(CORE DIRECTIVE 1; see docs/CORE_DIRECTIVES.md). Silent absence of "
+            "memory access was the failure mode that prompted the defense-in-depth wiring.",
+            "*****",
         ]
+
+    # Host is up. Now verify the token is accepted (the /health-only blind spot).
+    auth_state, auth_detail = _check_auth(base_url)
+    if auth_state == "unauthorized":
+        return [
+            "",
+            "*** CONCRETE-RULE VIOLATION DETECTED ***",
+            f"[loom-memory · AUTH REJECTED: {auth_detail}]",
+            f"The loom-memory host at {mcp_url} is UP, but your memory token was "
+            f"REJECTED ({auth_detail}).",
+            "",
+            "This is the SILENT-OUTAGE failure mode: /health passes, so the host looks",
+            "fine — but every authenticated memory_read / memory_write / memory_recall",
+            "call FAILS. Memory looks up and is not.",
+            "",
+            "Most likely cause: an expired or wrong token. Recovery:",
+            "  1. In ~/.claude.json, the loom-memory server's Authorization header should",
+            "     be 'Bearer ${TAPESTRY_MEMORY_API_KEY}' (an env ref) — NOT a literal",
+            "     'Bearer eyJ...' JWT (those expire).",
+            "  2. Set TAPESTRY_MEMORY_API_KEY (in ~/.claude/settings.json env) to the current key.",
+            "  3. Fully restart Claude Code so the MCP reconnects.",
+            "",
+            "Why this warning exists:",
+            "  loom-memory access is CORE DIRECTIVE 1. A 401/403 here means cross-project",
+            "  memory is offline for this session even though the host is reachable — the",
+            "  exact gap that hid the Aug-2026 outage (a /health-only probe never sees it).",
+            "*****",
+        ]
+
+    note = "" if auth_state != "no_token" else " (no token — self-host fallback)"
     return [
-        "",
-        "*** CONCRETE-RULE VIOLATION DETECTED ***",
-        f"[loom-memory · MCP UNREACHABLE: {status}]",
-        f"The loom-memory MCP server at {mcp_url} did not respond.",
-        "",
-        "Consequences:",
-        "  - memory_read / memory_write / memory_recall MCP tool calls WILL FAIL",
-        "  - cross-project memory persistence is offline for this session",
-        "  - the platform's primary value proposition is degraded",
-        "",
-        "Recovery (in order):",
-        "  1. Wait 30-60s for Render cold-start, then restart Claude Code",
-        "  2. Check your hosting provider dashboard for the memory service",
-        "  3. If service is down, check recent deploys / logs / Postgres health",
-        "  4. Fallback: typed-file memory at ~/.claude/projects/<key>/memory/ still works "
-        "for this session but does NOT persist to the cross-project store",
-        "",
-        "Why this warning exists:",
-        "  loom-memory access is a concrete rule of this platform "
-        "(CORE DIRECTIVE 1; see docs/CORE_DIRECTIVES.md). Silent absence of "
-        "memory access was the failure mode that prompted the defense-in-depth wiring.",
-        "*****",
+        "[loom-memory · MCP transport]",
+        f"MCP reachable at {mcp_url} ({status}); token accepted{note}. "
+        f"memory_read / memory_write / memory_recall / memory_search / memory_list / "
+        f"memory_delete should be available as tools.",
     ]
 
 

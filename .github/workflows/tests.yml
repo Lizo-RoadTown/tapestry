@@ -1,0 +1,54 @@
+name: tests
+
+# Runs the service test suites on every push to main and every PR.
+# Each service is its own matrix leg (fail-fast: false) so one red service
+# doesn't hide the others, and each shows its own pass/fail.
+#
+# Verified green offline (no DB, mocked): self-observer, architecture-registry,
+# policy, project-observatory, skill-making — 203 tests total as of 2026-09-26.
+# agent-context is heavier (fastembed model dep) and some tests expect a live
+# DB/fixture; it runs but is non-blocking (continue-on-error) until wired.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  pytest:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.optional == true }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: self-observer,         workdir: services/self-observer }
+          - { name: architecture-registry, workdir: services/architecture-registry }
+          - { name: policy,                workdir: services/policy }
+          - { name: project-observatory,   workdir: services/project-observatory }
+          - { name: skill-making,          workdir: services/skill-making, pythonpath: python, testpath: python/skill_making/tests }
+          - { name: agent-context,         workdir: services/agent-context, optional: true }
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        working-directory: ${{ matrix.workdir }}
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          if [ -f requirements-test.txt ]; then
+            pip install -r requirements-test.txt
+          else
+            pip install pytest pytest-asyncio
+          fi
+
+      - name: Run tests
+        working-directory: ${{ matrix.workdir }}
+        env:
+          PYTHONPATH: ${{ matrix.pythonpath || '.' }}
+        run: pytest ${{ matrix.testpath || '' }} -q

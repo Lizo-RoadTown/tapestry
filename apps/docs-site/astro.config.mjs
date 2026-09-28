@@ -97,6 +97,7 @@ export default defineConfig({
             { label: "First Observatory visit", slug: "start/first-observatory-visit" },
             { label: "Set up a new project (comprehensive)", slug: "how-to/set-up-a-new-project" },
             { label: "Create your own plugin", slug: "how-to/create-your-own-plugin" },
+            { label: "Deploy a service to Render", slug: "how-to/deploy-a-service" },
             { label: "Recover from common failures", slug: "how-to/recover-from-common-failures" },
             // The Observatory's actionable pages. What it is + how to read it
             // lives in Learn ("The Observatory"); the feed contract is in Reference.
@@ -137,6 +138,7 @@ export default defineConfig({
         {
           label: "Reference",
           items: [
+            { label: "CLI commands", slug: "reference/cli-commands" },
             { label: "OTel coordination contract", slug: "reference/otel-coordination-contract" },
             { label: "The Observatory feed", slug: "observatory/feed" },
             { label: "Platform dependencies", slug: "reference/platform-dependencies" },

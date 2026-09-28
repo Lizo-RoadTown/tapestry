@@ -107,6 +107,16 @@ Before diagnosing, confirm what the agent CAN see:
 2. If it's down, the issue is on the platform side, not your project. The Tapestry-agent or loom-agent operator needs to look. Report it.
 3. If the service is up and you're getting 401, you might be sending a bearer that the server can't verify. Removing the bearer and falling back to self-host mode is the usual fix for individual operators.
 
+### Symptom: SessionStart shows `*** CONCRETE-RULE VIOLATION DETECTED ***` with "AUTH REJECTED"
+
+**Cause:** The memory host is reachable (its `/health` responds) but it **rejected the token** — an authenticated `/v1/recall` returned 401/403. This is the case a plain reachability check misses: the host is up, so `/health` looks fine, but memory writes and recalls silently fail because the bearer is expired or unverifiable. The SessionStart hook now probes with the token, not just `/health`, so this surfaces as a violation instead of a "reachable ... OK" that hides a dead token. (This is the failure mode that went unnoticed for weeks in August 2026, when an expired JWT left memory returning 401 while `/health` stayed green.)
+
+Per CORE DIRECTIVE 1, a CONCRETE-RULE violation means **halt substantive work and report to the operator** — do not proceed on in-session context alone.
+
+**Fix:** Same as the 401/403 section directly above — check `/health` is `ok` (it will be, in this case), then resolve the token: for an individual operator, remove the bearer and fall back to self-host mode; for a hosted deployment, the operator reissues/repoints the JWT (`TAPESTRY_MEMORY_API_KEY`). A healthy self-host setup with **no** token is not a violation — the probe treats "no token" as the expected self-host fallback, not a rejection.
+
+**How to confirm fixed:** Restart Claude Code; the SessionStart MCP-transport block should read reachable with the token accepted, and no AUTH REJECTED violation appears. A `memory_recall` succeeds.
+
 ### Symptom: After restarting Claude Code, hooks still don't fire
 
 **Cause:** Plugin cache staleness OR settings.json typo OR the marketplace isn't actually registered.

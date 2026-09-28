@@ -22,6 +22,8 @@ tapestry observatory  Open the Observatory console in a browser.
 tapestry init         Register the project and write .env / .mcp.json /
                       .project-intelligence/ (granular path; does not touch
                       .claude/settings.json).
+tapestry make-plugin  Scaffold a personalized Claude Code plugin to publish
+                      to your own marketplace.
 tapestry version      Print version and platform info.
 ```
 

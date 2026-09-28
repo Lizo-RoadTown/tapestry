@@ -45,16 +45,17 @@ tapestry/
 │   ├── docs-site/           Astro Starlight site + marketing pages (Vercel)
 │   └── web-dashboard/       Operator-facing dashboard (forward home)
 ├── services/                Backend bounded services
-│   ├── agent-context/       ← live; the memory MCP (Render-hosted)
-│   ├── project-registry/    ← live; project / repo / machine registration
-│   ├── architecture-registry/   slot README; canonical home pending migration
-│   ├── candidate-registry/      slot README
-│   ├── policy/                  slot README
-│   ├── audit-log/               slot README
+│   ├── agent-context/       the memory MCP (cut over from the-loom)
+│   ├── project-registry/    project / repo / machine registration
+│   ├── architecture-registry/   code present; cutover pending (see README)
+│   ├── policy/                  code present; cutover pending (see README)
+│   ├── telemetry-ingestion/     code present; deploy pending
+│   ├── project-observatory/     code present; deploy pending
+│   ├── self-observer/           deployed live (Render cron)
+│   ├── skill-making/            code present (engine lift); deploy shape TBD
 │   ├── docs-mcp/                stdio MCP exposing the docs (pip-installable)
-│   ├── project-observatory/     slot README
-│   ├── skill-making/            slot README
-│   └── telemetry-ingestion/     slot README
+│   ├── candidate-registry/      absorbed into architecture-registry (no service)
+│   └── audit-log/               deferred — no consumer yet
 ├── engine/                  Recursive skill engine slots (forward homes)
 ├── packages/
 │   ├── auth/                Canonical loom_auth (JWT + tenant resolution)
@@ -69,11 +70,17 @@ tapestry/
 └── .claude-plugin/          Marketplace manifest (`tapestry`)
 ```
 
-Two services (`agent-context`, `project-registry`) have been cut over from `the-loom` to this repo and run in production. The rest of `services/` is forward-home slots: code matures in the legacy source repos and migrates here per the [migration framework](docs/migration-cicd/).
+Most of `services/` now holds real, migrated code rather than empty slots:
+
+- **Live / cut over:** `self-observer` is deployed as a Render cron; `agent-context` (the memory MCP) and `project-registry` are cut over from `the-loom`.
+- **Code present, cutover or deploy pending:** `architecture-registry`, `policy`, `telemetry-ingestion`, and `project-observatory` carry working code with passing tests; their live Render services still build from `the-loom` (or await first deploy) until the operator repoints — see each service README. `docs-mcp` (a pip-installable stdio MCP) and `skill-making` (the engine lift) also hold working code.
+- **Still slots:** `audit-log` (deferred — no consumer yet) and `candidate-registry` (absorbed into `architecture-registry` — no separate service).
+
+Migration follows the [migration framework](docs/migration-cicd/).
 
 ## Relationship to other repos
 
-Tapestry is the **canonical product system**. Legacy source repos (`Lizo-RoadTown/the-loom`, `Lizo-RoadTown/Make_Skills`) continue to be built in; mature pieces consolidate here via curated migration PRs. The parallel-build is intentional — premature consolidation would import unfinished structure. See [docs/migration/README.md](docs/migration/README.md) for the approach.
+Tapestry is the **canonical product system** and the live system. `Lizo-RoadTown/the-loom` and `Lizo-RoadTown/Make_Skills` are **retired legacy source repos**, not active parallel prototypes — no new building happens there. Migration brings mature capabilities home into Tapestry via curated PRs, scoped Lift / Refactor / Rewrite / Retire per piece. The end state is Tapestry standing alone, with no new runtime dependency on either legacy repo. See [docs/migration/README.md](docs/migration/README.md) for the approach.
 
 ## Self-host vs hosted
 

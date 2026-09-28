@@ -76,7 +76,7 @@ The Blueprint declares which env vars each service needs but does not set their 
    | `OTEL_EXPORTER_OTLP_HEADERS` | from [Grafana Cloud setup](/how-to/set-up-grafana-cloud/) |
    | `LOOM_JWT_PUBLIC_KEY` | RSA public key (PEM) — every service verifies tokens with it |
 
-3. Attach the env group to each web service: open the service → **Environment** → **Link Environment Group** → select `loom-shared-secrets`.
+3. Attach the env group to each web service: open the service → **Environment** → **Link Environment Group** → select `tapestry-shared-secrets`.
 
 ### Per-service secrets
 

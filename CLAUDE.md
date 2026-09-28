@@ -91,7 +91,7 @@ Describe what *is*, not what it *isn't*. No "the unlock," no "delightful," no de
 - **Always open via `gh pr create`** with a Test Plan checklist.
 - **Cite proposals + ADRs** when relevant.
 - **Never `--no-verify`, never `--amend` on something already pushed.** Make a new commit.
-- **Co-author tag**: `Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>`.
+- **Co-author tag**: `Co-Authored-By: Claude <noreply@anthropic.com>`.
 
 ## What to do when in doubt
 

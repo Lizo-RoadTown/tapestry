@@ -158,5 +158,62 @@ def test_missing_name_errors(tmp_path, monkeypatch):
     assert rc == 1
 
 
+# ---------------------------------------------------------------------------
+# --dry-run must not leak resolved secret VALUES to stdout (security).
+# Exercises the REAL masking — _resolve_env_vars is NOT stubbed here.
+# ---------------------------------------------------------------------------
+def test_dry_run_masks_secret_values(tmp_path, monkeypatch, capsys):
+    def _boom(*a, **k):
+        raise AssertionError("network call during --dry-run")
+    monkeypatch.setattr(deploy, "_request", _boom)
+    monkeypatch.setenv("MY_SECRET", "super-secret-value-123")
+    monkeypatch.chdir(tmp_path)
+    rc = deploy.run(_args(
+        name="dry-svc", type="web", build="pip install -e .",
+        start="python -m x", repo="https://github.com/o/r",
+        secret=["MY_SECRET"], set=["PLAIN=visible-plain"], dry_run=True,
+    ))
+    assert rc == 0
+    out = capsys.readouterr().out
+    # The resolved secret value must NEVER appear in dry-run output.
+    assert "super-secret-value-123" not in out
+    # The mask marker must appear for the secret key.
+    assert '"key": "MY_SECRET"' in out
+    assert '"value": "***"' in out
+    # Non-secret env var values are left visible.
+    assert "visible-plain" in out
+
+
+def test_dropped_static_alias_not_advertised():
+    # The static/static_site alias is dropped: the builder can't produce a
+    # valid static-site body, so the CLI no longer advertises it.
+    assert "static" not in deploy._TYPE_ALIASES
+    assert "static_site" not in deploy._VALID_TYPES
+    # --type help lists only what is buildable.
+    p = argparse.ArgumentParser()
+    deploy.add_arguments(p)
+    type_help = next(
+        a.help for a in p._actions if getattr(a, "dest", None) == "type"
+    )
+    assert "static" not in type_help
+    for advertised in ("web", "cron", "worker", "private"):
+        assert advertised in type_help
+
+
+def test_healthcheck_omitted_for_worker_and_private():
+    # healthCheckPath is web-only; Render rejects it on worker/private.
+    for alias in ("worker", "private"):
+        spec = {
+            "name": "svc", "type": alias, "buildCommand": "b", "startCommand": "s",
+            "healthCheckPath": "/health", "_envVars": {}, "_secretNames": [],
+        }
+        p = deploy._build_service_payload(spec, "https://github.com/o/r", "own-1")
+        assert "healthCheckPath" not in p["serviceDetails"]
+        # worker/private still carry runtime/plan/build/start — a valid body.
+        assert p["serviceDetails"]["runtime"]
+        assert p["serviceDetails"]["plan"]
+        assert p["serviceDetails"]["envSpecificDetails"]["startCommand"] == "s"
+
+
 if __name__ == "__main__":
     sys.exit(pytest.main([__file__, "-q"]))

@@ -36,6 +36,7 @@ Verified against Render's API reference 2026-09-25:
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 import os
 import subprocess
@@ -51,12 +52,16 @@ DEFAULT_API_URL = os.environ.get("RENDER_API_URL", "https://api.render.com/v1")
 DEFAULT_SPEC_PATH = "deploy/render-service.json"
 
 # Friendly aliases -> Render's serviceType enum.
+# Only types the payload builder can produce a valid body for are advertised.
+# web_service / background_worker / private_service / cron_job all take
+# runtime + plan + build/start (healthCheckPath is web-only, gated below).
+# static_site is intentionally omitted: it has no start command / runtime /
+# plan and needs a publishPath the builder does not produce.
 _TYPE_ALIASES = {
     "web": "web_service",
     "cron": "cron_job",
     "worker": "background_worker",
     "private": "private_service",
-    "static": "static_site",
 }
 _VALID_TYPES = set(_TYPE_ALIASES.values())
 
@@ -250,7 +255,8 @@ def _build_service_payload(spec: dict, repo_url: str, owner_id: str) -> dict:
         if not schedule:
             raise RuntimeError("cron service needs a 'schedule' (cron expression)")
         details["schedule"] = schedule
-    else:
+    elif service_type == "web_service":
+        # healthCheckPath is web-only; Render rejects it on worker/private.
         if spec.get("healthCheckPath"):
             details["healthCheckPath"] = spec["healthCheckPath"]
 
@@ -272,6 +278,17 @@ def _build_service_payload(spec: dict, repo_url: str, owner_id: str) -> dict:
     return payload
 
 
+def _mask_secret_values(payload: dict, secret_names: set[str]) -> dict:
+    """Return a deep copy of the payload with every envVar value whose key is a
+    declared secret replaced by '***'. Non-secret env var values are kept. Used
+    only for --dry-run output so resolved secret values never reach stdout."""
+    masked = copy.deepcopy(payload)
+    for ev in masked.get("envVars", []):
+        if ev.get("key") in secret_names:
+            ev["value"] = "***"
+    return masked
+
+
 # --------------------------------------------------------------------------
 # CLI
 # --------------------------------------------------------------------------
@@ -280,7 +297,7 @@ def add_arguments(p: argparse.ArgumentParser) -> None:
                    help=f"Deploy spec JSON (default: {DEFAULT_SPEC_PATH}).")
     p.add_argument("--name", default=None, help="Render service name.")
     p.add_argument("--type", default=None,
-                   help="Service type: web | cron | worker | private | static.")
+                   help="Service type: web | cron | worker | private.")
     p.add_argument("--plan", default=None, help="Render plan (e.g. starter, free).")
     p.add_argument("--region", default=None, help="Region (default: oregon).")
     p.add_argument("--branch", default=None, help="Git branch (default: main).")
@@ -346,8 +363,11 @@ def run(args: argparse.Namespace) -> int:
     # --- DRY RUN: compose + print, no network, no key needed. ---
     if args.dry_run:
         payload = _build_service_payload(spec, repo_url, args.owner_id or "own-DRYRUN")
+        # Never print resolved secret VALUES to stdout: mask any envVar whose key
+        # is a declared secret name. The real (non-dry-run) POST is unaffected.
+        masked = _mask_secret_values(payload, set(spec["_secretNames"]))
         print("DRY RUN — would POST /v1/services with:")
-        print(json.dumps(payload, indent=2))
+        print(json.dumps(masked, indent=2))
         if spec.get("envGroup"):
             print(f"\nThen POST /v1/env-groups/<id of {spec['envGroup']}>/services/<new id>")
         return 0

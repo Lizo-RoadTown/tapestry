@@ -24,6 +24,8 @@ tapestry init         Register the project and write .env / .mcp.json /
                       .claude/settings.json).
 tapestry make-plugin  Scaffold a personalized Claude Code plugin to publish
                       to your own marketplace.
+tapestry deploy       Create a Render service for the current repo via the
+                      Render API (--dry-run to preview; needs no API key).
 tapestry version      Print version and platform info.
 ```
 

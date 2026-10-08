@@ -99,15 +99,24 @@ def _git_sha(repo_root: Path) -> str:
 # ---------------------------------------------------------------------------
 
 def parse_render_yaml(repo_root: Path) -> dict:
-    """Extract services, env var KEYS (never values), disks, databases."""
-    path = repo_root / "render.yaml"
-    raw = _read_text(path)
+    """Extract services, env var KEYS (never values), disks, databases.
+
+    Looks for the Blueprint in the repo root first (the Render convention), then
+    under infra/deploy/ (where Tapestry keeps it). First hit wins.
+    """
+    raw = None
+    found_path = None
+    for candidate in ("render.yaml", "infra/deploy/render.yaml"):
+        raw = _read_text(repo_root / candidate)
+        if raw is not None:
+            found_path = candidate
+            break
     if raw is None:
         return {"present": False}
     try:
         data = yaml.safe_load(raw) or {}
     except yaml.YAMLError as e:
-        return {"present": True, "parse_error": str(e)}
+        return {"present": True, "path": found_path, "parse_error": str(e)}
 
     services = []
     for svc in data.get("services") or []:
@@ -139,7 +148,7 @@ def parse_render_yaml(repo_root: Path) -> dict:
             "region": db.get("region"),
         })
 
-    return {"present": True, "services": services, "databases": databases}
+    return {"present": True, "path": found_path, "services": services, "databases": databases}
 
 
 # ---------------------------------------------------------------------------

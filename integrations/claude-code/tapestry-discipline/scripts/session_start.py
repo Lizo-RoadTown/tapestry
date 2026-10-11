@@ -440,7 +440,7 @@ def main() -> int:
     start = now_ms()
     log_event("SessionStart", "start")
     try:
-        data = json.load(sys.stdin)
+        data = json.loads(sys.stdin.buffer.read().decode("utf-8", errors="replace"))
     except json.JSONDecodeError:
         log_event("SessionStart", "end", exit_code=0, elapsed_ms=now_ms() - start, action="noop", note="malformed_input")
         return 0

@@ -1,0 +1,433 @@
+# Reconstruction manifest — procedure v0.1, step 10 record shape.
+# Stable IDs are permanent; provisional_name is NOT a final name (step 8: names come last).
+# implementation_state / deployment_state / trigger_type are separate; "unknown" is honest, never guessed away.
+procedure_version: "0.1"
+reconstruction_id: two-layer-toolkit-2026-10
+lead_repository: tapestry
+scope_revision: "docs/reconstruction/2026-10-21-scope.md v1 (2026-10-21, working tree over d40ef00)"
+sources:
+  - repository: tapestry
+    revision: d40ef00322f00b67e6378f22f23b40181360f2f9
+  - repository: the-loom
+    revision: 71dd23a93a531c2400d2feaa894e7b987dddf677
+  - repository: Make_Skills
+    revision: 45ada50cf47d833e5795282a037583e4cfe18957
+  - repository: education-lab
+    revision: 9634455014a7ab94ec7cba0fbf7110a9676eb17a
+  - repository: education-plugins
+    revision: 14e86e514fa17b03246199310639b84dfa259964
+acceptance_scenarios:
+  - id: m1-skill-invocation-to-finding
+    trigger: skill_invocation_in_registered_repo
+    expected_outcome: event_stored_with_identity_and_evidence_backed_finding_inspectable
+  - id: correction-to-installed-support
+    trigger: correction_event
+    expected_outcome: support_installed_and_evaluated
+
+components:
+  - id: component-001
+    provisional_name: memory-service
+    final_name: null
+    responsibility: Keep and recall knowledge records for every session in every repo
+    source_locations: ["tapestry/services/agent-context/"]
+    canonical_home: tapestry/services/agent-context
+    implementation_state: complete
+    deployment_state: deployed (Render loom-agent-context)
+    trigger_type: http
+    disposition: retain
+    treatment: not_applicable
+    state_owner: itself (pgvector Postgres)
+    consumers: [every agent session, discipline hooks auto-recall]
+    contracts: [MCP tools memory_read/write/recall/search/list/delete, REST /v1/recall|write|read]
+    evidence: ["services/agent-context/main.py:1-24", "Core Directive 1 (CLAUDE.md)"]
+    stage: inventoried
+    blockers: ["known defect: WAF 403 on some technical content (memory_write)"]
+  - id: component-002
+    provisional_name: event-store-and-receiver
+    final_name: null
+    responsibility: Accept signed telemetry events, persist them idempotently with daily rollups, answer reads with the 0-vs-None contract
+    source_locations: ["tapestry/services/telemetry-ingestion/ (persist.py, hook_event_handler.py, read_api.py, main.py)", "the-loom/services/telemetry-ingestion/ (deployed log-only copy)"]
+    canonical_home: tapestry/services/telemetry-ingestion
+    implementation_state: complete-untested (zero tests)
+    deployment_state: undeployed from tapestry; legacy log-only copy live as loom-telemetry-ingestion
+    trigger_type: http
+    disposition: extract
+    treatment: refactor (add authenticated reads; deploy by repoint per adopted arrangement)
+    state_owner: telemetry_events + telemetry_rollup_daily (tapestry migrations 005/006, not yet applied to production)
+    consumers: [component-004 via read API (intended), component-005, operator console]
+    contracts: ["POST /hook-events (X-Loom-Hook-Signature HMAC)", "POST /skill-used (X-MakeSkills-Signature HMAC)", "GET /telemetry/* (auth REQUIRED before deploy)"]
+    evidence: ["persist.py:128-135 idempotent CTE", "read_api.py:162-216 0-vs-None", "the-loom main.py:67-70 discards"]
+    stage: decided
+    blockers: ["migrations 005/006 not applied to any production DB", "no render.yaml block", "read auth not yet implemented"]
+  - id: component-003
+    provisional_name: session-collector
+    final_name: null
+    responsibility: Capture session activity in every managed repo (hook events, Skill-call counts, snapshots, session reports) and emit it
+    source_locations: ["tapestry/integrations/claude-code/tapestry-discipline/scripts/"]
+    canonical_home: tapestry/integrations/claude-code/tapestry-discipline
+    implementation_state: complete (artifact-identity resolution NOT implemented; skills self-scan NOT implemented)
+    deployment_state: deployed (installed per machine/repo)
+    trigger_type: hook (every session)
+    disposition: retain
+    treatment: refactor (identity-in-capture per requirement 1; skills self-scan; flush default-path fix)
+    state_owner: local hooks.jsonl (retry buffer; retention policy pending)
+    consumers: [component-002 (intended; endpoint unset), Grafana OTLP copy, component-006 via Path A candidates]
+    contracts: ["flat hook-event JSON, HMAC t=<unix>,v1=<hex> over ts.body"]
+    evidence: ["_observability.py:375-528", "observer.py:17-38", "flush_hooks_jsonl.py:114 path mismatch"]
+    stage: decided
+    blockers: ["LOOM_INGEST_ENDPOINT unset (wire X1)", "no artifact_ref on events (identity gap)"]
+  - id: component-004
+    provisional_name: structure-sweeper
+    final_name: null
+    responsibility: Scheduled scan of registered repos' skill/agent file structure; drift candidates; synthesis memo to memory
+    source_locations: ["tapestry/services/self-observer/"]
+    canonical_home: tapestry/services/self-observer
+    implementation_state: complete (usage lookup is a stub returning None)
+    deployment_state: deployed (Render cron tapestry-self-observer-cron, 6h)
+    trigger_type: scheduled
+    disposition: retain
+    treatment: refactor (swap usage stub for component-002 read API; add staleness gate per push-not-pull ruling)
+    state_owner: none (stateless scan; memo in loom memory)
+    consumers: [component-006 candidates, every session via auto-recalled memo]
+    contracts: ["POST /candidates source_path=path_b, content-hash dedup"]
+    evidence: ["render.yaml:160-163", "telemetry_client.py stub", "config.py:152-155 legacy URL default"]
+    stage: decided
+    blockers: ["wire X4", "the-loom render.yaml:292-302 still carries a cron block (double-blueprint; runtime state unknown)"]
+  - id: component-005
+    provisional_name: signal-classifiers
+    final_name: null
+    responsibility: Pure classifiers (hot_path, orphaned, degrading) over telemetry aggregates; atomic signal snapshots
+    source_locations: ["tapestry/services/project-observatory/"]
+    canonical_home: unknown (home/rename decision deferred; the service name belongs to the program layer per the two-layer ruling)
+    implementation_state: complete-tested
+    deployment_state: staging only (autoDeploy false)
+    trigger_type: scheduled + http
+    disposition: retain
+    treatment: refactor (package scale-neutral; one classifier first against production store)
+    state_owner: observation_signals (migration 006)
+    consumers: [console, component-009 (future)]
+    contracts: ["reads telemetry_rollup_daily + telemetry_events in one RLS transaction; emits observation_signals; signals are evidence, never candidates"]
+    evidence: ["signals.py:110-135 excludes ''/NULL artifact_ref", "006:12-17 boundary pledge"]
+    stage: decided
+    blockers: ["wire X3", "input starvation until component-003 carries artifact_ref", "small-N percentile caveat"]
+  - id: component-006
+    provisional_name: candidate-ledger
+    final_name: null
+    responsibility: Store candidates, their lifecycle, and dispatch promotions
+    source_locations: ["the-loom/services/architecture-registry/ (live)", "tapestry/services/architecture-registry/ (newer copy, repoint-gated)"]
+    canonical_home: unknown (pending D2 spine-vs-registry)
+    implementation_state: complete
+    deployment_state: deployed (Render loom-architecture-registry, legacy name)
+    trigger_type: http
+    disposition: defer
+    treatment: not_applicable
+    state_owner: candidates tables in loom-postgres (9-kind enum)
+    consumers: [web-dashboard, component-008 via dispatch, policy state reads]
+    contracts: ["POST/GET /candidates", "PATCH /candidates/{id}/status with auto-dispatch on promotion_requested+kind=skill"]
+    evidence: ["the-loom main.py routes 84-321", "tapestry render.yaml:186-242 repoint gates"]
+    stage: decided
+    blockers: ["D2: one candidate standard (spine vs registry) undecided"]
+  - id: component-007
+    provisional_name: decision-audit
+    final_name: null
+    responsibility: Record promote/hold/reject/demote decisions immutably; aggregate policy state; never applies changes itself
+    source_locations: ["the-loom/services/policy/ (live)", "tapestry/services/policy/ (copy, repoint-gated)"]
+    canonical_home: tapestry/services/policy (repoint pending gates)
+    implementation_state: complete
+    deployment_state: deployed (Render loom-policy, legacy name)
+    trigger_type: http
+    disposition: retain
+    treatment: lift (repoint when gated checks pass)
+    state_owner: decisions rows (immutable, supersedes-chain)
+    consumers: [web-dashboard, future policy-daemon]
+    contracts: ["POST /decisions", "GET /candidates/{id}/policy-state"]
+    evidence: ["services/policy/main.py:76-160"]
+    stage: decided
+    blockers: []
+  - id: component-008
+    provisional_name: skill-builder
+    final_name: null
+    responsibility: Receive promoted candidates, persist SKILL.md, compile to a callable tool, acknowledge registration
+    source_locations: ["Make_Skills/services/skill_making/bridge_receiver.py + core/skill_making/compiler.py (live path)", "tapestry/services/skill-making/ + engine/skill-compiler/ (undeployed copies)"]
+    canonical_home: unknown (bring-home decision not made)
+    implementation_state: complete (two copies)
+    deployment_state: live end-to-end via Make_Skills engine for kind=skill; tapestry copies undeployed
+    trigger_type: http (HMAC dispatch)
+    disposition: consolidate
+    treatment: refactor
+    state_owner: student_skills (Make_Skills side)
+    consumers: [component-006 ack receiver]
+    contracts: ["HMAC PromotionCandidate -> /bridge/promotion-candidate; RegistrationAck back"]
+    evidence: ["promote_dispatcher.py:101-105", "bridge_receiver.py", "compiler.py"]
+    stage: decided
+    blockers: ["canonical-copy decision", "only kind=skill has a destination handler (8/9 kinds dead-end)"]
+  - id: component-009
+    provisional_name: finding-to-repair-initiator
+    final_name: null
+    responsibility: Read qualifying signals as evidence and initiate the repair workflow (diagnosis, build, validation, installation, subsequent evaluation) with a recommended automation level; never activates on its own
+    source_locations: ["ADR-ratified empty slot: tapestry/services/observation-decomposer/ (docs/adr/0001-observer-topology.md:22,29)"]
+    canonical_home: tapestry/services/observation-decomposer
+    implementation_state: missing
+    deployment_state: none
+    trigger_type: unknown
+    disposition: extract
+    treatment: rewrite
+    state_owner: none (candidate state stays in component-006)
+    consumers: [component-006, policy-daemon (future)]
+    contracts: ["emits candidates with evidence + recommended automation level; activation stays policy-gated"]
+    evidence: ["docs/adr/0001-observer-topology.md:29 safety boundary"]
+    stage: inventoried
+    blockers: ["policy-daemon-activation design deferred by ADR-0001", "requirement 4 defines completion: installed, validated, re-evaluated"]
+  - id: component-010
+    provisional_name: fleet-harvester
+    final_name: null
+    responsibility: Registry-driven external scan of class repos' skills and correction records into a catalog
+    source_locations: ["education-lab/scripts/harvest.py:1-246", "education-lab/.github/workflows/harvest.yml"]
+    canonical_home: education-lab (until consolidated)
+    implementation_state: complete
+    deployment_state: manual (daily Action skips: HARVEST_TOKEN secret missing)
+    trigger_type: manual + scheduled(blocked)
+    disposition: consolidate
+    treatment: not_applicable (retire-by-replacement when the platform self-report + sweeper are live; trigger named in education-lab brief)
+    state_owner: catalog/harvest.json + harvest-report.md
+    consumers: [classification, correction-triage, operator]
+    contracts: ["GitHub trees API reads; blob-sha diffing"]
+    evidence: ["education-lab task inventory 2026-10-21"]
+    stage: decided
+    blockers: ["platform twin (components 003+004 with identity) not live yet"]
+  - id: component-011
+    provisional_name: payload-syncer
+    final_name: null
+    responsibility: Copy canonical domain source (rules file) into the marketplace package with a drift check
+    source_locations: ["education-lab/scripts/compile_plugins.py"]
+    canonical_home: education-lab (until consolidated)
+    implementation_state: complete
+    deployment_state: manual
+    trigger_type: manual
+    disposition: consolidate
+    treatment: not_applicable (retire-by-replacement into marketplace mechanics; same trigger discipline as component-010)
+    state_owner: none
+    consumers: [education-plugins releases]
+    contracts: ["one SYNC row today; SKILL.md content edited directly in education-plugins"]
+    evidence: ["education-lab session correction 2026-10-21"]
+    stage: decided
+    blockers: ["platform distribution twin not consolidated"]
+  - id: component-012
+    provisional_name: learning-domain-content
+    final_name: null
+    responsibility: The education domain payload - learner model (152 tagged rules), class classification scheme, teaching-skill payloads, correction-triage epistemics
+    source_locations: ["education-lab/rules/learning-principles.yaml", "education-lab/catalog/fleet.yaml", "education-lab/skills/correction-triage/", "education-plugins/plugins/*"]
+    canonical_home: education-lab + education-plugins
+    implementation_state: working data
+    deployment_state: distributed (3 plugins shipped; settings in 7/9 repos)
+    trigger_type: manual (human-merged)
+    disposition: retain
+    treatment: not_applicable
+    state_owner: education-lab (personal scope, education domain; never platform-absorbed)
+    consumers: [class repos, awg, fall-2026-hub]
+    contracts: ["skills cite rule IDs"]
+    evidence: ["education-lab task inventory 2026-10-21"]
+    stage: decided
+    blockers: []
+  - id: component-013
+    provisional_name: fleet-registry
+    final_name: null
+    responsibility: Answer what projects, repos, and machines exist in the fleet
+    source_locations: ["tapestry/services/project-registry/"]
+    canonical_home: tapestry/services/project-registry
+    implementation_state: complete
+    deployment_state: deployed (Render loom-project-registry)
+    trigger_type: http
+    disposition: retain
+    treatment: not_applicable
+    state_owner: projects/repos/machines tables
+    consumers: [onboard CLI, component-004 scan set, component-010]
+    contracts: ["REST CRUD, by-slug idempotent"]
+    evidence: ["services/project-registry/main.py:1-26"]
+    stage: decided
+    blockers: ["tenancy home question (open item 5) touches this component"]
+  - id: component-014
+    provisional_name: distribution-mechanics
+    final_name: null
+    responsibility: Package and distribute plugins, the CLI, and docs (marketplaces, PyPI, docs-site, docs-mcp)
+    source_locations: ["tapestry/.claude-plugin/marketplace.json", "tapestry/apps/docs-site/", "tapestry/services/docs-mcp/", "publish workflows"]
+    canonical_home: tapestry
+    implementation_state: complete
+    deployment_state: deployed/working
+    trigger_type: manual + CI
+    disposition: retain
+    treatment: not_applicable
+    state_owner: marketplace manifests; PyPI package
+    consumers: [all consuming repos; domain marketplaces publish through it (target state)]
+    contracts: ["marketplace name tapestry and plugin names are frozen (split dependency contract)"]
+    evidence: ["marketplace.json:12-33"]
+    stage: decided
+    blockers: []
+  - id: component-015
+    provisional_name: structure-standard
+    final_name: null
+    responsibility: The shared decomposition standard both layers use - the method, the declared structure file, and the mechanical extractor
+    source_locations: ["Lizo-RoadTown/surveyor (method)", "tapestry-patterns scripts/architecture_snapshot.py", "decomposition.json convention (lens-core + consuming repos)"]
+    canonical_home: surveyor (method); tapestry-patterns (extractor)
+    implementation_state: method=documented, extractor=complete
+    deployment_state: extractor runs in every consuming repo at SessionStart
+    trigger_type: hook + manual
+    disposition: retain
+    treatment: not_applicable
+    state_owner: each repo's decomposition.json and snapshots
+    consumers: [both layers; this procedure itself (its canonical home is pending relocation to the decomposition module)]
+    contracts: ["shape-agnostic snapshot json + diff"]
+    evidence: ["architecture_snapshot.py:1-35"]
+    stage: decided
+    blockers: []
+  - id: component-016
+    provisional_name: operator-console
+    final_name: null
+    responsibility: The visible status and evidence surface - candidate queue, decisions, signals, Grafana panel
+    source_locations: ["tapestry/apps/web-dashboard/", "tapestry CLI observatory command -> tapestry-khaki.vercel.app/observatory"]
+    canonical_home: tapestry/apps/web-dashboard
+    implementation_state: complete for candidates/decisions; NOT wired to the new event store or signals
+    deployment_state: deployed (Vercel)
+    trigger_type: human
+    disposition: retain
+    treatment: refactor (wire to component-002 reads + component-005 signals for the milestone visibility clause)
+    state_owner: none (reads others' state)
+    consumers: [Liz]
+    contracts: ["reads registry; Promote/Hold/Reject writes policy"]
+    evidence: ["apps/web-dashboard/README.md:1-20"]
+    stage: decided
+    blockers: ["depends on wires X1-X3 and read auth"]
+  - id: component-017
+    provisional_name: program-layer-standard
+    final_name: null
+    responsibility: The program layer's shared database standard (candidates -> decisions -> verified + lineage) and launcher
+    source_locations: ["lens-core docs/schema/spine.sql", "lens-core launcher (charter)"]
+    canonical_home: lens-core
+    implementation_state: charter (spine v1 is the Lens roadmap's phase B, horizon now)
+    deployment_state: none
+    trigger_type: unknown
+    disposition: defer
+    treatment: not_applicable
+    state_owner: lens-core roadmap
+    consumers: [Lens siblings; D2 interacts with component-006]
+    contracts: ["approved observatories.md boundary: project observatory sees only shared interfaces"]
+    evidence: ["lens-core docs/architecture/observatories.md (approved 2026-10-21)"]
+    stage: inventoried
+    blockers: ["owned by lens-core; Tapestry is a consumer, not the owner"]
+
+connections:
+  - id: conn-001
+    producer: component-003
+    consumer: component-002
+    contract: flat hook-event JSON (ts, hook, phase, scope_in, action, note, exit_code, elapsed_ms, session_id, tool_name, project_id)
+    identity_fields: server-side uuid5(session_id|hook_name|phase|tool_name|raw_ts); NO artifact_ref today (identity gap)
+    trigger: every hook event
+    transport: HTTPS POST /hook-events, X-Loom-Hook-Signature HMAC (LOOM_HOOK_BRIDGE_SECRET)
+    access_scope: write-only, signed
+    delivery_behavior: fire-and-forget at sender; effectively-once at DB (ON CONFLICT DO NOTHING); manual backfill via flush_hooks_jsonl.py
+    failure_handling: sender drops on failure; local hooks.jsonl retains for manual flush; flush default path misses project-local logs
+    evidence: "_observability.py:375-528; hook_event_handler.py:174-273"
+    status: BROKEN (wire X1 - LOOM_INGEST_ENDPOINT unset; push is a silent no-op)
+  - id: conn-002
+    producer: Make_Skills engine telemetry sender
+    consumer: component-002
+    contract: TelemetryBatch (Pydantic, extra=forbid)
+    identity_fields: artifact_ref "skill/<uuid>" (the ONLY producer emitting artifact_refs today)
+    trigger: skill usage batches
+    transport: HTTPS POST /skill-used, X-MakeSkills-Signature HMAC (LOOM_SKILL_BRIDGE_SECRET)
+    access_scope: write-only, signed
+    delivery_behavior: batch
+    failure_handling: none needed at receiver today because the deployed receiver verifies, logs, and DISCARDS
+    evidence: "the-loom main.py:67-70; target URL distributed by the legacy registry (promote_dispatcher.py:287-291)"
+    status: BROKEN (wire X2 - data discarded on arrival; callback repoint required)
+  - id: conn-003
+    producer: component-004
+    consumer: component-006
+    contract: POST /candidates (source_path=path_b, evidence_refs self_observation)
+    identity_fields: content hash (dedup)
+    trigger: 6-hourly cron
+    transport: HTTPS
+    access_scope: write, service-auth
+    delivery_behavior: at-least-once with content-hash dedup
+    failure_handling: GitHub token expiry silently degrades the scan to public repos
+    evidence: "self-observer candidate_client.py:42-67; first live scan 2026-09-06 (12 repos)"
+    status: WORKING
+  - id: conn-004
+    producer: component-006
+    consumer: component-008
+    contract: HMAC-signed PromotionCandidate -> /bridge/promotion-candidate; RegistrationAck back to /skill-registered
+    identity_fields: candidate id; idempotency at receiver
+    trigger: PATCH status to promotion_requested with kind=skill (auto-dispatch BackgroundTask)
+    transport: HTTPS, HMAC
+    access_scope: service-to-service, signed
+    delivery_behavior: dispatch + acknowledgement loop
+    failure_handling: only kind=skill has a handler; the other 8 kinds dead-end (ADR-0001 deferred item)
+    evidence: "the-loom main.py:234-259; promote_dispatcher.py:101-105"
+    status: WORKING (kind=skill only)
+  - id: conn-005
+    producer: component-001
+    consumer: every agent session (bidirectional)
+    contract: MCP tools + REST /v1; records with name, record_type, content, project_tags
+    identity_fields: record name
+    trigger: per session (auto-recall at SessionStart; writes during work)
+    transport: HTTPS, bearer (TAPESTRY_MEMORY_API_KEY); self-host fallback tenants
+    access_scope: per-tenant
+    delivery_behavior: synchronous
+    failure_handling: Core Directive 1 - sessions halt rather than work without memory
+    evidence: "services/agent-context/main.py:1-24; .mcp.json in every managed repo"
+    status: WORKING (known defect - WAF 403 on some content)
+  - id: conn-006
+    producer: component-005
+    consumer: observation_signals table -> component-016 (and component-009, future)
+    contract: atomic per-run snapshot INSERT; signals are evidence, never candidates
+    identity_fields: artifact_ref + window (aggregates, not event ids)
+    trigger: 6h cron (compute_signals.py --once)
+    transport: in-DB within one RLS transaction
+    access_scope: tenant-scoped (fail-closed on SELF_HOST_TENANT_ID)
+    delivery_behavior: snapshot per run
+    failure_handling: fails closed on missing tenant
+    evidence: "signals.py:83-136; compute_signals.py:26-48"
+    status: BROKEN (wire X3 - staging only, autoDeploy false; also input-starved until artifact identity exists)
+  - id: conn-007
+    producer: component-002 (read API)
+    consumer: component-004
+    contract: GET /telemetry/invocations?repo=&file_path= with the 0-vs-None distinction (never-seen -> null/known:false; seen-zero -> 0/known:true)
+    identity_fields: artifact_ref = "{repo}#{file_path}" (NO producer writes this form today)
+    trigger: during cron scan
+    transport: HTTPS (read auth REQUIRED before deploy)
+    access_scope: read, to-be-authenticated
+    delivery_behavior: synchronous query
+    failure_handling: stub returns None today, suppressing orphan verdicts
+    evidence: "read_api.py:105-216; telemetry_client.py:21-34; config.py:152-155 legacy URL default"
+    status: BROKEN (wire X4 - stub never swapped; identity form unproduced)
+  - id: conn-008
+    producer: class repos (skills + correction records)
+    consumer: component-010 -> catalog -> correction-triage -> education-plugins -> class repos
+    contract: GitHub reads; human-merged PRs out
+    identity_fields: blob sha per skill file
+    trigger: manual (operator-run)
+    transport: GitHub API + git
+    access_scope: operator token
+    delivery_behavior: on-demand full scan
+    failure_handling: daily Action skips on missing secret
+    evidence: "education-lab task inventory 2026-10-21; handoff-tapestry-education-lab-task-inventory-2026-10-21"
+    status: WORKING (manual only)
+
+decisions:
+  - id: dec-001
+    summary: Telemetry deployment, all five recommended options (repoint in place; live loom-postgres; free plan; authenticated reads day one; copy skill secret, mint hook secret)
+    reference: loom memory decision-telemetry-deployment-all-recommended-2026-10-21
+  - id: dec-002
+    summary: Six adoption requirements for the personal loop, including Act = autonomous repair workflow and identity as part of capture
+    reference: loom memory adoption-requirements-personal-loop-2026-10-21
+  - id: dec-003
+    summary: Plugins scan, observer sweeps, Tapestry never crawls; harvest retires by replacement
+    reference: loom memory design-plugins-scan-observer-sweeps-2026-10-21
+  - id: dec-004
+    summary: Two-layer agent symmetry; one anatomy, parameterized by telemetry layer and domain; package once, instantiate per layer and domain; deployment boundaries wait until the loop works
+    reference: loom memory two-level-agent-symmetry-2026-10-21
+  - id: dec-005
+    summary: DEFERRED - D2 one candidate standard (spine vs registry); classifier package home and the project-observatory rename; skill-builder canonical copy; tenancy home
+    reference: docs/architecture/2026-10-21-fleet-reality-map.md "Remaining open"
+
+authorization_reference: "loom memory: decision-telemetry-deployment-all-recommended-2026-10-21, adoption-requirements-personal-loop-2026-10-21; scope record docs/reconstruction/2026-10-21-scope.md §Authorization"

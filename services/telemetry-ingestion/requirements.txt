@@ -11,3 +11,8 @@ pydantic==2.9.2
 # the shared RLS/pool pattern stays in lockstep across services.
 psycopg[binary]==3.2.3
 psycopg-pool==3.2.4
+
+# Read-route auth (A1, 2026-10-21): RS256 JWT verification for /telemetry/*
+# reads (telemetry_auth.py). Pin matches services/agent-context so the shared
+# jose behavior stays in lockstep.
+python-jose[cryptography]==3.3.0

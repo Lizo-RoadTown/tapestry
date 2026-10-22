@@ -39,62 +39,28 @@ row, ignoring the window); `invocations` is driven by the WINDOWED SUM. The
 two are computed separately on purpose — a windowed SUM of 0 is ambiguous on
 its own, which is exactly the bug the None-stub avoided by never returning 0.
 
-## Tenant resolution (Phase 0: self-host only)
+## Tenant resolution + read auth
 
-telemetry-ingestion deliberately omits python-jose (see requirements.txt), so
-there is no JWT verification here yet. Reads resolve the tenant from the
-environment using the SAME order the write path already uses
-(skill_usage_handler._self_host_tenant_id: SELF_HOST_TENANT_ID →
-LOOM_SELF_HOST_TENANT_ID → nil) — we reuse that helper rather than duplicate
-it. If it resolves to the nil placeholder we FAIL CLOSED (503) instead of
-serving an all-zeros-tenant read that would leak nothing but silently answer
-"0 / not known" for every artifact — a false-negative that would poison the
-orphan-detection contract above.
-
-TODO(hosted-auth): when telemetry-ingestion gains hosted-multitenant read
-auth, add Bearer-JWT verification here (mirror
-services/agent-context/main.py:_resolve_tenant_for_rest — self-host fallback,
-RS256 verify, tenant_id claim) and pull in python-jose. Until then reads are
-self-host single-tenant only.
+Every read route REQUIRES authentication (adoption requirement 3; the
+2026-10-21 telemetry deployment decision): the `require_read_tenant`
+dependency in telemetry_auth.py accepts the telemetry read key
+(`TAPESTRY_TELEMETRY_READ_KEY` → self-host tenant, failing CLOSED with 503
+when that tenant is unset) or an RS256 JWT verified against
+`LOOM_JWT_PUBLIC_KEY` (tenant from the `tenant_id` claim). No anonymous
+path. The resolved tenant feeds db.tenant_transaction, so the 005 RLS
+policies scope every query exactly as before.
 """
 from __future__ import annotations
 
 import uuid
 from typing import Any, Optional
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 
 import db
-import skill_usage_handler
+import telemetry_auth
 
 router = APIRouter()
-
-
-# ---------------------------------------------------------------------------
-# Tenant resolution (self-host; fail closed)
-# ---------------------------------------------------------------------------
-
-
-def _resolve_read_tenant() -> str:
-    """Resolve the self-host tenant for a read, or fail closed.
-
-    Reuses the write path's env resolver
-    (skill_usage_handler._self_host_tenant_id, SAME order as
-    loom_auth.auth_bridge.SELF_HOST_TENANT_ID) so reads and writes always land
-    in the same tenant envelope. Returns 503 rather than reading the all-zeros
-    tenant when unset — a silent nil-tenant read answers "0 / not known" for
-    every artifact, which is a false negative the orphan-detection contract
-    cannot tolerate.
-    """
-    tenant_id = skill_usage_handler._self_host_tenant_id()
-    if not tenant_id or tenant_id == skill_usage_handler.NIL_TENANT_ID:
-        raise HTTPException(
-            503,
-            "Telemetry read tenant unresolved: set SELF_HOST_TENANT_ID (or "
-            "LOOM_SELF_HOST_TENANT_ID). Refusing to serve an all-zeros-tenant "
-            "read (would answer 0/unknown for every artifact).",
-        )
-    return tenant_id
 
 
 # ---------------------------------------------------------------------------
@@ -168,6 +134,7 @@ async def get_invocations(
     file_path: Optional[str] = Query(None),
     window_days: int = Query(30, ge=1, le=365),
     project_slug: Optional[str] = Query(None),
+    tenant_id: str = Depends(telemetry_auth.require_read_tenant),
 ) -> dict[str, Any]:
     """Invocation count for one artifact over a window, with the 0-vs-None
     existence contract. Backs the self-observer's `invocations_30d`.
@@ -178,7 +145,6 @@ async def get_invocations(
       active               → {invocations: <n>,  known: true}
     """
     ref = _normalize_artifact_ref(artifact_ref, repo, file_path)
-    tenant_id = _resolve_read_tenant()
 
     project_filter = "AND project_slug = %(project_slug)s" if project_slug else ""
     params = {
@@ -240,6 +206,7 @@ async def get_counts(
     artifact_ref: Optional[str] = Query(None),
     tool_name: Optional[str] = Query(None),
     event_kind: Optional[str] = Query(None),
+    tenant_id: str = Depends(telemetry_auth.require_read_tenant),
 ) -> dict[str, Any]:
     """Top-N invocation/error counts grouped by one dimension, summed from the
     daily rollup over a window. Rows sorted by invocations desc.
@@ -252,7 +219,6 @@ async def get_counts(
             422,
             f"group_by must be one of {sorted(_COUNTS_GROUP_BY)}; got {group_by!r}.",
         )
-    tenant_id = _resolve_read_tenant()
 
     params: dict[str, Any] = {"window_days": window_days, "limit": limit}
     filters = [
@@ -348,6 +314,7 @@ _COORDINATION_STATES = ("healthy", "degraded", "blind", "unknown")
 async def get_signals(
     window_days: int = Query(30, ge=1, le=365),
     project_slug: Optional[str] = Query(None),
+    tenant_id: str = Depends(telemetry_auth.require_read_tenant),
 ) -> dict[str, Any]:
     """Coordination-quality aggregate over a window: friction / memory-miss /
     error rates, per-coordination-state counts, and the upskill-candidate
@@ -357,7 +324,6 @@ async def get_signals(
     (`attrs @> '{...}'`, GIN-indexed) plus the typed `coordination_state`
     column, per the OTel coordination contract.
     """
-    tenant_id = _resolve_read_tenant()
     project_filter = "AND project_slug = %(project_slug)s" if project_slug else ""
     params = {"window_days": window_days, "project_slug": project_slug}
 
@@ -422,12 +388,12 @@ LIMIT %(limit)s
 async def get_episode(
     coordination_context_id: uuid.UUID,
     limit: int = Query(1000, ge=1, le=10000),
+    tenant_id: str = Depends(telemetry_auth.require_read_tenant),
 ) -> dict[str, Any]:
     """Ordered event list for one coordination episode (all events sharing a
     coordination_context_id), earliest first. UUID path type validates the id;
     the (tenant_id, coordination_context_id) index backs the lookup.
     """
-    tenant_id = _resolve_read_tenant()
     params = {"ctx_id": str(coordination_context_id), "limit": limit}
 
     async with db.tenant_transaction(tenant_id) as conn:

@@ -28,6 +28,7 @@ jobs:
           - { name: policy,                workdir: services/policy }
           - { name: project-observatory,   workdir: services/project-observatory }
           - { name: skill-making,          workdir: services/skill-making, pythonpath: python, testpath: python/skill_making/tests }
+          - { name: telemetry-ingestion,   workdir: services/telemetry-ingestion }
           - { name: agent-context,         workdir: services/agent-context, optional: true }
     steps:
       - uses: actions/checkout@v4

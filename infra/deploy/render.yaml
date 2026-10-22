@@ -319,3 +319,62 @@ services:
   #       sync: false
   #     - key: LOOM_DB_URL
   #       sync: false                 # raw connection string to the LIVE loom-postgres
+
+  # --------------------------------------------------------------------------
+  # PRODUCTION re-point of loom-telemetry-ingestion — DISABLED (repoint gate).
+  # ============================================================================
+  # A1 of docs/plans/2026-10-21-master-plan-personal-loop.md. REPOINT of the
+  # EXISTING `loom-telemetry-ingestion` Render service at the Tapestry repo
+  # (rootDir services/telemetry-ingestion), NOT a new/duplicate service. Same
+  # name → same URL → the engine's /skill-used callback and the hooks' ingest
+  # endpoint point at the same host, unchanged. Replaces the log-only legacy
+  # build with the persisting receiver + authenticated read API (components
+  # pl-002/pl-003; decision decision-telemetry-deployment-all-recommended-
+  # 2026-10-21). Reuses the LIVE loom-postgres via a sync:false LOOM_DB_URL —
+  # NO `databases:` block, NO fromDatabase (would spawn a new empty DB).
+  #
+  # ENABLE ONLY at runbook 05's repoint gate
+  # (docs/migration-cicd/runbooks/05-telemetry-ingestion.md), AFTER:
+  #   (1) tapestry migrations 005_init_telemetry.sql + 006_init_observation_
+  #       signals.sql applied to live loom-postgres, recorded in
+  #       infra/migrations/APPLIED.md with evidence,
+  #   (2) env provisioned on the service: LOOM_DB_URL (raw string, sync:false),
+  #       SELF_HOST_TENANT_ID (must equal the fleet constant below),
+  #       LOOM_SKILL_BRIDGE_SECRET copied byte-identical from the engine pair,
+  #       LOOM_HOOK_BRIDGE_SECRET freshly minted (NEW secret, hook emitter
+  #       carries the same value), TAPESTRY_TELEMETRY_READ_KEY minted
+  #       (authenticated reads are an implementation requirement — no
+  #       anonymous read path exists in this build),
+  #   (3) the-loom PR removing its loom-telemetry-ingestion block
+  #       (the-loom/render.yaml:144-164) merged — ONE-BLUEPRINT invariant,
+  #   (4) operator written authorization.
+  # ROLLBACK = re-point the Render service's repo back to the-loom (one
+  # dashboard action; the shared DB is untouched by a repoint).
+  # --------------------------------------------------------------------------
+  # - type: web
+  #   name: loom-telemetry-ingestion     # SAME name → same URL → senders unchanged
+  #   runtime: python
+  #   plan: free                         # adopted decision 3: cold-start loss window
+  #                                      # accepted; recoverable via the idempotent
+  #                                      # flush_hooks_jsonl backfill
+  #   region: oregon
+  #   branch: main
+  #   rootDir: services/telemetry-ingestion
+  #   buildCommand: pip install -r requirements.txt
+  #   startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+  #   autoDeploy: false                  # operator performs the repoint per runbook 05
+  #   healthCheckPath: /health
+  #   envVars:
+  #     - fromGroup: tapestry-shared-secrets   # LOOM_JWT_PUBLIC_KEY (JWT read auth)
+  #     - key: PYTHON_VERSION
+  #       value: "3.12"
+  #     - key: LOOM_DB_URL
+  #       sync: false                    # raw connection string to the LIVE loom-postgres
+  #     - key: LOOM_SKILL_BRIDGE_SECRET
+  #       sync: false                    # COPY byte-identical — same value as the Make_Skills engine
+  #     - key: LOOM_HOOK_BRIDGE_SECRET
+  #       sync: false                    # NEW secret, minted at provisioning; hook emitter gets the same value
+  #     - key: TAPESTRY_TELEMETRY_READ_KEY
+  #       sync: false                    # read-route shared key (telemetry-specific; NOT the memory key)
+  #     - key: SELF_HOST_TENANT_ID
+  #       value: 1d8ec1b3-d62a-5fab-9a52-eb6a3e09f1c8   # must match writer/reader/cron or reads scope to the nil tenant (fail-closed 503)

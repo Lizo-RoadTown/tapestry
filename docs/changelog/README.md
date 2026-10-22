@@ -64,6 +64,7 @@ Newest first. (Older history predating the trail lives in `import-map.md` and gi
 
 | Date | Kind | Change | PRs |
 |---|---|---|---|
+| 2026-10-21 | feature | [Telemetry reads authenticated; deploy block, runbook, migrations ledger (A1)](2026-10-21-telemetry-read-auth.md) | #184 |
 | 2026-09-07 | chore | [Docs-site accuracy pass (18 pages reconciled with code)](2026-09-07-docs-site-accuracy-pass.md) | this PR |
 | 2026-09-06 | fix | [Upskilling audit re-prompts per window, not once per session](2026-09-06-periodic-upskilling-trigger.md) | #170 |
 | 2026-09-06 | fix | [self-observer: retry registry discovery through a cold start](2026-09-06-self-observer-registry-cold-start-retry.md) | #169 |

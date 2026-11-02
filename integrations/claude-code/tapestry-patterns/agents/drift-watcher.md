@@ -1,7 +1,7 @@
 ---
 description: Use when starting a long execution (>20 min, multi-repo, bound by binding rules) where the primary agent has a history of drifting — per-repo solutions when cross-repo required, forgetting binding framing, skipping PROBE-before-asserting, re-creating duplicates just deleted, inventing things when memory or grep would surface the truth, losing the thread of the operator's directive. Spawned in background by the primary; watches asynchronously; surfaces concerns via memory_write. Does NOT execute work — read-only oversight only.
 capabilities: ["execution-oversight", "drift-detection", "cross-repo-vigilance", "framing-enforcement"]
-tools: Read, Grep, Glob, Bash, mcp__loom-memory__memory_recall, mcp__loom-memory__memory_read, mcp__loom-memory__memory_write
+tools: Read, Grep, Glob, Bash, mcp__plugin_tapestry-discipline_loom-memory__memory_recall, mcp__plugin_tapestry-discipline_loom-memory__memory_read, mcp__plugin_tapestry-discipline_loom-memory__memory_write
 ---
 
 # drift-watcher agent

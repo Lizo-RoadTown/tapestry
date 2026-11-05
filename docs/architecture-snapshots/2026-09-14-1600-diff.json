@@ -1,0 +1,144 @@
+{
+  "current_timestamp": "2026-09-14T16:00:40.246964+00:00",
+  "prev_timestamp": "2026-08-22T23:17:44.359276+00:00",
+  "current_sha": "85107bf8417d2846c439a10cf45152b40f247807",
+  "prev_sha": "47332906dde9b6f42409780d3969c63b46d44436",
+  "current_shape": "mixed",
+  "changes": {
+    "shape": [],
+    "render": [],
+    "node": [],
+    "python": [
+      "NEW manifest: `services/architecture-registry/requirements-test.txt` (2 packages)",
+      "NEW manifest: `services/architecture-registry/requirements.txt` (6 packages)",
+      "NEW manifest: `services/policy/requirements-test.txt` (2 packages)",
+      "NEW manifest: `services/policy/requirements.txt` (5 packages)",
+      "NEW manifest: `services/project-observatory/requirements-test.txt` (2 packages)",
+      "NEW manifest: `services/project-observatory/requirements.txt` (4 packages)",
+      "NEW manifest: `services/self-observer/requirements-test.txt` (2 packages)",
+      "NEW manifest: `services/self-observer/requirements.txt` (3 packages)",
+      "NEW manifest: `services/telemetry-ingestion/requirements.txt` (5 packages)"
+    ],
+    "mcp": [],
+    "auth": [],
+    "inventory": []
+  },
+  "commits": [
+    {
+      "sha": "e9a3bb39",
+      "subject": "feat(policy): migrate policy service from the-loom (Refactor, code-only) (#166)",
+      "files": [
+        "docs/migration/import-map.md",
+        "infra/deploy/render.yaml",
+        "infra/migrations/004_init_policy.sql",
+        "services/policy/README.md",
+        "services/policy/auth_bridge.py",
+        "services/policy/main.py",
+        "services/policy/models.py",
+        "services/policy/pytest.ini",
+        "services/policy/requirements-test.txt",
+        "services/policy/requirements.txt",
+        "services/policy/storage.py",
+        "services/policy/tests/__init__.py",
+        "services/policy/tests/test_policy_invariants.py"
+      ]
+    },
+    {
+      "sha": "fb86cee1",
+      "subject": "feat(architecture-registry): migrate candidate registry from the-loom (Lift/Refactor)",
+      "files": [
+        "infra/deploy/render.yaml",
+        "infra/migrations/007_init_candidates.sql",
+        "services/architecture-registry/README.md",
+        "services/architecture-registry/auth_bridge.py",
+        "services/architecture-registry/bridge_hmac.py",
+        "services/architecture-registry/bridge_models.py",
+        "services/architecture-registry/main.py",
+        "services/architecture-registry/models.py",
+        "services/architecture-registry/promote_dispatcher.py",
+        "services/architecture-registry/pytest.ini",
+        "services/architecture-registry/registration_handler.py",
+        "services/architecture-registry/requirements-test.txt",
+        "services/architecture-registry/requirements.txt",
+        "services/architecture-registry/storage.py",
+        "services/architecture-registry/tests/__init__.py",
+        "services/architecture-registry/tests/test_bridge_contract.py",
+        "services/architecture-registry/tests/test_candidate_invariants.py",
+        "services/architecture-registry/tests/test_promote_dispatcher.py",
+        "services/architecture-registry/tests/test_registration_handler.py",
+        "services/architecture-registry/tests/test_status_patch_auto_dispatch.py"
+      ]
+    },
+    {
+      "sha": "bd5f3084",
+      "subject": "self-observer: reconcile verify findings",
+      "files": [
+        "infra/deploy/render.yaml",
+        "services/self-observer/requirements.txt"
+      ]
+    },
+    {
+      "sha": "364e4563",
+      "subject": "feat(self-observer): migrate from the-loom, make scan targets registry-driven",
+      "files": [
+        "infra/deploy/render.yaml",
+        "services/self-observer/README.md",
+        "services/self-observer/candidate_client.py",
+        "services/self-observer/config.py",
+        "services/self-observer/github_scanner.py",
+        "services/self-observer/main.py",
+        "services/self-observer/memory_client.py",
+        "services/self-observer/pytest.ini",
+        "services/self-observer/registry_client.py",
+        "services/self-observer/requirements-test.txt",
+        "services/self-observer/requirements.txt",
+        "services/self-observer/signal_rules.py",
+        "services/self-observer/synthesis.py",
+        "services/self-observer/telemetry_client.py",
+        "services/self-observer/tests/__init__.py",
+        "services/self-observer/tests/conftest.py",
+        "services/self-observer/tests/test_memory_client.py",
+        "services/self-observer/tests/test_registry_client.py",
+        "services/self-observer/tests/test_scanner_local.py",
+        "services/self-observer/tests/test_signal_rules.py",
+        "services/self-observer/tests/test_synthesis.py"
+      ]
+    },
+    {
+      "sha": "aa180353",
+      "subject": "feat(observer): signal computation core (Phase 1 task 3)",
+      "files": [
+        "services/project-observatory/requirements-test.txt",
+        "services/project-observatory/signals.py",
+        "services/project-observatory/tests/__init__.py",
+        "services/project-observatory/tests/conftest.py",
+        "services/project-observatory/tests/test_signals.py"
+      ]
+    },
+    {
+      "sha": "a608cba1",
+      "subject": "feat(observer): scaffold services/project-observatory (Phase 1 task 2)",
+      "files": [
+        "services/project-observatory/README.md",
+        "services/project-observatory/config.py",
+        "services/project-observatory/db.py",
+        "services/project-observatory/main.py",
+        "services/project-observatory/requirements.txt",
+        "services/project-observatory/tenant.py"
+      ]
+    },
+    {
+      "sha": "197fc508",
+      "subject": "feat(telemetry): scaffold services/telemetry-ingestion (Phase 0 task 2)",
+      "files": [
+        "services/telemetry-ingestion/README.md",
+        "services/telemetry-ingestion/bridge_hmac.py",
+        "services/telemetry-ingestion/bridge_models.py",
+        "services/telemetry-ingestion/db.py",
+        "services/telemetry-ingestion/main.py",
+        "services/telemetry-ingestion/requirements.txt",
+        "services/telemetry-ingestion/skill_usage_handler.py"
+      ]
+    }
+  ]
+}

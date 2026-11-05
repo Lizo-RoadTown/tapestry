@@ -1,0 +1,38 @@
+{
+  "current_timestamp": "2026-10-14T18:52:38.489917+00:00",
+  "prev_timestamp": "2026-10-12T16:56:28.708763+00:00",
+  "current_sha": "2cbbee90e6377afc6525a461dc739318ae1d3531",
+  "prev_sha": "1c3cf417750d763aeeceb2206515bd9e24cc1f91",
+  "current_shape": "mixed",
+  "changes": {
+    "shape": [],
+    "render": [],
+    "node": [],
+    "python": [],
+    "mcp": [],
+    "auth": [],
+    "inventory": []
+  },
+  "commits": [
+    {
+      "sha": "64dbe3a4",
+      "subject": "fix(cli): make-plugin opt-in memory, UTF-8 hook, multi-plugin marketplace (#183)",
+      "files": [
+        "docs/changelog/2026-10-10-make-plugin-scaffold-fixes.md",
+        "packages/cli/pyproject.toml",
+        "packages/cli/tapestry_cli/make_plugin.py"
+      ]
+    },
+    {
+      "sha": "43008668",
+      "subject": "feat(cli): tapestry deploy \u00e2\u20ac\u201d create a Render service from the terminal (#175)",
+      "files": [
+        "docs/changelog/2026-09-25-tapestry-deploy-render.md",
+        "packages/cli/pyproject.toml",
+        "packages/cli/tapestry_cli/cli.py",
+        "packages/cli/tapestry_cli/deploy.py",
+        "packages/cli/tests/test_deploy.py"
+      ]
+    }
+  ]
+}

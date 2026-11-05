@@ -1,0 +1,301 @@
+{
+  "timestamp": "2026-08-22T23:15:51.562815+00:00",
+  "git_sha": "bc913101b6795736e183d17a08164c2f5656e75d",
+  "repo_root": "C:\\Users\\LizO5\\tapestry",
+  "render": {
+    "present": false
+  },
+  "node": {
+    "present": true,
+    "manifests": [
+      {
+        "path": "apps/docs-site/package.json",
+        "name": "tapestry-docs-site",
+        "version": "0.1.0",
+        "scripts": [
+          "dev",
+          "build",
+          "preview",
+          "generate-static-docs"
+        ],
+        "key_dependencies": {},
+        "total_dependency_count": 6,
+        "total_dev_dependency_count": 0
+      },
+      {
+        "path": "apps/web-dashboard/package.json",
+        "name": "loom-web-dashboard",
+        "version": "0.0.1",
+        "scripts": [
+          "dev",
+          "build",
+          "start",
+          "lint",
+          "type-check"
+        ],
+        "key_dependencies": {
+          "next": "^15.0.4",
+          "react": "^19.0.0",
+          "react-dom": "^19.0.0",
+          "tailwindcss": "3.4.14",
+          "typescript": "5.6.3"
+        },
+        "total_dependency_count": 3,
+        "total_dev_dependency_count": 9
+      },
+      {
+        "path": "integrations/vscode/package.json",
+        "name": "tapestry",
+        "version": "0.1.1",
+        "scripts": [
+          "compile",
+          "watch",
+          "package"
+        ],
+        "key_dependencies": {
+          "typescript": "^5.4.0"
+        },
+        "total_dependency_count": 0,
+        "total_dev_dependency_count": 4
+      }
+    ],
+    "total_manifest_count": 3
+  },
+  "python": {
+    "present": true,
+    "manifests": [
+      {
+        "path": "engine/agency-to-structure/python/pyproject.toml",
+        "kind": "pyproject.toml",
+        "project_name": "agency-to-structure",
+        "package_count": 2,
+        "packages": []
+      },
+      {
+        "path": "packages/auth/pyproject.toml",
+        "kind": "pyproject.toml",
+        "project_name": "loom-auth",
+        "package_count": 1,
+        "packages": []
+      },
+      {
+        "path": "packages/cli/pyproject.toml",
+        "kind": "pyproject.toml",
+        "project_name": "tapestry-cli",
+        "package_count": 0,
+        "packages": []
+      },
+      {
+        "path": "packages/sdk/python/pyproject.toml",
+        "kind": "pyproject.toml",
+        "project_name": "loom-sdk",
+        "package_count": 1,
+        "packages": []
+      },
+      {
+        "path": "services/agent-context/requirements-test.txt",
+        "kind": "requirements.txt",
+        "package_count": 4,
+        "packages": [
+          {
+            "name": "asgi-lifespan",
+            "constraint": ">=2.1,<3"
+          },
+          {
+            "name": "httpx",
+            "constraint": ">=0.27,<1"
+          },
+          {
+            "name": "pytest",
+            "constraint": ">=8.0,<9"
+          },
+          {
+            "name": "pytest-asyncio",
+            "constraint": ">=0.24"
+          }
+        ]
+      },
+      {
+        "path": "services/agent-context/requirements.txt",
+        "kind": "requirements.txt",
+        "package_count": 8,
+        "packages": [
+          {
+            "name": "fastapi",
+            "constraint": "==0.115.4"
+          },
+          {
+            "name": "fastembed",
+            "constraint": "==0.4.2"
+          },
+          {
+            "name": "mcp",
+            "constraint": ">=1.20,<2"
+          },
+          {
+            "name": "pgvector",
+            "constraint": "==0.3.6"
+          },
+          {
+            "name": "psycopg-pool",
+            "constraint": "==3.2.4"
+          },
+          {
+            "name": "psycopg[binary]",
+            "constraint": "==3.2.3"
+          },
+          {
+            "name": "python-jose[cryptography]",
+            "constraint": "==3.3.0"
+          },
+          {
+            "name": "uvicorn[standard]",
+            "constraint": "==0.32.0"
+          }
+        ]
+      },
+      {
+        "path": "services/docs-mcp/pyproject.toml",
+        "kind": "pyproject.toml",
+        "project_name": "tapestry-docs-mcp",
+        "package_count": 1,
+        "packages": []
+      },
+      {
+        "path": "services/project-registry/requirements.txt",
+        "kind": "requirements.txt",
+        "package_count": 5,
+        "packages": [
+          {
+            "name": "fastapi",
+            "constraint": "==0.115.4"
+          },
+          {
+            "name": "psycopg-pool",
+            "constraint": "==3.2.4"
+          },
+          {
+            "name": "psycopg[binary]",
+            "constraint": "==3.2.3"
+          },
+          {
+            "name": "python-jose[cryptography]",
+            "constraint": "==3.3.0"
+          },
+          {
+            "name": "uvicorn[standard]",
+            "constraint": "==0.32.0"
+          }
+        ]
+      },
+      {
+        "path": "services/skill-making/requirements.txt",
+        "kind": "requirements.txt",
+        "package_count": 7,
+        "packages": [
+          {
+            "name": "fastapi",
+            "constraint": ">=0.115"
+          },
+          {
+            "name": "httpx",
+            "constraint": ">=0.27"
+          },
+          {
+            "name": "langchain-core",
+            "constraint": ">=0.3"
+          },
+          {
+            "name": "psycopg-pool",
+            "constraint": ">=3.2"
+          },
+          {
+            "name": "psycopg[binary]",
+            "constraint": ">=3.2"
+          },
+          {
+            "name": "pydantic",
+            "constraint": ">=2"
+          },
+          {
+            "name": "uvicorn[standard]",
+            "constraint": ">=0.32"
+          }
+        ]
+      }
+    ],
+    "total_manifest_count": 9,
+    "total_package_count": 29
+  },
+  "mcp": {
+    "present": false
+  },
+  "auth": {
+    "present": false
+  },
+  "inventory": {
+    "present": true,
+    "directories": [
+      {
+        "name": "apps",
+        "file_count_depth_1": 0,
+        "subdir_count": 3
+      },
+      {
+        "name": "docs",
+        "file_count_depth_1": 1,
+        "subdir_count": 16
+      },
+      {
+        "name": "engine",
+        "file_count_depth_1": 0,
+        "subdir_count": 4
+      },
+      {
+        "name": "infra",
+        "file_count_depth_1": 0,
+        "subdir_count": 5
+      },
+      {
+        "name": "integrations",
+        "file_count_depth_1": 0,
+        "subdir_count": 6
+      },
+      {
+        "name": "packages",
+        "file_count_depth_1": 0,
+        "subdir_count": 6
+      },
+      {
+        "name": "scripts",
+        "file_count_depth_1": 7,
+        "subdir_count": 0
+      },
+      {
+        "name": "services",
+        "file_count_depth_1": 0,
+        "subdir_count": 10
+      },
+      {
+        "name": "templates",
+        "file_count_depth_1": 1,
+        "subdir_count": 4
+      }
+    ],
+    "notable_files": [
+      {
+        "name": ".project-intelligence",
+        "type": "dir"
+      },
+      {
+        "name": "CLAUDE.md",
+        "type": "file"
+      },
+      {
+        "name": "README.md",
+        "type": "file"
+      }
+    ]
+  },
+  "shape": "mixed"
+}

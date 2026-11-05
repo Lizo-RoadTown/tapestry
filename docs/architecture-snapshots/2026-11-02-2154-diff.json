@@ -1,0 +1,44 @@
+{
+  "current_timestamp": "2026-11-02T21:54:40.887415+00:00",
+  "prev_timestamp": "2026-11-02T21:34:22.660153+00:00",
+  "current_sha": "4c7f0dcb8266062e6ec5966e41f5714bb55371c0",
+  "prev_sha": "2cbbee90e6377afc6525a461dc739318ae1d3531",
+  "current_shape": "mixed",
+  "changes": {
+    "shape": [],
+    "render": [
+      "NEW: render.yaml introduced"
+    ],
+    "node": [],
+    "python": [
+      "NEW manifest: `services/telemetry-ingestion/requirements-test.txt` (3 packages)",
+      "`services/telemetry-ingestion/requirements.txt`: NEW `python-jose[cryptography]` `==3.3.0`"
+    ],
+    "mcp": [],
+    "auth": [],
+    "inventory": []
+  },
+  "commits": [
+    {
+      "sha": "284f0966",
+      "subject": "feat(telemetry): authenticated reads, gated deploy block, cutover runbook, migrations ledger (A1) (#184)",
+      "files": [
+        ".github/workflows/tests.yml",
+        "docs/changelog/2026-10-21-telemetry-read-auth.md",
+        "docs/changelog/README.md",
+        "docs/migration-cicd/runbooks/05-telemetry-ingestion.md",
+        "infra/deploy/render.yaml",
+        "infra/migrations/APPLIED.md",
+        "infra/migrations/README.md",
+        "services/telemetry-ingestion/read_api.py",
+        "services/telemetry-ingestion/requirements-test.txt",
+        "services/telemetry-ingestion/requirements.txt",
+        "services/telemetry-ingestion/telemetry_auth.py",
+        "services/telemetry-ingestion/tests/__init__.py",
+        "services/telemetry-ingestion/tests/conftest.py",
+        "services/telemetry-ingestion/tests/test_read_auth.py",
+        "services/telemetry-ingestion/tests/test_zero_vs_none_contract.py"
+      ]
+    }
+  ]
+}

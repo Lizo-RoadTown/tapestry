@@ -1,0 +1,35 @@
+{
+  "current_timestamp": "2026-08-21T22:54:45.032798+00:00",
+  "prev_timestamp": "2026-08-21T21:38:54.165497+00:00",
+  "current_sha": "bc913101b6795736e183d17a08164c2f5656e75d",
+  "prev_sha": "bad099cbf513b00905f04a6660be6f7debd02aeb",
+  "current_shape": "mixed",
+  "changes": {
+    "shape": [],
+    "render": [],
+    "node": [],
+    "python": [],
+    "mcp": [],
+    "auth": [],
+    "inventory": []
+  },
+  "commits": [
+    {
+      "sha": "cc3218de",
+      "subject": "feat(cli): tapestry init seeds a full project skeleton + drops the-loom dependency (0.1.5)",
+      "files": [
+        "packages/cli/pyproject.toml",
+        "packages/cli/tapestry_cli/init.py",
+        "packages/cli/tests/test_init_seed.py"
+      ]
+    },
+    {
+      "sha": "72c91394",
+      "subject": "release(cli): tapestry-cli 0.1.4 \u00e2\u20ac\u201d ship the memory auth header",
+      "files": [
+        "packages/cli/pyproject.toml",
+        "packages/cli/tapestry_cli/__init__.py"
+      ]
+    }
+  ]
+}
